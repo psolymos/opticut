@@ -1,0 +1,12 @@
+Package: opticut
+Type: Package
+Title: Optimal partitioning
+Version: 0.0-1
+Date: 2015-06-15
+Author: Peter Solymos
+Maintainer: Peter Solymos <solymos@ualberta.ca>
+Description: Optimal partitioning.
+URL: https://github.com/psolymos/opticut
+License: GPL-2
+LazyLoad: yes
+LazyData: true
