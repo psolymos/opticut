@@ -274,7 +274,7 @@ cbind(a=comb, b=(2:20)-1)
 ## because the used distr is different for
 ## each species by definition.
 
-source("c:/Dropbox/pkg/indval/opticut3.R")
+#source("c:/Dropbox/pkg/indval/opticut3.R")
 library(ResourceSelection)
 ## settings
 n.used <- 1000
@@ -305,12 +305,12 @@ Z1=NULL
 
 library(rioja)
 data(aber)
-strat.plot(aber, scale.percent=TRUE, y.rev=TRUE)
+strat.plot(aber$spec, scale.percent=TRUE, y.rev=TRUE)
 
-Z <- diag(1, nrow(aber), nrow(aber))
+Z <- diag(1, nrow(aber$spec), nrow(aber$spec))
 Z[lower.tri(Z)] <- 1
 Z <- Z[,-1]
-Y <- data.matrix(aber)
+Y <- data.matrix(aber$spec)
 Y <- Y[,apply(Y, 2, max) > 10]
 
 #mod <- opticut(Y ~ 1, strata=Z, dist="gaussian")

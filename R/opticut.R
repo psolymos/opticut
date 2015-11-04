@@ -104,7 +104,7 @@ dist="gaussian", linkinv, ...)
     if (is.null(Z1)) {
         XX <- as.data.frame(X)
     } else {
-        XX <- as.data.frame(cbind(X[,1], Z1, X[,-1,drop=FALSE]))
+        XX <- as.data.frame(cbind(X[,1,drop=FALSE], Z1, X[,-1,drop=FALSE]))
     }
     if (!is.function(dist)) {
         dist <- match.arg(dist,
