@@ -1,11 +1,11 @@
 ## -------------- OptiCut -----------
 
-## higher than kmax is complement, 
+## higher than kmax is complement,
 ## e.g. 100 is same as 011 for our purposes
 ## this returns a 'contrast' matrix corresponding to
 ## all possible binary partitions of the factor levels n
-allComb <- 
-function(n) 
+allComb <-
+function(n)
 {
     n <- as.integer(n)
     if (n < 2)
@@ -36,7 +36,7 @@ function(n)
 ## this takes a classification vector
 ## with at least 2 levels
 ## and returns a model matrix with binary partitions
-modelComb <- 
+modelComb <-
 function(x, collapse = " ")
 {
     f <- droplevels(as.factor(x))
@@ -45,7 +45,7 @@ function(x, collapse = " ")
     n <- max(i)
     s <- seq_len(n)
     ac <- allComb(n)
-    LABELS <- apply(ac, 2, function(z) 
+    LABELS <- apply(ac, 2, function(z)
         paste(LEVELS[as.logical(z)], collapse=collapse))
     out <- apply(ac, 2, function(z) z[match(i, s)])
     rownames(out) <- f
@@ -69,9 +69,9 @@ checkModelComb <- function(x) {
         }
     }
     out <- !any(mat)
-    attr(out, "comp") <- cbind(i=row(mat)[which(mat[upper.tri(mat)])], 
+    attr(out, "comp") <- cbind(i=row(mat)[which(mat[upper.tri(mat)])],
         j=col(mat)[which(mat[upper.tri(mat)])])
-    attr(out, "same") <- cbind(i=row(mat)[which(mat[lower.tri(mat)])], 
+    attr(out, "same") <- cbind(i=row(mat)[which(mat[lower.tri(mat)])],
         j=col(mat)[which(mat[lower.tri(mat)])])
     out
 }
@@ -94,9 +94,12 @@ x2 <- sapply(2:10, f)
 all(x1==x2)
 }
 
-## Z1 is NULL or a single column from Z
-.opticut1 <- 
-function(Y, X, Z1=NULL, 
+## Z1 is:
+## * NULL (this is used to fit model for H0, i.e. no partition)
+## * a single column from Z matrix
+## * or a matrix itself (design matrix w/o intercept)
+.opticut1 <-
+function(Y, X, Z1=NULL,
 dist="gaussian", linkinv, ...)
 {
     if (missing(linkinv))
@@ -127,7 +130,6 @@ dist="gaussian", linkinv, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
-    #        se <- sqrt(diag(vcov(mod)))
         }
         if (dist == "binomial") {
             link <- list(...)$link
@@ -137,7 +139,6 @@ dist="gaussian", linkinv, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
-    #        se <- sqrt(diag(vcov(mod)))
         }
         if (dist == "negbin") {
             require(MASS)
@@ -145,7 +146,6 @@ dist="gaussian", linkinv, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
-    #        se <- sqrt(diag(vcov(mod)))
         }
         if (dist == "beta") {
             require(betareg)
@@ -153,7 +153,6 @@ dist="gaussian", linkinv, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$link$mean$linkinv
-    #        se <- sqrt(diag(vcov(mod)))
         }
         if (dist == "zip") {
             require(pscl)
@@ -161,7 +160,6 @@ dist="gaussian", linkinv, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
-    #        se <- sqrt(diag(vcov(mod)))
         }
         if (dist == "zinb") {
             require(pscl)
@@ -169,7 +167,6 @@ dist="gaussian", linkinv, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
-    #        se <- sqrt(diag(vcov(mod)))
         }
         if (dist == "ordered") {
             if (!is.null(list(...)$method))
@@ -184,16 +181,13 @@ dist="gaussian", linkinv, ...)
                         stop("data argument should not be provided as part of ...")
                     mod <- polr(Y ~ 1, method="logistic", ...)
                 } else {
-                    mod <- polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]), 
+                    mod <- polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
                         method="logistic", ...)
                 }
                 cf <- c(0, coef(mod))
-    #            se <- rep(NA, length(cf)) # c(0, sqrt(diag(vcov(mod))))
-                #se <- sqrt(diag(vcov(mod)))[1:length(cf)]
             } else {
                 mod <- glm(Y ~ .-1, data=XX, family=binomial("logit"), ...)
                 cf <- coef(mod)
-    #            se <- sqrt(diag(vcov(mod)))
             }
             ll <- as.numeric(logLik(mod))
             linv <- binomial("logit")$linkinv
@@ -206,21 +200,17 @@ dist="gaussian", linkinv, ...)
             link <- list(...)$link
             if (is.null(link))
                 link <- "logit"
-    #        mod <- ResourceSelection:::rsf.fit(X=data.matrix(XX), Y=Y, m=m, link=link, ...)
             if (link == "log") {
                 stop("rsf (rspf with log link) not implemented")
-                #mod <- rsf(Y ~ .-1, data=XX, ...)
             } else {
                 mod <- rspf(Y ~ ., data=XX[,-1,drop=FALSE], link=link, ...)
             }
             cf <- mod$coefficients
             ll <- as.numeric(mod$loglik)
             linv <- binomial(link)$linkinv
-    #        se <- mod$std.error
         }
         if (!linkinv)
             linv <- NULL
-    #    out <- list(coef=cf, se=se, logLik=ll, linkinv=linv)
         out <- list(coef=cf, logLik=ll, linkinv=linv)
     } else {
         out <- dist(Y, XX, linkinv, ...)
@@ -228,16 +218,21 @@ dist="gaussian", linkinv, ...)
     out
 }
 
+## todo: if Z inherits from class optilevel,
+## use that as best binary partition (check no. of levels)
+
 ## Y is abundance vector
 ## X is model matrix for nuisance variables
-## Z is design matrix for binary splits
-opticut1 <- 
+## Z is design matrix for binary splits or a factor (using rankComb)
+opticut1 <-
 function(Y, X, Z, dist="gaussian", ...)
 {
-    #dist <- match.arg(dist)
     X <- data.matrix(X)
     if (is.null(rownames(X)))
         rownames(X) <- seq_len(nrow(X))
+    if (is.factor(Z)) {
+        Z <- rankComb(Y, X, Z, dist=dist, ...)
+    }
     Z <- data.matrix(Z)
     if (is.null(colnames(Z)))
         colnames(Z) <- paste0("split.", seq_len(ncol(Z)))
@@ -249,13 +244,11 @@ function(Y, X, Z, dist="gaussian", ...)
     res0 <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf <- matrix(0, N, length(res0$coef)+1)
     rownames(cf) <- colnames(Z)
-#    se <- cf
     ll <- numeric(N)
     names(ll) <- colnames(Z)
     for (i in seq_len(N)) {
         res <- .opticut1(Y, X, Z1=Z[,i], dist=dist, ...)
         cf[i,] <- res$coef
-#        se[i,] <- res$se
         ll[i] <- res$logLik
     }
     dll <- ll - max(ll)
@@ -264,29 +257,26 @@ function(Y, X, Z, dist="gaussian", ...)
     cf0 <- res0$linkinv(cf[,1L])
     cf1 <- res0$linkinv(cf[,1L] + cf[,2L])
     h <- sign(cf[,2L])
-    out <- data.frame(assoc=h, w=w, 
+    out <- data.frame(assoc=h, w=w,
         null=cfnull,
-        mu0=cf0, mu1=cf1, 
+        mu0=cf0, mu1=cf1,
         logL=ll, logLR=ll-res0$logLik)
     rownames(out) <- colnames(Z)
     attr(out, "logL_null") <- res0$logLik
-#    attr(out, "se_null") <- res0$se[1L]
-#    attr(out, "se") <- cbind(se0=se[,1L], se1=se[,2L])
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else dist
     class(out) <- c("opticut1", "data.frame")
-    out    
+    out
 }
 
 ## this is the main user interface
-opticut <- 
-function(formula, data, strata, dist="gaussian", cl=NULL, ...)
+opticut <-
+function(formula, data, strata, dist="gaussian",
+comb=c("rank", "all"), cl=NULL, ...)
 {
-    if (dist=="rspf")
-        stop("rspf is available for single species: use opticut1")
-
-    if (missing(data)) 
+    comb <- match.arg(comb)
+    if (missing(data))
         data <- parent.frame()
     mf <- match.call(expand.dots = FALSE)
     mm <- match(c("formula", "data"), names(mf), 0)
@@ -304,21 +294,26 @@ function(formula, data, strata, dist="gaussian", cl=NULL, ...)
     if (missing(strata))
         stop("strata is missing")
     if (is.null(dim(strata))) {
-        Z <- modelComb(strata)
+        if (comb == "rank")
+            Z <- droplevels(as.factor(strata)) # factor
+        if (comb == "all")
+            Z <- modelComb(strata) # matrix
     } else {
-        Z <- strata
+        Z <- as.matrix(strata) # matrix
     }
     Y <- data.matrix(Y)
+    if (dist=="rspf" && ncol(Y) > 1L)
+        stop("rspf is only available for single species in RHS")
 
     ## sequential
     if (is.null(cl)) {
         ## show prograss bar
-        if (ncol(Y) > 1 && interactive() && require(pbapply)) {
-            res <- pbapply(Y, 2, function(yy, ...) 
+        if (ncol(Y) > 1L && interactive() && require(pbapply)) {
+            res <- pbapply(Y, 2, function(yy, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
         ## do not show prograss bar
         } else {
-            res <- apply(Y, 2, function(yy, ...) 
+            res <- apply(Y, 2, function(yy, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
         }
     ## parallel
@@ -333,24 +328,24 @@ function(formula, data, strata, dist="gaussian", cl=NULL, ...)
             assign("X", X, envir=e)
             assign("Z", X, envir=e)
             clusterExport(cl, c("X","Z","dist"), envir=e)
-            res <- parApply(cl, Y, 2, function(yy, ...) 
+            res <- parApply(cl, Y, 2, function(yy, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
             clusterEvalQ(cl, rm(list=c("opticut1",".opticut1",
                 "X","Z","dist",
-                "checkModelComb","allComb","modelComb")))
+                "checkModelComb","allComb","modelComb","rankComb")))
         ## forking
         } else {
             if (cl < 2)
                 stop("cl must be at least 2 for forking")
-            res <- mclapply(1:ncol(Y), function(i, ...) 
+            res <- mclapply(1:ncol(Y), function(i, ...)
                 opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...))
         }
     }
-
     out <- list(call=match.call(),
         species=res,
         strata=Z,
-        dist=dist)
+        dist=dist,
+        comb=comb)
     class(out) <- "opticut"
     out
 }
@@ -388,19 +383,19 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
     cat("Univariate opticut results, dist = ", attr(x, "dist"),
         "\nw = ",
         format(xx[1,"w"], digits = digits),
-        "; H = ", format(attr(x, "H"), digits = digits), 
-        "; logL_null = ", format(attr(x, "logL_null"), digits = digits), 
+        "; H = ", format(attr(x, "H"), digits = digits),
+        "; logL_null = ", format(attr(x, "logL_null"), digits = digits),
         "\n\n", TXT, "\n", sep="")
     print.data.frame(xx, ...)
     DROP <- nrow(x) - nrow(xx)
     if (DROP > 0) {
-        cat(nrow(x), " binary ", 
-            ifelse(nrow(x) > 1, "splits", "split"), 
+        cat(nrow(x), " binary ",
+            ifelse(nrow(x) > 1, "splits", "split"),
             " (", DROP,
             ifelse(DROP > 1, " models", " model"),
             " not shown)\n", sep="")
     } else {
-        cat(nrow(x), "binary", 
+        cat(nrow(x), "binary",
             ifelse(nrow(x) > 1, "splits", "split"), "\n")
     }
     cat("\n")
@@ -408,9 +403,9 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
 }
 
 
-plot.opticut1 <- 
+plot.opticut1 <-
 function(x, cut=2, ylim=c(-1,1),
-ylab="Model weight * Association", xlab="Partitions", ...) 
+ylab="Model weight * Association", xlab="Partitions", ...)
 {
     w <- x$w * x$assoc
     names(w) <- rownames(x)
@@ -422,7 +417,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
     COL <- c(colorRampPalette(c("red","yellow"))(10),
         colorRampPalette(c("yellow","green"))(10))
     br <- seq(-1, 1, 0.1)
-    barplot(rep(0, length(w)), width=1, space=0, 
+    barplot(rep(0, length(w)), width=1, space=0,
         col=COL[as.integer(cut(w, breaks=seq(-1, 1, 0.1)))],
         ylim=ylim, xlab=xlab, ylab=ylab, ...)
     lines(rep(which.max(abs(w))-0.5, 2), c(-1,1), col="grey", lwd=2)
@@ -441,11 +436,12 @@ print.opticut <- function(x, digits, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
     cat("Multivariate opticut results, dist =", x$dist, "\n")
-    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
     cat(length(x$species), "species, ")
-    cat(ncol(x$strata), 
-        ifelse(ncol(x$strata) > 1, "binary splits\n", "binary split\n"))
+    nstr <- if (is.factor(x$strata))
+        nlevels(x$strata) else ncol(x$strata)
+    cat(nstr, ifelse(nstr > 1, "binary splits\n", "binary split\n"))
     cat("\n")
     invisible(x)
 }
@@ -454,7 +450,7 @@ print.summary.opticut <- function(x, digits, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
     cat("Multivariate opticut results, dist =", x$dist, "\n")
-    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"), 
+    cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
     print(format.data.frame(x$summary, digits=digits))
     cat(x$nsplit, "binary", ifelse(x$nsplit > 1, "splits\n", "split\n"))
@@ -465,7 +461,7 @@ print.summary.opticut <- function(x, digits, ...) {
 }
 
 summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
-    spp <- lapply(object$species, function(z) 
+    spp <- lapply(object$species, function(z)
         as.matrix(z[order(z$w, decreasing=TRUE)[1L],]))
     sppmat <- t(sapply(spp, function(z) as.matrix(z)))
     hab <- sapply(spp, rownames)
@@ -478,14 +474,15 @@ summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
     res <- res[res$logLR >= min(max(res$logLR), cut),,drop=FALSE]
     res$logL <- NULL
     object$summary <- res
-    object$nsplit <- ncol(object$strata)
+    object$nsplit <- if (is.factor(object$strata))
+        nlevels(object$strata) else ncol(object$strata)
     object$missing <- length(object$species) - nrow(res)
     class(object) <- c("summary.opticut")
     object
 }
 
-plot.opticut <- 
-function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...) 
+plot.opticut <-
+function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
 {
     if (!is.null(what)) {
         plot(x$species[[what]])
@@ -507,11 +504,11 @@ function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
         ww[llr < cut] <- 0
         ww <- ww[rowSums(ww) != 0,,drop=FALSE]
         op <- par(las=las)
-        plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0), 
+        plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0),
             type="n", axes=FALSE, ann=FALSE, ...)
         axis(2, at=1:ncol(ww)-0.5,
             labels=colnames(ww), tick=TRUE)
-        axis(1, at=1:nrow(ww)-0.5, 
+        axis(1, at=1:nrow(ww)-0.5,
             labels=rownames(ww), tick=TRUE)
         abline(h=1:ncol(ww)-0.5)
         abline(v=0:nrow(ww), col="lightgrey")
@@ -532,73 +529,26 @@ function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
 }
 
 
-Lc_cut <-
-function (x)
-{
-    if (is.factor(x))
-        stop("x must be numeric")
-    if (any(x < 0))
-        stop("x must be non-negative")
-    ## modeling after 'ineq'
-    o <- order(x)
-    z <- x[o]
-    p <- seq_len(length(z))/sum(length(z))
-    L <- cumsum(z)/sum(z)
-    p <- c(0, p)
-    L <- c(0, L)
-    ## approximating 1st derivative for Youden index
-    J <- p - L
-    ## Gini index, after 'ineq'
-    G <- sum(z * 1:length(z))
-    G <- 2 * G/(length(z) * sum(z))
-    G <- G - 1 - (1/length(z))
-    ##
-    m1 <- which.max(J)
-
-    list(
-        ## threshold (x corresponding to L)
-        x=unname(z[m1]), 
-        ## cumulative y
-        L=unname(L[m1+1]), 
-        ## cumulative x
-        p=unname(p[m1+1]), 
-        ## asymmetry index
-        S=unname(L[m1+1] + p[m1+1]), 
-        ## Gini index
-        G=G, 
-        ## Youden index
-        J=max(J))
-}
-
-lorenzComb <- 
-function(x, g, cut=0.5)
-{
-    Freq <- table(g=as.factor(g), 
-        lc=ifelse(x >= Lc_cut(x)$x, 1L, 0L))
-    Prob <- Freq[,"1"] / rowSums(Freq)
-    ## high valued classes
-    Hi <- names(Prob)[Prob >= cut]
-    structure(ifelse(g %in% Hi, 1L, 0L),  x1=Hi)
-}
 
 rankComb <-
-function(Y, X, g, dist="gaussian", ...) 
+function(Y, X, Z, dist="gaussian", ...)
 {
-    g <- as.factor(x0)
-    Z <- model.matrix(~g)
-    m <- .opticut1(Y, X, Z1=Z[,-1,drop=FALSE], 
+    if (!is.factor(Z))
+        stop("Z must be a factor")
+    Z0 <- model.matrix(~Z)
+    m <- .opticut1(Y, X, Z1=Z0[,-1,drop=FALSE],
         linkinv=TRUE, dist=dist, ...)
-    x <- rank(-c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z)]))
-    names(x) <- levels(g)
+    x <- rank(-c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)]))
+    names(x) <- levels(Z)
     o <- x[order(x)]
     ## all levels is H0, not needed (thus -1)
-    Z1 <- matrix(0, length(g), nlevels(g)-1)
-    colnames(Z1) <- 1:(nlevels(g)-1)
+    out <- matrix(0, length(Z), nlevels(Z)-1)
+    colnames(out) <- 1:(nlevels(Z)-1)
     for (i in seq_len(length(o)-1)) {
-        Z1[g %in% names(o)[1:i], i] <- 1
-        colnames(Z1)[i] <- paste(names(o)[1:i], collapse=" ")
+        out[Z %in% names(o)[1:i], i] <- 1
+        colnames(out)[i] <- paste(names(o)[1:i], collapse=" ")
     }
-    Z1
+    out
 }
 
 
