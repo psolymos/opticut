@@ -36,6 +36,30 @@ Into SO?
 Text here...
 
 
+# Examples
+
+`allComb` returns a 'contrast' matrix corresponding to
+all possible binary partitions of the factor with `n` levels.
+Complements are not counted twice, i.e.
+(0,0,1,1) is equivalent to (1,1,0,0).
+
+```{r, echo=FALSE}
+source("~/repos/opticut/R/opticut.R")
+```
+```{r}
+allComb(n = 4)
+```
+
+`modelComb` this takes a classification vector with at least 2 levels
+and returns a model matrix with binary partitions.
+
+```{r}
+(f <- rep(LETTERS[1:4], each=2))
+modelComb(f)
+```
+
+# Old
+
 ```{r, eval=FALSE}
 source("~/repos/opticut/R/opticut.R")
 
