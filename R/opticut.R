@@ -4,15 +4,13 @@
 ## e.g. 100 is same as 011 for our purposes
 ## this returns a 'contrast' matrix corresponding to
 ## all possible binary partitions of the factor levels n
-allComb <-
+nComb <-
 function(n)
 {
     n <- as.integer(n)
     if (n < 2)
         stop("n must be at least 2")
     kmax <- floor(n/2)
-    if (kmax > n)
-        stop("k must not be higher than n")
     s <- seq_len(n)
     clist <- lapply(seq_len(kmax), function(k) combn(n, k))
     ## if kmax is even, take care of cases like
@@ -36,7 +34,7 @@ function(n)
 ## this takes a classification vector
 ## with at least 2 levels
 ## and returns a model matrix with binary partitions
-modelComb <-
+allComb <-
 function(x, collapse = " ")
 {
     f <- droplevels(as.factor(x))
@@ -44,7 +42,7 @@ function(x, collapse = " ")
     i <- as.integer(f)
     n <- max(i)
     s <- seq_len(n)
-    ac <- allComb(n)
+    ac <- nComb(n)
     LABELS <- apply(ac, 2, function(z)
         paste(LEVELS[as.logical(z)], collapse=collapse))
     out <- apply(ac, 2, function(z) z[match(i, s)])
@@ -55,7 +53,7 @@ function(x, collapse = " ")
 
 ## this checks a design matrix for complementary rows
 ## e.g. 1100 vs 0011
-checkModelComb <- function(x) {
+checkComb <- function(x) {
     n <- NCOL(x)
     if (n < 2)
         return(TRUE)
@@ -69,29 +67,80 @@ checkModelComb <- function(x) {
         }
     }
     out <- !any(mat)
-    attr(out, "comp") <- cbind(i=row(mat)[which(mat[upper.tri(mat)])],
-        j=col(mat)[which(mat[upper.tri(mat)])])
-    attr(out, "same") <- cbind(i=row(mat)[which(mat[lower.tri(mat)])],
-        j=col(mat)[which(mat[lower.tri(mat)])])
+    attr(out, "comp") <- cbind(
+        i=row(mat)[upper.tri(row(mat))][which(mat[upper.tri(mat)])],
+        j=col(mat)[upper.tri(col(mat))][which(mat[upper.tri(mat)])])
+    attr(out, "same") <- cbind(
+        i=row(mat)[lower.tri(row(mat))][which(mat[lower.tri(mat)])],
+        j=col(mat)[lower.tri(col(mat))][which(mat[lower.tri(mat)])])
     out
 }
 
 if (FALSE) {
-allComb(2)
-allComb(3)
-allComb(4)
+nComb(2)
+nComb(3)
+nComb(4)
 x <- sample(LETTERS[1:4], 10, TRUE)
-modelComb(x, "_")
+allComb(x, "_")
 x <- sample(LETTERS[1:5], 100, TRUE)
-modelComb(x, "_")
-checkModelComb(modelComb(x, "_"))
+allComb(x, "_")
+checkComb(allComb(x, "_"))
 ## check if this is working OK
 f <- function(n) {
     sum(sapply(1:(n-1), function(z) choose(n, z)))
 }
-x1 <- sapply(2:10, function(z) ncol(allComb(z))*2)
+x1 <- sapply(2:10, function(z) ncol(nComb(z))*2)
 x2 <- sapply(2:10, f)
 all(x1==x2)
+}
+
+## x is a named vector of ranks, referring to factor levels
+## in some classification vector, 1=highest abundance.
+oComb <-
+function(x, collapse = " ")
+{
+    if (length(x) < 2L)
+        stop("length of x must be >1")
+    if (is.null(names(x)))
+        names(x) <- seq_len(length(x))
+    o <- x[order(x, decreasing = FALSE)]
+    out <- diag(1L, length(o))
+    out[upper.tri(out)] <- 1L
+    out <- out[,-ncol(out)]
+    rownames(out) <- names(o)
+    colnames(out) <- seq_len(ncol(out))
+    for (i in seq_len(ncol(out))) {
+        colnames(out)[i] <- paste(names(x)[names(x) %in%
+            rownames(out)[out[,i] > 0]],
+            collapse = collapse)
+    }
+    #out <- 1L - out
+    attr(out, "rank") <- o
+    out
+}
+
+rankComb <-
+function(Y, X, Z, dist="gaussian", collapse = " ", ...)
+{
+    if (!is.factor(Z))
+        stop("Z must be a factor")
+    Z0 <- model.matrix(~Z)
+    m <- .opticut1(Y, X, Z1=Z0[,-1,drop=FALSE],
+        linkinv=TRUE, dist=dist, ...)
+    x <- rank(-c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)]))
+    names(x) <- levels(Z)
+    oc <- oComb(x, collapse = collapse)
+    oc[match(Z, rownames(oc)),]
+
+#    o <- x[order(x)]
+    ## all levels is H0, not needed (thus -1)
+#    out <- matrix(0, length(Z), nlevels(Z)-1)
+#    colnames(out) <- 1:(nlevels(Z)-1)
+#    for (i in seq_len(length(o)-1)) {
+#        out[Z %in% names(o)[1:i], i] <- 1
+#        colnames(out)[i] <- paste(names(o)[1:i], collapse=" ")
+#    }
+#    out
 }
 
 ## Z1 is:
@@ -236,7 +285,7 @@ function(Y, X, Z, dist="gaussian", ...)
     Z <- data.matrix(Z)
     if (is.null(colnames(Z)))
         colnames(Z) <- paste0("split.", seq_len(ncol(Z)))
-    if (!checkModelComb(Z))
+    if (!checkComb(Z))
         stop("complementary design variables found")
     if (length(unique(c(length(Y), nrow(X), nrow(Z)))) > 1)
         stop("dimension mismatch")
@@ -257,10 +306,11 @@ function(Y, X, Z, dist="gaussian", ...)
     cf0 <- res0$linkinv(cf[,1L])
     cf1 <- res0$linkinv(cf[,1L] + cf[,2L])
     h <- sign(cf[,2L])
-    out <- data.frame(assoc=h, w=w,
+    I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+    out <- data.frame(assoc=h, I=I,
         null=cfnull,
         mu0=cf0, mu1=cf1,
-        logL=ll, logLR=ll-res0$logLik)
+        logL=ll, logLR=ll-res0$logLik, w=w)
     rownames(out) <- colnames(Z)
     attr(out, "logL_null") <- res0$logLik
     attr(out, "H") <- sum(w^2)
@@ -297,7 +347,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         if (comb == "rank")
             Z <- droplevels(as.factor(strata)) # factor
         if (comb == "all")
-            Z <- modelComb(strata) # matrix
+            Z <- allComb(strata) # matrix
     } else {
         Z <- as.matrix(strata) # matrix
     }
@@ -322,7 +372,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         ## snow type cluster
         if (inherits(cl, "cluster")) {
             clusterExport(cl, c("opticut1",".opticut1",
-                "checkModelComb","allComb","modelComb"))
+                "checkComb","allComb","nComb"))
             e <- new.env()
             assign("dist", dist, envir=e)
             assign("X", X, envir=e)
@@ -332,7 +382,7 @@ comb=c("rank", "all"), cl=NULL, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
             clusterEvalQ(cl, rm(list=c("opticut1",".opticut1",
                 "X","Z","dist",
-                "checkModelComb","allComb","modelComb","rankComb")))
+                "checkComb","allComb","nComb","rankComb")))
         ## forking
         } else {
             if (cl < 2)
@@ -351,10 +401,10 @@ comb=c("rank", "all"), cl=NULL, ...)
 }
 
 parseAssoc <- function(x) {
-    LRc <- rep(1, nrow(x))
-    LRc[x$logLR > 2] <- 2
-    LRc[x$logLR > 8] <- 3
-    Sign <- c("-","0","+")[x$assoc+2]
+    LRc <- rep(1L, nrow(x))
+    LRc[x$logLR > 2] <- 2L
+    LRc[x$logLR > 8] <- 3L
+    Sign <- c("-","0","+")[x$assoc + 2L]
     Assoc <- character(nrow(x))
     for (i in 1:length(Assoc))
         Assoc[i] <- paste0(rep(Sign[i], LRc[i]), collapse="")
@@ -371,7 +421,7 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
     xx$assoc <- parseAssoc(xx)
     if (any(xx$logLR >= cut)) {
         SHOW <- which(xx$logLR >= cut)
-        tmp <- if (length(SHOW) > 1)
+        tmp <- if (length(SHOW) > 1L)
             "Best supported models" else "Best supported model"
         TXT <- paste0(tmp, " with logLR >= ",
             format(cut, digits = digits), ":")
@@ -381,8 +431,8 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
     }
     xx <- xx[SHOW,,drop=FALSE]
     cat("Univariate opticut results, dist = ", attr(x, "dist"),
-        "\nw = ",
-        format(xx[1,"w"], digits = digits),
+        "\nI = ", format(xx[1L,"I"], digits = digits),
+        "; w = ", format(xx[1L,"w"], digits = digits),
         "; H = ", format(attr(x, "H"), digits = digits),
         "; logL_null = ", format(attr(x, "logL_null"), digits = digits),
         "\n\n", TXT, "\n", sep="")
@@ -529,26 +579,5 @@ function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
 }
 
 
-
-rankComb <-
-function(Y, X, Z, dist="gaussian", ...)
-{
-    if (!is.factor(Z))
-        stop("Z must be a factor")
-    Z0 <- model.matrix(~Z)
-    m <- .opticut1(Y, X, Z1=Z0[,-1,drop=FALSE],
-        linkinv=TRUE, dist=dist, ...)
-    x <- rank(-c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)]))
-    names(x) <- levels(Z)
-    o <- x[order(x)]
-    ## all levels is H0, not needed (thus -1)
-    out <- matrix(0, length(Z), nlevels(Z)-1)
-    colnames(out) <- 1:(nlevels(Z)-1)
-    for (i in seq_len(length(o)-1)) {
-        out[Z %in% names(o)[1:i], i] <- 1
-        colnames(out)[i] <- paste(names(o)[1:i], collapse=" ")
-    }
-    out
-}
 
 

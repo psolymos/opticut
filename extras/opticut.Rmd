@@ -38,27 +38,67 @@ Text here...
 
 # Examples
 
-`allComb` returns a 'contrast' matrix corresponding to
+## Finding all combinations
+
+Finding all combinations does not require a model or observed responses.
+It only takes a classification vector with $n > 1$ partitions.
+
+`nComb` returns a 'contrast' matrix corresponding to
 all possible binary partitions of the factor with `n` levels.
 Complements are not counted twice, i.e.
 (0,0,1,1) is equivalent to (1,1,0,0).
+The number of such possible combinations is $2^{n-1} - 1$.
 
 ```{r, echo=FALSE}
 source("~/repos/opticut/R/opticut.R")
 ```
 ```{r}
-allComb(n = 4)
+nComb(n = 2)
+nComb(n = 3)
+nComb(n = 4)
 ```
 
-`modelComb` this takes a classification vector with at least 2 levels
-and returns a model matrix with binary partitions.
+`allComb` this takes a classification vector with at least 2 levels
+and returns a model matrix with binary partitions. `checkComb`
+checks if combinations are unique and non-complementary
+(misfits are returned as attributes).
 
 ```{r}
 (f <- rep(LETTERS[1:4], each=2))
-modelComb(f)
+(mc <- allComb(f, collapse = "_"))
+checkComb(mc)
+mc2 <- cbind(z = 1 - mc[,1], mc[,c(1:ncol(mc), 1)])
+colnames(mc2) <- 1:ncol(mc2)
+mc2
+checkComb(mc2)
 ```
 
+
+
 # Old
+
+## Examples
+
+* 3 fake species from Legendre
+  - discuss differences
+  - explain components of the analysis
+  - lay out hypothesis in evidential terms (Ecology p-value section?)
+* Dolina data set, as in Com Ecol
+  - see effect of confounding: split, effect size, w, LR
+* Power calculation with confounding
+
+## Challenges
+
+* Explain as model selection, not p-value / testing
+* Provide general hierarchical description of the problem & model
+  (w, penalty involved)
+* Dune: releve data, ordinal ?
+* Mites, dolina, EA's bugs: count (can be 0/1)
+
+## Extensions
+
+* presence only data
+* detection error (N-mix, etc, offsets)
 
 ```{r, eval=FALSE}
 source("~/repos/opticut/R/opticut.R")
@@ -80,13 +120,15 @@ boxplot(lam3~x0)
 Y3 <- rpois(n, lam3)
 Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
 X <- model.matrix(~x2)
-Z <- modelComb(x0)
+Z <- allComb(x0)
 
 opticut1(Y1, X, Z, dist="poisson")
+opticut1(Y1, X, as.factor(x0), dist="poisson")
 opticut1(Y2, X, Z, dist="poisson")
-(mod <- opticut(Y ~ x2, strata=x0, dist="poisson"))
+opticut1(Y2, X, as.factor(x0), dist="poisson")
+summary(mod <- opticut(Y ~ x2, strata=x0, dist="poisson"))
 ## comparing rank based vs all combinations
-r1 <- opticut(Y ~ x2, strata=Z[,1:4], dist="poisson", comb="rank")
+r1 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 r2 <- opticut(Y ~ x2, strata=Z[,1:4], dist="poisson", comb="all")
 
 ## dist as function: lme4
@@ -166,7 +208,6 @@ plot(mod0)
 
 system.time(aa <- opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", comb="rank"))
 system.time(bb <- opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", comb="all"))
-identical(aa, bb)
 
 ## sequential
 system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson"))
