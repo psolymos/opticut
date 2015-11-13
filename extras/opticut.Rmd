@@ -65,7 +65,7 @@ The indicator value ($I$) for each candidate partition can be calculated
 based on expected values using the inverse link function as 
 $\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and 
 $\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
-$I = 1 - \frac{min(\mu_{0}, \mu_{1})}{max(\mu_{0}, \mu_{1})}$.
+$I = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
 
 ## Finding all possible binary partitions
 
@@ -345,6 +345,24 @@ horizons for species:
 ```{r}
 library(rioja)
 data(aber)
-strat.plot(aber$spec, scale.percent=TRUE, y.rev=TRUE)
+strat.plot(aber$spec, aber$ages$Depth, scale.percent=TRUE, y.rev=TRUE)
+
+z <- as.factor(cut(aber$ages$Depth, 5))
+ab <- as.matrix(aber$spec) / 100
+ab[ab == 0] <- 0.0001
+ab <- ab[,apply(ab, 2, max) > 0.05]
+
+a <- opticut(ab ~ 1, strata=z, comb="rank", dist="beta")
+summary(a)
+bp <- bestpart(a)
+
+op <- par(mfrow=c(3,4), mar=c(2,2,1,1))
+for (i in 1:12) {
+    plot(ab[,i], aber$ages$Depth, type="l", ann=FALSE)
+    segments(x0=rep(0, nrow(ab)), y0=aber$ages$Depth, x1=ab[,i], 
+        col=ifelse(bp[,i] > 0, 2, 1))
+    title(main=colnames(ab)[i])
+}
+par(op)
 ```
 

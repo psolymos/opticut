@@ -346,6 +346,7 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (is.null(dim(strata))) {
         if (comb == "rank")
             Z <- droplevels(as.factor(strata)) # factor
+            levels(Z) <- gsub(" +", "", levels(Z))
         if (comb == "all")
             Z <- allComb(strata) # matrix
     } else {
@@ -579,6 +580,26 @@ function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
     }
 }
 
+bestpart <- function (object, ...) 
+    UseMethod("bestpart")
 
-
-
+bestpart.opticut <- 
+function (object, ...)
+{
+    out <- list()
+    if (object$comb == "rank") {
+        for (spp in names(object$species)) {
+            i <- rownames(object$species[[spp]])[which.max(object$species[[spp]]$logLR)]
+            out[[spp]] <- ifelse(object$strata %in% strsplit(i, " ")[[1L]], 1L, 0L)
+        }
+        out <- do.call(cbind, out)
+        rownames(out) <- object$strata
+    } else {
+        for (spp in names(object$species)) {
+            i <- rownames(object$species[[spp]])[which.max(object$species[[spp]]$logLR)]
+            out[[spp]] <- object$strata[,i]
+        }
+        out <- do.call(cbind, out)
+    }
+    out
+}
