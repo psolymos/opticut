@@ -395,6 +395,8 @@ comb=c("rank", "all"), cl=NULL, ...)
     }
     out <- list(call=match.call(),
         species=res,
+        X=X,
+        Y=Y,
         strata=Z,
         dist=dist,
         comb=comb)

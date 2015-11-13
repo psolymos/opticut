@@ -337,10 +337,7 @@ Z <- allComb(as.integer(dd$x0))
 (mod <- opticut1(Y, X, dd$x0, dist="rspf", m=0, B=0))
 ```
 
-## Todo
-
-Check pollen stratigraphy data to identify
-horizons for species:
+## Stratigraphy example
 
 ```{r}
 library(rioja)
@@ -365,4 +362,12 @@ for (i in 1:12) {
 }
 par(op)
 ```
+
+## Todo
+
+Bootstrap based partitioning uncertainty: find best partition with bootstrap:
+parametric or non-parametric?
+
+Bootstrap based CI on I: use best partition to get CI (parametric or non-parametric?)
+
 
