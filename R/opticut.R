@@ -4,23 +4,23 @@
 ## e.g. 100 is same as 011 for our purposes
 ## this returns a 'contrast' matrix corresponding to
 ## all possible binary partitions of the factor levels n
-nComb <-
-function(n)
+kComb <-
+function(k)
 {
-    n <- as.integer(n)
-    if (n < 2)
-        stop("n must be at least 2")
-    kmax <- floor(n/2)
-    s <- seq_len(n)
-    clist <- lapply(seq_len(kmax), function(k) combn(n, k))
+    k <- as.integer(k)
+    if (k < 2)
+        stop("k must be at least 2")
+    kmax <- floor(k/2)
+    s <- seq_len(k)
+    clist <- lapply(seq_len(kmax), function(kk) combn(k, kk))
     ## if kmax is even, take care of cases like
     ## 1100 and 0011
-    if (kmax == n/2) {
+    if (kmax == k/2) {
         COL <- seq_len(ncol(clist[[kmax]])/2)
         clist[[kmax]] <- clist[[kmax]][,COL, drop=FALSE]
     }
     m <- sapply(clist, ncol)
-    out <- matrix(0L, n, sum(m))
+    out <- matrix(0L, k, sum(m))
     z <- 1
     for (i in seq_len(length(clist))) {
         for (j in seq_len(m[i])) {
@@ -42,7 +42,7 @@ function(x, collapse = " ")
     i <- as.integer(f)
     n <- max(i)
     s <- seq_len(n)
-    ac <- nComb(n)
+    ac <- kComb(n)
     LABELS <- apply(ac, 2, function(z)
         paste(LEVELS[as.logical(z)], collapse=collapse))
     out <- apply(ac, 2, function(z) z[match(i, s)])
@@ -77,9 +77,9 @@ checkComb <- function(x) {
 }
 
 if (FALSE) {
-nComb(2)
-nComb(3)
-nComb(4)
+kComb(2)
+kComb(3)
+kComb(4)
 x <- sample(LETTERS[1:4], 10, TRUE)
 allComb(x, "_")
 x <- sample(LETTERS[1:5], 100, TRUE)
@@ -89,7 +89,7 @@ checkComb(allComb(x, "_"))
 f <- function(n) {
     sum(sapply(1:(n-1), function(z) choose(n, z)))
 }
-x1 <- sapply(2:10, function(z) ncol(nComb(z))*2)
+x1 <- sapply(2:10, function(z) ncol(kComb(z))*2)
 x2 <- sapply(2:10, f)
 all(x1==x2)
 }
@@ -350,6 +350,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             Z <- allComb(strata) # matrix
     } else {
         Z <- as.matrix(strata) # matrix
+        comb <- NA # user supplied matrix, not checked
     }
     Y <- data.matrix(Y)
     if (dist=="rspf" && ncol(Y) > 1L)
@@ -372,7 +373,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         ## snow type cluster
         if (inherits(cl, "cluster")) {
             clusterExport(cl, c("opticut1",".opticut1",
-                "checkComb","allComb","nComb"))
+                "checkComb","allComb","kComb","rankComb","oComb"))
             e <- new.env()
             assign("dist", dist, envir=e)
             assign("X", X, envir=e)
@@ -382,7 +383,7 @@ comb=c("rank", "all"), cl=NULL, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
             clusterEvalQ(cl, rm(list=c("opticut1",".opticut1",
                 "X","Z","dist",
-                "checkComb","allComb","nComb","rankComb")))
+                "checkComb","allComb","kComb","rankComb","oComb")))
         ## forking
         } else {
             if (cl < 2)
@@ -436,7 +437,7 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
         "; H = ", format(attr(x, "H"), digits = digits),
         "; logL_null = ", format(attr(x, "logL_null"), digits = digits),
         "\n\n", TXT, "\n", sep="")
-    print.data.frame(xx, ...)
+    print.data.frame(xx, digits=digits, ...)
     DROP <- nrow(x) - nrow(xx)
     if (DROP > 0) {
         cat(nrow(x), " binary ",

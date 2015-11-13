@@ -1,15 +1,15 @@
 ---
-title: "opticut: likelihood based optimal partitioning for indicator species analysis"
+title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
 author: "Peter Solymos et al."
 date: "November 4, 2015"
-output: html_document
+output: pdf_document
 ---
 
 # Introduction
 
 General problem: find where species abundances are high vs low, leads to optimal classification of low vs high abundance strata.
 
-Previous attempts: historical review, highlighting IndVal
+Previous attempts: historical review (?), highlighting IndVal
 
 Issues:
 
@@ -25,37 +25,67 @@ Goals:
 
 # Methods
 
-Describe math...
+## The quest for optimal binary partitioning
 
-# Examples
+$Y_{i}$'s are observations for a single species
+from $n$ locations ($i = 1, ..., n$).
+$g_{i}$'s are known discrete descriptors of the locations with
+$k$ levels ($k > 2$). $z^{(m)}$ is a binary reclassification of $g$ taking
+values (0, 1). The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification out of the total $M = 2^{k-1} - 1$ total combinations (excluding complements). See below for options for defining binary partitions.
+There can also be other site descriptors denoted as $x_{ij}$
+taking discrete or continuous values ($j = 1, ..., p$; number of predictors).
 
-Into SO?
+A suitable parametric model describe the
+relationship between the observations and the site decriptors
+through the probability density function $P(Y = y | z, x, \theta)$ 
+where $\theta$ is the vector of model parameters 
+($\beta_{0}, \beta_{1}, \alpha_{1}, ..., \alpha_{p}$).
+The choice of the parametric model depends on the nature of the 
+observations. It can be Gaussian, Binomial, Poisson,
+ordinal, Beta regression, or zero-inflated models, with a 
+suitable link function ($f$) for the mean:
+$f(\eta_{i}) = \beta_{0}^{(m)} + \beta_{1}^{(m)} z_{i}^{(m)} + \sum_{j=1}^{p} \alpha_{j}^{(m)} x_{ij}$.
 
-# Discussion
+$\hat{\theta}^{(m)}$ is the maximum likelihood estimate (MLE) of the 
+model parameters given the data and classification $m$, 
+with corresponding log-likelihood value $l(\hat{\theta}^{(m)}; y)$.
+Finding MLEs for all $M$ candidate binary partitions
+leads to a set of log-likelihood values. One can compare
+the log-likelihood values to a null model (no binary partition is necessar)
+where $\beta_{1} = 0$ leading to the MLE $\hat{\theta}^{(0)}$
+and corresponding log-likelihood value for the null model: 
+$l(\hat{\theta}^{(0)}; y)$.
 
-Text here...
+The log-likelihood ratio for each cadidate partition can be
+calculated as $l(\hat{\theta}^{(m)}; y) - l(\hat{\theta}^{(0)}; y)$.
+The best supported binary partition is
+the model with the highest log-likelihood ratio value.
 
+The indicator value ($I$) for each candidate partition can be calculated
+based on expected values using the inverse link function as 
+$\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and 
+$\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
+$I = 1 - \frac{min(\mu_{0}, \mu_{1})}{max(\mu_{0}, \mu_{1})}$.
 
-# Examples
-
-## Finding all combinations
+## Finding all possible binary partitions
 
 Finding all combinations does not require a model or observed responses.
-It only takes a classification vector with $n > 1$ partitions.
+It only takes a classification vector with $k > 1$ partitions.
 
-`nComb` returns a 'contrast' matrix corresponding to
+`kComb` returns a 'contrast' matrix corresponding to
 all possible binary partitions of the factor with `n` levels.
 Complements are not counted twice, i.e.
 (0,0,1,1) is equivalent to (1,1,0,0).
-The number of such possible combinations is $2^{n-1} - 1$.
+The number of such possible combinations is $2^{k-1} - 1$.
 
 ```{r, echo=FALSE}
 source("~/repos/opticut/R/opticut.R")
+options("digits"=7)
 ```
 ```{r}
-nComb(n = 2)
-nComb(n = 3)
-nComb(n = 4)
+kComb(k = 2)
+kComb(k = 3)
+kComb(k = 4)
 ```
 
 `allComb` this takes a classification vector with at least 2 levels
@@ -73,36 +103,9 @@ mc2
 checkComb(mc2)
 ```
 
+## Poisson count model example
 
-
-# Old
-
-## Examples
-
-* 3 fake species from Legendre
-  - discuss differences
-  - explain components of the analysis
-  - lay out hypothesis in evidential terms (Ecology p-value section?)
-* Dolina data set, as in Com Ecol
-  - see effect of confounding: split, effect size, w, LR
-* Power calculation with confounding
-
-## Challenges
-
-* Explain as model selection, not p-value / testing
-* Provide general hierarchical description of the problem & model
-  (w, penalty involved)
-* Dune: releve data, ordinal ?
-* Mites, dolina, EA's bugs: count (can be 0/1)
-
-## Extensions
-
-* presence only data
-* detection error (N-mix, etc, offsets)
-
-```{r, eval=FALSE}
-source("~/repos/opticut/R/opticut.R")
-
+```{r}
 set.seed(1234)
 n <- 200
 x0 <- sample(1:4, n, TRUE)
@@ -121,17 +124,69 @@ Y3 <- rpois(n, lam3)
 Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
 X <- model.matrix(~x2)
 Z <- allComb(x0)
-
 opticut1(Y1, X, Z, dist="poisson")
-opticut1(Y1, X, as.factor(x0), dist="poisson")
 opticut1(Y2, X, Z, dist="poisson")
-opticut1(Y2, X, as.factor(x0), dist="poisson")
-summary(mod <- opticut(Y ~ x2, strata=x0, dist="poisson"))
-## comparing rank based vs all combinations
-r1 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
-r2 <- opticut(Y ~ x2, strata=Z[,1:4], dist="poisson", comb="all")
+opticut1(Y3, X, Z, dist="poisson")
+summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
+```
 
-## dist as function: lme4
+Describe here what is what in the output.
+
+## Not using all possible partitions
+
+Blindly fitting a model to all possible partitions is wasteful
+use of resources. Instead, one can rank the $k$ partitions
+based on expected response values ($\mu_{1}, ..., \mu_{k}$)
+and only explore $k-1$ partitions:
+
+```{r}
+oComb(1:4)
+```
+
+`oComb` return the 'contrast' matrix based on the rank vector as input.
+Rank 1 means highest expected value among the partitions.
+
+The function `rankComb` fits the model with multiple ($k > 2$) factor levels
+to find out the ranking, and returns a binary classification matrix
+similarly to `allComb`:
+
+```{r}
+head(rankComb(Y1, Z, as.factor(x0)))
+```
+
+Note that the ranking varies from species to species, thus
+it is not possible to supply the resulting matrix as
+`strata` definition:
+
+```{r}
+summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
+```
+
+There is an overhead of fitting the model to calculate the ranking.
+But computing efficiencies can be still high compared to all partitions
+when the number of levels ($k$) is high.
+
+## Distributions
+
+Currently available distributions:
+
+* `"gaussian"`: real valued continuous observations, e.g. biomass,
+* `"poisson"`: Poisson count data,
+* `"binomial"`: presence-absence type data,
+* `"negbin"`: overdispersed Negative Binomial count data,
+* `"beta"`: continuous response in the unit interval, e.g. percent cover,
+* `"zip"`: zero-inflated Poisson counts,
+* `"zinb"`: zero-inflated Negative Binomial counts,
+* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover, 
+* `"rspf"`: presence-only data using resource selection probability functions.
+
+The `distr` argument accepts a function, so other parametric models
+can be supplied which are avoided due to package dependencies. 
+It is possible to supply occupancy or N-mixture model
+to account for detection error in the observations.
+Here is an example using mixed models and the package `lme4`:
+
+```{r}
 library(lme4)
 set.seed(1234)
 n <- 200
@@ -144,7 +199,7 @@ lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2 + ee[g])
 Y1 <- rpois(n, lam1)
 
 X <- model.matrix(~x2)
-Z <- modelComb(x0)
+Z <- allComb(x0)
 
 lmefun <- function(Y, X, linkinv, gr, ...) {
     X <- as.matrix(X)
@@ -154,16 +209,20 @@ lmefun <- function(Y, X, linkinv, gr, ...) {
         linkinv=family(m)$linkinv)
 }
 lmefun(Y1, X, gr=g)
-.opticut1(Y1, X, Z1=NULL, dist=lmefun, gr=g)
-aa <- opticut1(Y1, X, Z, dist=lmefun, gr=g)
 
+opticut1(Y1, X, Z, dist=lmefun, gr=g)
+```
 
+### Gaussian
 
-## Gaussian
+```{r}
 Y <- rnorm(n, log(lam1) + 10, 0.5)
 (mod <- opticut(Y ~ x2, strata=x0, dist="gaussian"))
+```
 
-## same with occupancy
+### Binomial
+
+```{r}
 set.seed(1234)
 n <- 1000
 x0 <- sample(1:4, n, TRUE)
@@ -178,15 +237,14 @@ boxplot(p2~x0)
 Y2 <- rbinom(n, 1, p2)
 Y <- cbind(SPP1=Y1, SPP2=Y2)
 X <- model.matrix(~x2)
-Z <- modelComb(x0)
+Z <- allComb(x0)
 
 summary(opticut(Y ~ x2, strata=x0, dist="binomial"))
+```
 
+### Legendre example
 
-
-
-### LEGENDRE EXAMPLE
-
+```{r}
 gr <- rep(1:5, each=5)
 spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
@@ -194,11 +252,16 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
 dist="poisson"
 Y <- spp[,1]
 X <- matrix(1,25,1)
-Z <- modelComb(gr)
+Z <- allComb(gr)
 
 summary(mod <- opticut(spp ~ 1, strata=gr, dist="poisson"))
+```
 
+### Mite data set: high performance computing
 
+See computing time diffs and plotting options.
+
+```{r, eval=FALSE}
 library(vegan)
 data(mite)
 data(mite.env)
@@ -218,19 +281,13 @@ system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl
 stopCluster(cl)
 ## forking -- will not work on Windows
 system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl=3))
+```
 
+### Dune data -- cover type info
 
-summary(mod <- opticut(as.matrix(mite) ~ SubsDens + WatrCont, mite.env,
-    strata=mite.env$hab, dist="poisson"))
-plot(mod)
+See http://www.davidzeleny.net/anadat-r/doku.php/en:data:dune
 
-s0 <- summary(mod0, cut=-Inf, sort=FALSE)$summary
-s <- summary(mod, cut=-Inf, sort=FALSE)$summary
-table(s0=s0$split, s=s$split)
-table(s0=s0$assoc, s=s$assoc)
-
-## dune data -- cover type info
-## http://www.davidzeleny.net/anadat-r/doku.php/en:data:dune
+```{r}
 library(vegan)
 data(dune)
 data(dune.env)
@@ -242,149 +299,25 @@ Dune <- as.matrix(dune)
 x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="ordered")
 summary(x)
 
-X <- matrix(1,20,1)
-Z <- modelComb(dune.env$Management)
-opticut1(Dune[,1], X, Z=Z, dist="ordered")
-
-library(pbapply)
+## Binarizing data
 Dune <- ifelse(as.matrix(dune)>0,1,0)
 x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="binomial")
 summary(x)
 
+## Beta regression
 Dune <- as.matrix(dune+0.5) / 10
 x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="beta")
 summary(x)
+```
 
-## these cutoff values do not work
-Dune <- as.matrix(dune)
-Dune[dune == 0] <- 0.001
-Dune[dune == 1] <- 0.02
-Dune[dune == 2] <- 0.1
-Dune[dune == 3] <- 2.5
-Dune[dune == 4] <- 5
-Dune[dune == 5] <- 8.75
-Dune[dune == 6] <- 18.75
-Dune[dune == 7] <- 37.5
-Dune[dune == 8] <- 62.5
-Dune[dune == 9] <- 87.5
-## need a small constant to get further away from 0
-Dune <- (Dune+.05) / 100
-#Dune <- Dune[,apply(Dune, 2, function(z) length(unique(z)))>2]
-x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="beta")
-summary(x)
-x <- opticut(Dune[,3] ~ 1, strata=dune.env$Management, dist="beta")
-summary(x)
+### Presence-only data
 
-library(parallel)
-cl <- makeCluster(3)
-
-X <- 10
-Z <- 4
-.f <- function(X, Y, Z)
-  X*Y*Z
-f <- function(X, Y, Z) .f(X, Y, Z)
-sapply(1:3, function(k) f(X=X,Y=k,Z=Z))
-
-clusterExport(cl, c("f",".f","X","Z"))
-parSapply(cl, 1:3, function(k) f(X=X,Y=k,Z=Z))
-
-rm(X,Z)
-ff <- function(X, Y, Z, cl) {
-    X <- 10
-    Z <- 4
-    clusterExport(cl, c("f",".f"))
-#    clusterExport(cl, c("X","Z"), envir=parent.frame())
-    e <- new.env()
-    assign("X", X, envir=e)
-    assign("Z", X, envir=e)
-    clusterExport(cl, c("X","Z"), envir=e)
-    parSapply(cl, 1:3, function(k) f(X=X,Y=k,Z=Z))
-}
-ff(X, 1:3, Z, cl)
-
-
-stopCluster(cl)
-
-
-}
-
-
-## Lc tangent
-if (FALSE) {
-
-
-g <- rep(1:5, each=5)
-spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
-    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
-    Species3=rep(c(18,2,0,0,0), each=5))
-dist="poisson"
-X <- matrix(1,25,1)
-#Z <- modelComb(g)
-Y <- spp[,2] # ifelse(spp[,2]>0,1,0)
-dist="poisson"
-#print(opticut1(Y, X, Z, dist=dist), cut=-Inf)
-
-g <- as.factor(g)
-Z <- model.matrix(~g)
-m <- .opticut1(Y, X, Z1=Z[,-1,drop=FALSE],
-    linkinv=TRUE, dist=dist)
-x <- m$linkinv(c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z)]))
-Z1 <- lorenzComb(x[as.integer(g)], g)
-
-table(g, Z1)
-opticut1(Y, X, Z=modelComb(g), dist=dist)
-opticut1(Y, X, Z=Z1, dist=dist)
-
-## Lc works for binomial case, but not perfectly
-
-## same with occupancy
-set.seed(1234)
-n <- 100
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-table(x0,x1)
-p1 <- plogis(0.5 + 0.5*x1 + -0.2*x2)
-Y1 <- rbinom(n, 1, p1)
-p2 <- plogis(0.1 + 0.5*ifelse(x0==4,1,0) + 0.2*x2)
-Y2 <- rbinom(n, 1, p2)
-X <- model.matrix(~x2)
-Z <- modelComb(x0)
-
-Y <- Y1
-g <- as.factor(x0)
-Z <- model.matrix(~g)
-m <- .opticut1(Y, X, Z1=Z[,-1,drop=FALSE],
-    linkinv=TRUE, dist="binomial")
-x <- m$linkinv(c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z)]))
-Z1 <- lorenzComb(x[as.integer(g)], g)
-
-table(g, Z1)
-opticut1(Y, X, Z=modelComb(g), dist="binomial")
-opticut1(Y, X, Z=Z1, dist="binomial")
-
-## iterative search based on ranking
-
-Y <- Y2
-
-
-print(opticut1(Y, X, Z=modelComb(g), dist="binomial"), cut=-Inf)
-print(opticut1(Y, X, Z=rankComb(Y, X, g, "binomial"), dist="binomial"), cut=-Inf)
-
-#comb <- sapply(2:20, function(z) ncol(allComb(z)))
-comb <- 2^(1:20)-1
-M <- 10
-plot((2:20)[1:M], comb[1:M], type="l", ylim=c(0,comb[M]), col=2)
-lines((2:20)[1:M], (2:20)[1:M]-1, col=4)
-
-cbind(a=comb, b=(2:20)-1)
-
+```{r}
 ## presence-only data
 ## single species model only:
 ## because the used distr is different for
 ## each species by definition.
 
-#source("c:/Dropbox/pkg/indval/opticut3.R")
 library(ResourceSelection)
 ## settings
 n.used <- 1000
@@ -399,45 +332,19 @@ dd <- simulateUsedAvail(x, cfs, n.used, m, link="logit")
 
 Y <- dd$status
 X <- model.matrix(~ x1 + x2, dd)
-Z <- modelComb(as.integer(dd$x0))
-link="logit"
-Z1=NULL
+Z <- allComb(as.integer(dd$x0))
 
-.opticut1(Y, X, Z1=NULL, dist="rspf", m=0, B=0)
-.opticut1(Y, X, Z1=Z[,1], dist="rspf", m=0, B=0)
+(mod <- opticut1(Y, X, dd$x0, dist="rspf", m=0, B=0))
+```
 
-(mod <- opticut1(Y, X, Z, dist="rspf", m=0, B=0))
+## Todo
 
+Check pollen stratigraphy data to identify
+horizons for species:
 
-
-
-## multi-species opticut
-
+```{r}
 library(rioja)
 data(aber)
 strat.plot(aber$spec, scale.percent=TRUE, y.rev=TRUE)
-
-Z <- diag(1, nrow(aber$spec), nrow(aber$spec))
-Z[lower.tri(Z)] <- 1
-Z <- Z[,-1]
-Y <- data.matrix(aber$spec)
-Y <- Y[,apply(Y, 2, max) > 10]
-
-#mod <- opticut(Y ~ 1, strata=Z, dist="gaussian")
-
-YY <- Y/100
-YY[YY==0] <- min(YY[YY>0])
-## response cannot be 0
-mod <- opticut(YY ~ 1, strata=Z, dist="beta")
-
-xx <- mod$species[[1]]
-ll0 <- mean(sapply(mod$species, attr, "logL_null"))
-ll <- rowMeans(sapply(mod$species, "[[", "logL"))
-w <- exp(ll) / sum(exp(ll))
-logLR <- ll - ll0
-
-xx$w <- w
-xx$logL <- ll
-xx$logLR <- logLR
-attr(xx, "logL_null") <- ll0
 ```
+
