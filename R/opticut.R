@@ -149,7 +149,7 @@ function(Y, X, Z, dist="gaussian", collapse = " ", ...)
 ## * or a matrix itself (design matrix w/o intercept)
 .opticut1 <-
 function(Y, X, Z1=NULL,
-dist="gaussian", linkinv, ...)
+dist="gaussian", linkinv, full_model=FALSE, ...)
 {
     if (missing(linkinv))
         linkinv <- is.null(Z1)
@@ -262,9 +262,12 @@ dist="gaussian", linkinv, ...)
             linv <- NULL
         out <- list(coef=cf, logLik=ll, linkinv=linv)
     } else {
+        if (full_model)
+            stop("custom distribution function: cannot return full model")
         out <- dist(Y, XX, linkinv, ...)
     }
-    out
+    if (full_model)
+        mod else out
 }
 
 ## todo: if Z inherits from class optilevel,
@@ -582,10 +585,10 @@ function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
     }
 }
 
-bestpart <- function (object, ...) 
+bestpart <- function (object, ...)
     UseMethod("bestpart")
 
-bestpart.opticut <- 
+bestpart.opticut <-
 function (object, ...)
 {
     out <- list()
@@ -604,4 +607,111 @@ function (object, ...)
         out <- do.call(cbind, out)
     }
     out
+}
+
+.extractOpticut <-
+function (object, which=NULL, boot=FALSE,
+internal=TRUE, ...)
+{
+    if (is.null(which))
+        which <- names(object$species)
+    bp <- bestpart(object)
+    spp <- names(object$species)
+    names(spp) <- spp
+    spp <- spp[which]
+    n <- NROW(object$Y)
+    if (is.logical(boot)) {
+        j <- if (boot)
+            sample.int(n, replace=TRUE) else seq_len(n)
+    } else {
+        j <- boot
+    }
+    out <- list()
+    for (i in spp) {
+        out[[i]] <- if (internal) {
+            .opticut1(
+                Y=object$Y[j,i],
+                X=object$X[j,],
+                Z1=bp[j,i],
+                dist=object$dist, ...)
+        } else {
+            opticut1(
+                Y=object$Y[j,i,drop=FALSE],
+                X=object$X[j,],
+                Z=bp[j,i,drop=FALSE],
+                dist=object$dist, ...)
+        }
+    }
+    out
+}
+
+bestmodel <- function (object, ...)
+    UseMethod("bestmodel")
+
+bestmodel.opticut <-
+function (object, which=NULL, ...)
+{
+    .extractOpticut(object, which,
+        boot=FALSE,
+        internal=TRUE,
+        full_model=TRUE, ...)
+}
+
+uncertainty <- function (object, ...)
+    UseMethod("uncertainty")
+
+uncertainty.opticut <-
+function (object, which=NULL,
+type=c("asymp", "boot"), B=99, ...)
+{
+    type <- match.arg(type)
+    B <- as.integer(B)
+    if (B < 1)
+        stop("B must be > 0")
+    linkinv <- .opticut1(
+        Y=object$Y[,1L],
+        X=object$X,
+        Z1=NULL,
+        dist=object$dist, ...)$linkinv
+    m <- .extractOpticut(object, which,
+        boot=FALSE,
+        internal=TRUE,
+        full_model=TRUE, ...)
+    spp <- names(m)
+    out <- list()
+    if (type == "asymp") {
+        for (i in spp) {
+            m1 <- m[[i]]
+            cf <- mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
+            cf <- rbind(coef(m1)[c(1L, 2L)], cf)
+            cf0 <- linkinv(cf[,1L])
+            cf1 <- linkinv(cf[,1L] + cf[,2L])
+            I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+            out[[i]] <- cbind(mu0=cf0, mu1=cf1, I=I)
+        }
+    }
+    if (type == "boot") {
+        for (i in spp) {
+            cf <- t(pbsapply(seq_len(B), function(z) {
+                .extractOpticut(object, i,
+                    boot=TRUE,
+                    internal=TRUE,
+                    full_model=FALSE)[[1L]]$coef[c(1L, 2L)]
+            }))
+            cf <- rbind(coef(m[[i]])[c(1L, 2L)], cf)
+            cf0 <- linkinv(cf[,1L])
+            cf1 <- linkinv(cf[,1L] + cf[,2L])
+            I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+            out[[i]] <- cbind(mu0=cf0, mu1=cf1, I=I)
+        }
+    }
+    out
+}
+## attach attr to object???
+
+##
+confint.opticut <-
+function (object, parm, level = 0.95, ...)
+{
+NULL
 }
