@@ -261,7 +261,7 @@ summary(mod <- opticut(spp ~ 1, strata=gr, dist="poisson"))
 
 See computing time diffs and plotting options.
 
-```{r, eval=FALSE}
+```{r}
 library(vegan)
 data(mite)
 data(mite.env)
