@@ -266,7 +266,8 @@ library(vegan)
 data(mite)
 data(mite.env)
 mite.env$hab <- with(mite.env, interaction(Shrub, Topo, drop=TRUE))
-summary(mod0 <- opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson"))
+summary(mod0 <- opticut(as.matrix(mite) ~ SubsDens, mite.env,
+    strata=mite.env$hab, dist="poisson"))
 plot(mod0)
 
 system.time(aa <- opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", comb="rank"))
@@ -363,12 +364,32 @@ for (i in 1:12) {
 par(op)
 ```
 
-## Todo
+## Finding best partitions
 
-Bootstrap based partitioning uncertainty: find best partition with bootstrap:
-parametric or non-parametric? This is kind of redundant (w gives this well
-for large sample). It is interesting for small data sets.
+It is useful to access the best binary partition:
 
-Bootstrap based CI on I: use best partition to get CI (parametric or non-parametric?): CI around mu0, mu1, I
+```{r}
+bp <- bestpart(mod0)
+head(bp)
+```
+
+The model based on the best partition can be returned as:
+
+```{r}
+bestmodel(mod0, which=1)
+```
+
+the `which` argument can be used to subset the species.
+
+## Bootstrap
+
+Uncertainty in $I$ values might be of interest:
+
+```{r}
+uc <- uncertainty(mod0)
+i <- 1
+summary(uc[[i]])
+plot(density(uc[[i]]$I))
+```
 
 

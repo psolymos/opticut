@@ -611,7 +611,7 @@ function (object, ...)
 
 .extractOpticut <-
 function (object, which=NULL, boot=FALSE,
-internal=TRUE, ...)
+internal=TRUE, best=TRUE, ...)
 {
     if (is.null(which))
         which <- names(object$species)
@@ -628,18 +628,26 @@ internal=TRUE, ...)
     }
     out <- list()
     for (i in spp) {
-        out[[i]] <- if (internal) {
-            .opticut1(
+        if (internal) {
+            out[[i]] <- .opticut1(
                 Y=object$Y[j,i],
                 X=object$X[j,],
                 Z1=bp[j,i],
                 dist=object$dist, ...)
         } else {
-            opticut1(
-                Y=object$Y[j,i,drop=FALSE],
-                X=object$X[j,],
-                Z=bp[j,i,drop=FALSE],
-                dist=object$dist, ...)
+            if (best) {
+                out[[i]] <- opticut1(
+                    Y=object$Y[j,i,drop=TRUE],
+                    X=object$X[j,],
+                    Z=bp[j,i,drop=FALSE],
+                    dist=object$dist, ...)
+            } else {
+                out[[i]] <- opticut1(
+                    Y=object$Y[j,i,drop=TRUE],
+                    X=object$X[j,],
+                    Z=object$strata,
+                    dist=object$dist, ...)
+            }
         }
     }
     out
@@ -676,42 +684,81 @@ type=c("asymp", "boot"), B=99, ...)
     m <- .extractOpticut(object, which,
         boot=FALSE,
         internal=TRUE,
-        full_model=TRUE, ...)
+        full_model=TRUE,
+        best=TRUE, ...)
     spp <- names(m)
     out <- list()
     if (type == "asymp") {
         for (i in spp) {
+            bm <- rownames(object$species[[i]])[which.max(object$species[[i]]$logLR)]
             m1 <- m[[i]]
             cf <- mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
             cf <- rbind(coef(m1)[c(1L, 2L)], cf)
             cf0 <- linkinv(cf[,1L])
             cf1 <- linkinv(cf[,1L] + cf[,2L])
             I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-            out[[i]] <- cbind(mu0=cf0, mu1=cf1, I=I)
+            out[[i]] <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
         }
     }
     if (type == "boot") {
         for (i in spp) {
+            bm <- rownames(object$species[[i]])[which.max(object$species[[i]]$logLR)]
             cf <- t(pbsapply(seq_len(B), function(z) {
                 .extractOpticut(object, i,
                     boot=TRUE,
                     internal=TRUE,
-                    full_model=FALSE)[[1L]]$coef[c(1L, 2L)]
+                    full_model=FALSE,
+                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
             cf <- rbind(coef(m[[i]])[c(1L, 2L)], cf)
             cf0 <- linkinv(cf[,1L])
             cf1 <- linkinv(cf[,1L] + cf[,2L])
             I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-            out[[i]] <- cbind(mu0=cf0, mu1=cf1, I=I)
+            out[[i]] <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
+        }
+    }
+    ## this is just a concept
+    ## hard to keep track when comb="all"
+    if (type == "multi") {
+        for (i in spp) {
+            bm <- character(B + 1L)
+            bm[1L] <- rownames(object$species[[i]])[which.max(object$species[[i]]$logLR)]
+            mat <- matrix(NA, B + 1L, 3)
+            colnames(mat) <- c("I", "mu0", "mu1")
+            tmp <- as.numeric(object$species[[i]][which.max(object$species[[i]]$logLR),-1L])
+            names(tmp) <- colnames(object$species[[i]])[-1L]
+            mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
+            pb <- startpb(0, B)
+            on.exit(closepb(pb))
+            for (j in seq_len(B)) {
+                mod <- .extractOpticut(object, i,
+                    boot=TRUE,
+                    internal=FALSE,
+                    best=FALSE)[[1L]]
+                k <- which.max(mod$logLR)
+                bm[j + 1L] <- rownames(mod)[k]
+                tmp <- as.numeric(mod[k, -1L])
+                names(tmp) <- colnames(mod)[-1L]
+                mat[j + 1L, ] <- tmp[c("I", "mu0", "mu1")]
+                setpb(pb, j)
+            }
+            out[[i]] <- data.frame(best=bm, mat)
         }
     }
     out
 }
-## attach attr to object???
 
-##
-confint.opticut <-
-function (object, parm, level = 0.95, ...)
-{
-NULL
+if (FALSE) {
+object=opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
+a1=uncertainty(object,2,"asymp", B=999)
+a2=uncertainty(object,2,"boot", B=999)
+a3=uncertainty(object,2,"multi", B=999)
+aa <- data.frame(table(a3[[1]]$best))
+aa[order(aa$Freq, decreasing=TRUE),]
+
+plot(density(a2[[1]]$I))
+lines(density(a1[[1]]$I), col=2)
+
+a=uncertainty(object,type="asymp", B=999)
+lapply(a, summary)
 }
