@@ -127,7 +127,8 @@ Z <- allComb(x0)
 opticut1(Y1, X, Z, dist="poisson")
 opticut1(Y2, X, Z, dist="poisson")
 opticut1(Y3, X, Z, dist="poisson")
-summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
+summary(m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
+plot(m, cut=-Inf)
 ```
 
 Describe here what is what in the output.
@@ -267,7 +268,7 @@ data(mite)
 data(mite.env)
 mite.env$hab <- with(mite.env, interaction(Shrub, Topo, drop=TRUE))
 summary(mod0 <- opticut(as.matrix(mite) ~ SubsDens, mite.env,
-    strata=mite.env$hab, dist="poisson"))
+    strata=mite.env$hab, dist="poisson", comb="all"))
 plot(mod0)
 
 system.time(aa <- opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", comb="rank"))
@@ -366,17 +367,29 @@ par(op)
 
 ## Finding best partitions
 
-It is useful to access the best binary partition:
+It is useful to access the best binary partition
+(note the small sample size where this really can be a problem)
 
 ```{r}
-bp <- bestpart(mod0)
+source("~/repos/opticut/R/opticut.R")
+set.seed(1234)
+n <- 50
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+lam <- exp(0.5 + 1*x1 + -0.2*x2)
+Y <- rpois(n, lam)
+o <- opticut(Y ~ 1, strata=x0, dist="poisson", comb="rank")
+summary(o)
+
+bp <- bestpart(o)
 head(bp)
 ```
 
 The model based on the best partition can be returned as:
 
 ```{r}
-bestmodel(mod0, which=1)
+bestmodel(o, which=1)
 ```
 
 the `which` argument can be used to subset the species.
@@ -386,10 +399,25 @@ the `which` argument can be used to subset the species.
 Uncertainty in $I$ values might be of interest:
 
 ```{r}
-uc <- uncertainty(mod0)
+uc <- uncertainty(o, 1, type="a")
 i <- 1
 summary(uc[[i]])
 plot(density(uc[[i]]$I))
+data.frame(table(uc[[i]]$best))[order(table(uc[[i]]$best)),]
 ```
 
+The `type` argument for the `uncertainty` method can take the following values:
+
+* `"asymp"`: asymptotic distribution of $I$, $\mu_{0}$ and $\mu_{1}$
+  based on best partition found for the input object.
+* `"boot"`: non-parametric bootstrap distribution of $I$, $\mu_{0}$ and $\mu_{1}$
+  based on best partition found for the input object.
+* `"multi"`: non-parametric bootstrap distribution of $I$, $\mu_{0}$ and $\mu_{1}$
+  based on best partition found for the bootstrap data (i.e.
+  the model ranking is re-evaluated each time).
+
+## Todo
+
+* add HPC option to uncertainty calculations
+* build the package: R CMD check cleanup
 

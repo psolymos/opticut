@@ -156,6 +156,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
     if (is.null(Z1)) {
         XX <- as.data.frame(X)
     } else {
+        if (is.null(dim(X)))
+            X <- data.matrix(X)
         XX <- as.data.frame(cbind(X[,1,drop=FALSE], Z1, X[,-1,drop=FALSE]))
     }
     if (!is.function(dist)) {
@@ -338,6 +340,9 @@ comb=c("rank", "all"), cl=NULL, ...)
     mf[[1]] <- as.name("model.frame")
     mf <- eval(mf, parent.frame())
     Y <- model.response(mf, "numeric")
+    Y <- data.matrix(Y)
+    if (is.null(colnames(Y)))
+        colnames(Y) <- paste("Species", seq_len(ncol(Y)))
     if (any(duplicated(colnames(Y))))
         stop("Duplicate colnames found in LHS")
     ff <- formula
@@ -470,7 +475,13 @@ ylab="Model weight * Association", xlab="Partitions", ...)
 #    r <- cs <= coverage
 #    r[1] <- TRUE
 #    w <- w[names(w) %in% names(r[r])]
-    w <- w[x$logLR >= cut]
+    if (!any(x$logLR >= cut)) {
+        warning("All logLR < cut: cut ignored")
+    } else {
+        w <- w[x$logLR >= cut]
+    }
+#    if (length(w) < 1L)
+#        stop("All logLR < cut: try lowering cut value")
     COL <- c(colorRampPalette(c("red","yellow"))(10),
         colorRampPalette(c("yellow","green"))(10))
     br <- seq(-1, 1, 0.1)
@@ -539,11 +550,17 @@ summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
 }
 
 plot.opticut <-
-function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
+function(x, which=NULL, cut=2, sort=TRUE, coverage=0.95, las=1,
+ylab="Model weight * Association", xlab="Partitions", ...)
 {
-    if (!is.null(what)) {
-        plot(x$species[[what]])
+    if (!is.null(which) && length(which) == 1L) {
+        plot(x$species[[which]],
+            cut=cut, ylab=ylab, xlab=xlab, ...)
     } else {
+        if (x$comb == "rank")
+            stop("Plot single species (comb='rank'): specify 'which' argument")
+        if (!is.null(which) && length(which) > 1L)
+            x$species <- x$species[which]
         COL <- c(colorRampPalette(c("red","yellow"))(10),
             colorRampPalette(c("yellow","green"))(10))
         br <- seq(-1, 1, 0.1)
@@ -563,6 +580,7 @@ function(x, what=NULL, cut=2, sort=TRUE, coverage=0.95, las=1, ...)
         op <- par(las=las)
         plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0),
             type="n", axes=FALSE, ann=FALSE, ...)
+        title(ylab=ylab, xlab=xlab)
         axis(2, at=1:ncol(ww)-0.5,
             labels=colnames(ww), tick=TRUE)
         axis(1, at=1:nrow(ww)-0.5,
@@ -629,6 +647,8 @@ internal=TRUE, best=TRUE, ...)
     out <- list()
     for (i in spp) {
         if (internal) {
+            if (!best)
+                stop("use best=TRUE when internal=TRUE")
             out[[i]] <- .opticut1(
                 Y=object$Y[j,i],
                 X=object$X[j,],
@@ -642,10 +662,16 @@ internal=TRUE, best=TRUE, ...)
                     Z=bp[j,i,drop=FALSE],
                     dist=object$dist, ...)
             } else {
+                zz <- object$strata
+                if (is.null(dim(zz))) {
+                    zz <- zz[j]
+                } else {
+                    zz <- zz[j,]
+                }
                 out[[i]] <- opticut1(
                     Y=object$Y[j,i,drop=TRUE],
                     X=object$X[j,],
-                    Z=object$strata,
+                    Z=zz,
                     dist=object$dist, ...)
             }
         }
@@ -670,8 +696,9 @@ uncertainty <- function (object, ...)
 
 uncertainty.opticut <-
 function (object, which=NULL,
-type=c("asymp", "boot"), B=99, ...)
+type=c("asymp", "boot", "multi"), B=99, ...)
 {
+    require(pbapply)
     type <- match.arg(type)
     B <- as.integer(B)
     if (B < 1)
@@ -690,7 +717,9 @@ type=c("asymp", "boot"), B=99, ...)
     out <- list()
     if (type == "asymp") {
         for (i in spp) {
-            bm <- rownames(object$species[[i]])[which.max(object$species[[i]]$logLR)]
+            require(MASS)
+            k <- which.max(object$species[[i]]$logLR)
+            bm <- rownames(object$species[[i]])[k]
             m1 <- m[[i]]
             cf <- mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
             cf <- rbind(coef(m1)[c(1L, 2L)], cf)
@@ -702,7 +731,8 @@ type=c("asymp", "boot"), B=99, ...)
     }
     if (type == "boot") {
         for (i in spp) {
-            bm <- rownames(object$species[[i]])[which.max(object$species[[i]]$logLR)]
+            k <- which.max(object$species[[i]]$logLR)
+            bm <- rownames(object$species[[i]])[k]
             cf <- t(pbsapply(seq_len(B), function(z) {
                 .extractOpticut(object, i,
                     boot=TRUE,
@@ -721,16 +751,21 @@ type=c("asymp", "boot"), B=99, ...)
     ## hard to keep track when comb="all"
     if (type == "multi") {
         for (i in spp) {
+            if (object$comb == "all")
+                stop("comb='all' is no good, use 'rank' instead")
+            #warning("Experimental feature, excercise caution!")
+            k <- which.max(object$species[[i]]$logLR)
             bm <- character(B + 1L)
-            bm[1L] <- rownames(object$species[[i]])[which.max(object$species[[i]]$logLR)]
+            bm[1L] <- rownames(object$species[[i]])[k]
             mat <- matrix(NA, B + 1L, 3)
             colnames(mat) <- c("I", "mu0", "mu1")
-            tmp <- as.numeric(object$species[[i]][which.max(object$species[[i]]$logLR),-1L])
+            tmp <- as.numeric(object$species[[i]][k, -1L])
             names(tmp) <- colnames(object$species[[i]])[-1L]
             mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
             pb <- startpb(0, B)
             on.exit(closepb(pb))
             for (j in seq_len(B)) {
+                ## Z is factor, thus 'rank' applied
                 mod <- .extractOpticut(object, i,
                     boot=TRUE,
                     internal=FALSE,
