@@ -125,22 +125,15 @@ function(Y, X, Z, dist="gaussian", collapse = " ", ...)
     if (!is.factor(Z))
         stop("Z must be a factor")
     Z0 <- model.matrix(~Z)
-    m <- .opticut1(Y, X, Z1=Z0[,-1,drop=FALSE],
+    m <- .opticut1(Y, X, Z1=Z0[,-1L,drop=FALSE],
         linkinv=TRUE, dist=dist, ...)
-    x <- rank(-c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)]))
-    names(x) <- levels(Z)
+    lc <- c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)])
+    names(lc) <- levels(Z)
+    x <- rank(-lc)
     oc <- oComb(x, collapse = collapse)
-    oc[match(Z, rownames(oc)),]
-
-#    o <- x[order(x)]
-    ## all levels is H0, not needed (thus -1)
-#    out <- matrix(0, length(Z), nlevels(Z)-1)
-#    colnames(out) <- 1:(nlevels(Z)-1)
-#    for (i in seq_len(length(o)-1)) {
-#        out[Z %in% names(o)[1:i], i] <- 1
-#        colnames(out)[i] <- paste(names(o)[1:i], collapse=" ")
-#    }
-#    out
+    out <- oc[match(Z, rownames(oc)),]
+    attr(out, "est") <- m$linkinv(lc)
+    out
 }
 
 ## Z1 is:
@@ -286,6 +279,9 @@ function(Y, X, Z, dist="gaussian", ...)
         rownames(X) <- seq_len(nrow(X))
     if (is.factor(Z)) {
         Z <- rankComb(Y, X, Z, dist=dist, ...)
+        Est <- attr(Z, "est")
+    } else {
+        Est <- NA
     }
     Z <- data.matrix(Z)
     if (is.null(colnames(Z)))
@@ -321,6 +317,7 @@ function(Y, X, Z, dist="gaussian", ...)
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else dist
+    attr(out, "est") <- Est
     class(out) <- c("opticut1", "data.frame")
     out
 }

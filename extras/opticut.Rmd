@@ -30,34 +30,35 @@ Goals:
 $Y_{i}$'s are observations for a single species
 from $n$ locations ($i = 1, ..., n$).
 $g_{i}$'s are known discrete descriptors of the locations with
-$k$ levels ($k > 2$). $z^{(m)}$ is a binary reclassification of $g$ taking
-values (0, 1). The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification out of the total $M = 2^{k-1} - 1$ total combinations (excluding complements). See below for options for defining binary partitions.
+$K$ levels ($K > 2$). $z^{(m)}$ is a binary reclassification of $g$ taking
+values (0, 1). The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification out of the total $M = 2^{K-1} - 1$ total combinations (excluding complements). See below for options for defining binary partitions.
 There can also be other site descriptors denoted as $x_{ij}$
 taking discrete or continuous values ($j = 1, ..., p$; number of predictors).
 
 A suitable parametric model describe the
 relationship between the observations and the site decriptors
-through the probability density function $P(Y = y | z, x, \theta)$ 
-where $\theta$ is the vector of model parameters 
-($\beta_{0}, \beta_{1}, \alpha_{1}, ..., \alpha_{p}$).
+through the probability density function 
+$P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$ 
+where $\theta$ is the vector of model parameters: 
+$\theta = (\beta_{0}, \beta_{1}, \alpha_{1}, ..., \alpha_{p})$.
 The choice of the parametric model depends on the nature of the 
 observations. It can be Gaussian, Binomial, Poisson,
 ordinal, Beta regression, or zero-inflated models, with a 
 suitable link function ($f$) for the mean:
 $f(\eta_{i}) = \beta_{0}^{(m)} + \beta_{1}^{(m)} z_{i}^{(m)} + \sum_{j=1}^{p} \alpha_{j}^{(m)} x_{ij}$.
 
-$\hat{\theta}^{(m)}$ is the maximum likelihood estimate (MLE) of the 
+$\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the 
 model parameters given the data and classification $m$, 
-with corresponding log-likelihood value $l(\hat{\theta}^{(m)}; y)$.
+with corresponding log-likelihood value $l(\widehat{\theta^{(m)}}; y)$.
 Finding MLEs for all $M$ candidate binary partitions
 leads to a set of log-likelihood values. One can compare
 the log-likelihood values to a null model (no binary partition is necessar)
-where $\beta_{1} = 0$ leading to the MLE $\hat{\theta}^{(0)}$
+where $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
 and corresponding log-likelihood value for the null model: 
-$l(\hat{\theta}^{(0)}; y)$.
+$l(\widehat{\theta^{(0)}}; y)$.
 
 The log-likelihood ratio for each cadidate partition can be
-calculated as $l(\hat{\theta}^{(m)}; y) - l(\hat{\theta}^{(0)}; y)$.
+calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
 The best supported binary partition is
 the model with the highest log-likelihood ratio value.
 
@@ -66,8 +67,12 @@ based on expected values using the inverse link function as
 $\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and 
 $\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
 $I = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
+Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and 
+$\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
+for the observations given the binary partition $z_{i}^{(m)}$
+and at 0 value for all $x_{ij}$. 
 
-## Finding all possible binary partitions
+### Finding all possible binary partitions
 
 Finding all combinations does not require a model or observed responses.
 It only takes a classification vector with $k > 1$ partitions.
@@ -76,7 +81,7 @@ It only takes a classification vector with $k > 1$ partitions.
 all possible binary partitions of the factor with `n` levels.
 Complements are not counted twice, i.e.
 (0,0,1,1) is equivalent to (1,1,0,0).
-The number of such possible combinations is $2^{k-1} - 1$.
+The number of such possible combinations is $M = 2^{K-1} - 1$.
 
 ```{r, echo=FALSE}
 source("~/repos/opticut/R/opticut.R")
@@ -103,7 +108,7 @@ mc2
 checkComb(mc2)
 ```
 
-## Poisson count model example
+### Poisson count model example
 
 ```{r}
 set.seed(1234)
@@ -133,12 +138,14 @@ plot(m, cut=-Inf)
 
 Describe here what is what in the output.
 
-## Not using all possible partitions
+### Not using all possible partitions
 
 Blindly fitting a model to all possible partitions is wasteful
-use of resources. Instead, one can rank the $k$ partitions
-based on expected response values ($\mu_{1}, ..., \mu_{k}$)
-and only explore $k-1$ partitions:
+use of resources. Instead, one can rank the $K$ partitions
+based on expected response values 
+($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$, 
+where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
+This way we haveto explore only $K-1$ partitions:
 
 ```{r}
 oComb(1:4)
@@ -147,12 +154,13 @@ oComb(1:4)
 `oComb` return the 'contrast' matrix based on the rank vector as input.
 Rank 1 means highest expected value among the partitions.
 
-The function `rankComb` fits the model with multiple ($k > 2$) factor levels
+The function `rankComb` fits the model with multiple ($K > 2$) factor levels
 to find out the ranking, and returns a binary classification matrix
 similarly to `allComb`:
 
 ```{r}
-head(rankComb(Y1, Z, as.factor(x0)))
+head(rc <- rankComb(Y1, model.matrix(~x2), as.factor(x0), dist="poisson"))
+attr(rc, "est")
 ```
 
 Note that the ranking varies from species to species, thus
@@ -181,38 +189,6 @@ Currently available distributions:
 * `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover, 
 * `"rspf"`: presence-only data using resource selection probability functions.
 
-The `distr` argument accepts a function, so other parametric models
-can be supplied which are avoided due to package dependencies. 
-It is possible to supply occupancy or N-mixture model
-to account for detection error in the observations.
-Here is an example using mixed models and the package `lme4`:
-
-```{r}
-library(lme4)
-set.seed(1234)
-n <- 200
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-ee <- rnorm(n/5)
-g <- rep(1:5, each=n/5)
-lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2 + ee[g])
-Y1 <- rpois(n, lam1)
-
-X <- model.matrix(~x2)
-Z <- allComb(x0)
-
-lmefun <- function(Y, X, linkinv, gr, ...) {
-    X <- as.matrix(X)
-    m <- glmer(Y ~ X-1 + (1|gr), family=poisson("log"), ...)
-    list(coef=fixef(m),
-        logLik=logLik(m),
-        linkinv=family(m)$linkinv)
-}
-lmefun(Y1, X, gr=g)
-
-opticut1(Y1, X, Z, dist=lmefun, gr=g)
-```
 
 ### Gaussian
 
@@ -250,12 +226,10 @@ gr <- rep(1:5, each=5)
 spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
     Species3=rep(c(18,2,0,0,0), each=5))
-dist="poisson"
-Y <- spp[,1]
-X <- matrix(1,25,1)
-Z <- allComb(gr)
-
-summary(mod <- opticut(spp ~ 1, strata=gr, dist="poisson"))
+rownames(spp) <- gr
+spp
+summary(mod <- opticut(spp ~ 1, strata=gr, dist="poisson", comb="all"))
+summary(mod <- opticut(spp ~ 1, strata=gr, dist="poisson", comb="rank"))
 ```
 
 ### Mite data set: high performance computing
@@ -285,7 +259,9 @@ stopCluster(cl)
 system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl=3))
 ```
 
-### Dune data -- cover type info
+### Percenages
+
+#### Dune data, cover type data
 
 See http://www.davidzeleny.net/anadat-r/doku.php/en:data:dune
 
@@ -311,6 +287,33 @@ Dune <- as.matrix(dune+0.5) / 10
 x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="beta")
 summary(x)
 ```
+
+#### Stratigraphy example
+
+```{r}
+library(rioja)
+data(aber)
+strat.plot(aber$spec, aber$ages$Depth, scale.percent=TRUE, y.rev=TRUE)
+
+z <- as.factor(cut(aber$ages$Depth, 5))
+ab <- as.matrix(aber$spec) / 100
+ab[ab == 0] <- 0.0001
+ab <- ab[,apply(ab, 2, max) > 0.05]
+
+a <- opticut(ab ~ 1, strata=z, comb="rank", dist="beta")
+summary(a)
+bp <- bestpart(a)
+
+op <- par(mfrow=c(3,4), mar=c(2,2,1,1))
+for (i in 1:12) {
+    plot(ab[,i], aber$ages$Depth, type="l", ann=FALSE)
+    segments(x0=rep(0, nrow(ab)), y0=aber$ages$Depth, x1=ab[,i], 
+        col=ifelse(bp[,i] > 0, 2, 1))
+    title(main=colnames(ab)[i])
+}
+par(op)
+```
+
 
 ### Presence-only data
 
@@ -339,39 +342,54 @@ Z <- allComb(as.integer(dd$x0))
 (mod <- opticut1(Y, X, dd$x0, dist="rspf", m=0, B=0))
 ```
 
-## Stratigraphy example
+### Custom distributions
+
+The `distr` argument accepts a function, so other parametric models
+can be supplied which are avoided due to package dependencies. 
+It is possible to supply occupancy or N-mixture model
+to account for detection error in the observations.
+Here is an example using mixed models and the package `lme4`:
 
 ```{r}
-library(rioja)
-data(aber)
-strat.plot(aber$spec, aber$ages$Depth, scale.percent=TRUE, y.rev=TRUE)
+library(lme4)
+set.seed(1234)
+n <- 200
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+ee <- rnorm(n/5)
+g <- rep(1:5, each=n/5)
+lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2 + ee[g])
+Y1 <- rpois(n, lam1)
 
-z <- as.factor(cut(aber$ages$Depth, 5))
-ab <- as.matrix(aber$spec) / 100
-ab[ab == 0] <- 0.0001
-ab <- ab[,apply(ab, 2, max) > 0.05]
+X <- model.matrix(~x2)
+Z <- allComb(x0)
 
-a <- opticut(ab ~ 1, strata=z, comb="rank", dist="beta")
-summary(a)
-bp <- bestpart(a)
-
-op <- par(mfrow=c(3,4), mar=c(2,2,1,1))
-for (i in 1:12) {
-    plot(ab[,i], aber$ages$Depth, type="l", ann=FALSE)
-    segments(x0=rep(0, nrow(ab)), y0=aber$ages$Depth, x1=ab[,i], 
-        col=ifelse(bp[,i] > 0, 2, 1))
-    title(main=colnames(ab)[i])
+lmefun <- function(Y, X, linkinv, gr, ...) {
+    X <- as.matrix(X)
+    m <- glmer(Y ~ X-1 + (1|gr), family=poisson("log"), ...)
+    list(coef=fixef(m),
+        logLik=logLik(m),
+        linkinv=family(m)$linkinv)
 }
-par(op)
+lmefun(Y1, X, gr=g)
+
+opticut1(Y1, X, Z, dist=lmefun, gr=g)
 ```
+
+### Imperfect detectability: N-mixture case
+
+FIXME
+
+### Sampling error differences: using offsets
+
+FIXME
 
 ## Finding best partitions
 
 It is useful to access the best binary partition
-(note the small sample size where this really can be a problem)
 
 ```{r}
-source("~/repos/opticut/R/opticut.R")
 set.seed(1234)
 n <- 50
 x0 <- sample(1:4, n, TRUE)
@@ -379,7 +397,7 @@ x1 <- ifelse(x0 %in% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 lam <- exp(0.5 + 1*x1 + -0.2*x2)
 Y <- rpois(n, lam)
-o <- opticut(Y ~ 1, strata=x0, dist="poisson", comb="rank")
+o <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 summary(o)
 
 bp <- bestpart(o)
@@ -394,16 +412,15 @@ bestmodel(o, which=1)
 
 the `which` argument can be used to subset the species.
 
-## Bootstrap
+## Uncertainty
 
 Uncertainty in $I$ values might be of interest:
 
 ```{r}
-uc <- uncertainty(o, 1, type="a")
-i <- 1
-summary(uc[[i]])
-plot(density(uc[[i]]$I))
-data.frame(table(uc[[i]]$best))[order(table(uc[[i]]$best)),]
+uc <- uncertainty(o, 1, type="asymp")
+summary(uc[[1]])
+plot(density(uc[[1]]$I))
+data.frame(table(uc[[1]]$best))[order(table(uc[[1]]$best)),]
 ```
 
 The `type` argument for the `uncertainty` method can take the following values:
@@ -420,4 +437,5 @@ The `type` argument for the `uncertainty` method can take the following values:
 
 * add HPC option to uncertainty calculations
 * build the package: R CMD check cleanup
+* Add SV N-mix and offset examples
 
