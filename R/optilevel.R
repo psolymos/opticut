@@ -13,6 +13,7 @@ function(Y, X, alpha=0, ...)
     library(mefa4)
     if (is.null(colnames(X)))
         colnames(X) <- paste0("V", seq_len(ncol(X)))
+    colnames(X) <- gsub("\\s", "", colnames(X))
     m_full <- glm(Y ~ .-1, data=data.frame(X), ...)
     #m_full <- glm(Y ~ .-1, data=data.frame(X), family=family)
     IC_full <- (1-alpha)*AIC(m_full) + alpha*BIC(m_full)
@@ -31,12 +32,12 @@ function(Y, X, alpha=0, ...)
     IC_best <- ICvec[1] <- IC_full
 
     j <- 1
-    Delta <- 1
+    Delta <- -1
     delta_list <- list()
     IC_list <- list()
     cfmat_list <- list() 
     rnkmat_list <- list()
-    while (Delta > 0) {
+    while (Delta < 0) {
         cfmat_list[[j]] <- matrix(NA, k-j, k)
         rnkmat_list[[j]] <- matrix(NA, k-j, k)
         delta_list[[j]] <- numeric(k-j)
@@ -52,16 +53,16 @@ function(Y, X, alpha=0, ...)
             #m <- glm(Y ~ .-1, data=data.frame(XX), family=family)
             IC <- (1-alpha)*AIC(m) + alpha*BIC(m)
             IC_list[[j]][i] <- IC
-            delta_list[[j]][i] <- IC_best - IC
+            delta_list[[j]][i] <- IC - IC_best
             cf <- coef(m)
             rnk <- rank(cf)
             names(cf) <- names(rnk) <- colnames(XX)
             cfmat_list[[j]][i,] <- cf[gr]
             rnkmat_list[[j]][i,] <- rnk[gr]
         }
-        best <- which.max(delta_list[[j]])
+        best <- which.min(delta_list[[j]])
         Delta <- delta_list[[j]][best]
-        if (Delta > 0) {
+        if (Delta < 0) {
             IC_best <- IC_list[[j]][best]
             ICvec[j+1] <- IC_list[[j]][best]
             delta[j+1] <- Delta
@@ -91,6 +92,14 @@ function(y, x, alpha=0, ...)
             stop("zombie (sum=0) columns in x")
         X <- as.matrix(x)
     }
-    .optilevel(Y=y, X=X, alpha=alpha, ...)
+    out <- .optilevel(Y=y, X=X, alpha=alpha, ...)
+    levs <- list()
+    for (i in seq_len(length(out$ranklist))) {
+        levi <- sapply(1:max(out$rank[i,]), function(j)
+            paste(colnames(out$coef)[out$rank[i,] == j], collapse=" "))
+        levs[[i]] <- levi[out$rank[i,]]
+    }
+    out$levels <- levs
+    out
 }
 
