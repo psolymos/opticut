@@ -7,8 +7,8 @@
 
 ## estimation
 
-.optilevel <- 
-function(Y, X, alpha=0, ...) 
+.optilevel <-
+function(Y, X, alpha=0, ...)
 {
     library(mefa4)
     if (is.null(colnames(X)))
@@ -35,7 +35,7 @@ function(Y, X, alpha=0, ...)
     Delta <- -1
     delta_list <- list()
     IC_list <- list()
-    cfmat_list <- list() 
+    cfmat_list <- list()
     rnkmat_list <- list()
     while (Delta < 0) {
         cfmat_list[[j]] <- matrix(NA, k-j, k)
@@ -77,7 +77,7 @@ function(Y, X, alpha=0, ...)
         ranklist=rnkmat_list, deltalist=delta_list, iclist=IC_list)
 }
 
-optilevel <- 
+optilevel <-
 function(y, x, alpha=0, ...)
 {
     if (is.null(dim(x))) {
