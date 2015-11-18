@@ -280,8 +280,10 @@ function(Y, X, Z, dist="gaussian", ...)
     if (is.factor(Z)) {
         Z <- rankComb(Y, X, Z, dist=dist, ...)
         Est <- attr(Z, "est")
+        Comb <- "rank"
     } else {
         Est <- NA
+        Comb <- "all"
     }
     Z <- data.matrix(Z)
     if (is.null(colnames(Z)))
@@ -317,6 +319,7 @@ function(Y, X, Z, dist="gaussian", ...)
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else dist
+    attr(out, "comb") <- Comb
     attr(out, "est") <- Est
     class(out) <- c("opticut1", "data.frame")
     out
@@ -441,7 +444,8 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
         TXT <- paste0("Best supported model:")
     }
     xx <- xx[SHOW,,drop=FALSE]
-    cat("Univariate opticut results, dist = ", attr(x, "dist"),
+    cat("Univariate opticut results, comb = ", attr(x, "comb"), 
+        ", dist = ", attr(x, "dist"),
         "\nI = ", format(xx[1L,"I"], digits = digits),
         "; w = ", format(xx[1L,"w"], digits = digits),
         "; H = ", format(attr(x, "H"), digits = digits),
@@ -502,7 +506,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
 print.opticut <- function(x, digits, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
-    cat("Multivariate opticut results, dist =", x$dist, "\n")
+    cat("Multivariate opticut results, comb = ", x$comb, ", dist =", x$dist, "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
     cat(length(x$species), "species, ")
@@ -516,7 +520,7 @@ print.opticut <- function(x, digits, ...) {
 print.summary.opticut <- function(x, digits, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
-    cat("Multivariate opticut results, dist =", x$dist, "\n")
+    cat("Multivariate opticut results, comb = ", x$comb, ", dist =", x$dist, "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
     print(format.data.frame(x$summary, digits=digits))
