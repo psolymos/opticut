@@ -349,11 +349,13 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (missing(strata))
         stop("strata is missing")
     if (is.null(dim(strata))) {
-        if (comb == "rank")
+        if (comb == "rank") {
             Z <- droplevels(as.factor(strata)) # factor
             levels(Z) <- gsub(" +", "", levels(Z))
-        if (comb == "all")
+        }
+        if (comb == "all") {
             Z <- allComb(strata) # matrix
+        }
     } else {
         Z <- as.matrix(strata) # matrix
         comb <- NA # user supplied matrix, not checked
@@ -364,14 +366,14 @@ comb=c("rank", "all"), cl=NULL, ...)
 
     ## sequential
     if (is.null(cl)) {
-        ## show prograss bar
+        ## show progress bar
         if (ncol(Y) > 1L && interactive() && require(pbapply)) {
             res <- pbapply(Y, 2, function(yy, ...)
-                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
-        ## do not show prograss bar
+                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+        ## do not show progress bar
         } else {
             res <- apply(Y, 2, function(yy, ...)
-                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
+                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
         }
     ## parallel
     } else {
@@ -386,7 +388,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             assign("Z", X, envir=e)
             clusterExport(cl, c("X","Z","dist"), envir=e)
             res <- parApply(cl, Y, 2, function(yy, ...)
-                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...))
+                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
             clusterEvalQ(cl, rm(list=c("opticut1",".opticut1",
                 "X","Z","dist",
                 "checkComb","allComb","kComb","rankComb","oComb")))
@@ -395,7 +397,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             if (cl < 2)
                 stop("cl must be at least 2 for forking")
             res <- mclapply(1:ncol(Y), function(i, ...)
-                opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...))
+                opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...), ...)
         }
     }
     out <- list(call=match.call(),
