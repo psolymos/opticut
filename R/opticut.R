@@ -428,7 +428,7 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
         digits <- max(3L, getOption("digits") - 3L)
     xx <- x
     if (sort)
-        xx <- xx[order(xx$w, decreasing=TRUE),]
+        xx <- xx[order(xx$I, decreasing=TRUE),]
     xx$assoc <- parseAssoc(xx)
     if (any(xx$logLR >= cut)) {
         SHOW <- which(xx$logLR >= cut)
@@ -537,7 +537,7 @@ summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
     res <- data.frame(split=hab, sppmat)
     res$assoc <- parseAssoc(res)
     if (sort)
-        res <- res[order(res$split, 1-res$w, decreasing=FALSE),]
+        res <- res[order(res$split, 1-res$I, decreasing=FALSE),]
     res <- res[res$logLR >= min(max(res$logLR), cut),,drop=FALSE]
     res$logL <- NULL
     object$summary <- res
