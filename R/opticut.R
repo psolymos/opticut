@@ -364,8 +364,9 @@ comb=c("rank", "all"), cl=NULL, ...)
         comb <- NA # user supplied matrix, not checked
     }
     Y <- data.matrix(Y)
-    if (dist=="rspf" && ncol(Y) > 1L)
-        stop("rspf is only available for single species in RHS")
+    if (!is.function(dist))
+        if (dist=="rspf" && ncol(Y) > 1L)
+            stop("rspf is only available for single species in RHS")
 
     ## sequential
     if (is.null(cl)) {
@@ -444,7 +445,7 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
         TXT <- paste0("Best supported model:")
     }
     xx <- xx[SHOW,,drop=FALSE]
-    cat("Univariate opticut results, comb = ", attr(x, "comb"), 
+    cat("Univariate opticut results, comb = ", attr(x, "comb"),
         ", dist = ", attr(x, "dist"),
         "\nI = ", format(xx[1L,"I"], digits = digits),
         "; w = ", format(xx[1L,"w"], digits = digits),
