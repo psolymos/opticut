@@ -1,11 +1,11 @@
 Package: opticut
 Type: Package
-Title: Optimal partitioning
+Title: Likelihood based optimal partitioning for indicator species analysis
 Version: 0.0-1
-Date: 2015-06-15
+Date: 2015-10-22
 Author: Peter Solymos
 Maintainer: Peter Solymos <solymos@ualberta.ca>
-Description: Optimal partitioning.
+Description: likelihood based optimal partitioning for indicator species analysis.
 URL: https://github.com/psolymos/opticut
 License: GPL-2
 LazyLoad: yes
