@@ -145,7 +145,7 @@ for manipulating fitted objects.
 set.seed(1234)
 n <- 200
 x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 table(x0,x1)
 lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2)
@@ -181,7 +181,11 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
 spp
+
+## all partitions
 summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
+
+## rank based partitions
 summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="rank"))
 }
 \keyword{ models }

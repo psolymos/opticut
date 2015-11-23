@@ -48,7 +48,7 @@ function(Y, X, alpha=0, ...)
             l1 <- unique(gr[rnk == i])
             l2 <- unique(gr[rnk == i+1])
             gr[gr %in% c(l1, l2)] <- paste(l1, l2, sep="+")
-            XX <- groupSums(X, 2, gr)
+            XX <- mefa4::groupSums(X, 2, gr)
             m <- glm(Y ~ .-1, data=data.frame(XX), ...)
             #m <- glm(Y ~ .-1, data=data.frame(XX), family=family)
             IC <- (1-alpha)*AIC(m) + alpha*BIC(m)
@@ -102,4 +102,3 @@ function(y, x, alpha=0, ...)
     out$levels <- levs
     out
 }
-
