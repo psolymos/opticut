@@ -1,6 +1,10 @@
-# opticut version
+# opticut package versions
+
+## Version 0.1-0 -- Nov 23, 2015
+
+* Preparing for 1st major release.
 
 ## Version 0.0-1 -- Nov 22, 2015
 
-  * Organizing files and CHECK-ing package.
-  * Adding Examples.
+* Organizing files and checking package.
+* Adding Examples.
