@@ -85,10 +85,12 @@ Complements are not counted twice, i.e.
 (0,0,1,1) is equivalent to (1,1,0,0).
 The number of such possible combinations is $M = 2^{K-1} - 1$.
 
-```{r, echo=FALSE}
-source("~/repos/opticut/R/opticut.R")
-#options("digits"=7)
+Get the package and load it:
+```{r}
+#devtools::install_github("psolymos/opticut")
+library(opticut)
 ```
+
 ```{r}
 kComb(k = 2)
 kComb(k = 3)
