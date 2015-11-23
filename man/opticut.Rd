@@ -20,8 +20,6 @@ opticut1(Y, X, Z, dist = "gaussian", ...)
 opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), cl = NULL, ...)
 
-cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort
-
 \method{plot}{opticut1}(x, cut = getOption("ocoptions")$cut, 
     ylim = c(-1, 1), ylab = "Model weight * Association", 
     xlab = "Partitions", ...)
