@@ -51,7 +51,8 @@ character, how to define the binary partitions.
 \code{"all"} uses \code{\link{allComb}}.
 }
   \item{cl}{
-a cluster object, or an integer for multiple cores in parallel coputations.
+a cluster object, or an integer for multiple cores in parallel coputations
+(this does nothing on Windows).
 }
   \item{Y}{
 numeric, vector of observations.
@@ -172,24 +173,30 @@ n <- 200
 x0 <- sample(1:4, n, TRUE)
 x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
-p1 <- plogis(0.5 + 0.5*x1 + -0.2*x2)
+p1 <- plogis(-0.5 + 2*x1 + -0.8*x2)
 Y1 <- rbinom(n, 1, p1)
-p2 <- plogis(0.1 + 0.5*ifelse(x0==4,1,0) + 0.2*x2)
+p2 <- plogis(-0.1 + 2*ifelse(x0==4,1,0) + -0.8*x2)
 Y2 <- rbinom(n, 1, p2)
-p3 <- plogis(0.1 + -0.2*x2)
+p3 <- plogis(-0.1 + -0.8*x2)
 Y3 <- rbinom(n, 1, p3)
 Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
 X <- model.matrix(~x2)
+
+## all partitions, single species
 Z <- allComb(x0)
 opticut1(Y1, X, Z, dist="binomial")
-opticut1(Y2, X, Z, dist="binomial")
-opticut1(Y3, X, Z, dist="binomial")
 
-## all partitions
-summary(m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
+## rank based partitions, single species
+opticut1(Y1, X, as.factor(x0), dist="binomial")
+
+## all partitions, multiple species
+m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
+summary(m)
+## show all species
+summary(m, cut=0)
 plot(m)
 
-## rank based partitions
+## rank based partitions, multiple species
 summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
 
 \dontrun{
@@ -201,9 +208,8 @@ dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 ## filter species to speed up things a bit
 Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 100]
 ## opticut results
-
-system.time(dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="zinb"))
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb")
 summary(dol)
 
 ## parallel computing comparisons
@@ -223,9 +229,22 @@ system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist="zinb", comb="rank", cl=cl))
 stopCluster(cl)
 
+## --- Customizing distributions
+## we may want to expand the Zero-inflation component in a ZIP model
+## see how the return value needs to be structured
+fun <- function(Y, X, linkinv, zi_term, ...) {
+    X <- as.matrix(X)
+    mod <- pscl::zeroinfl(Y ~ X-1 | zi_term, dist = "poisson", ...)
+    list(coef=coef(mod),
+        logLik=logLik(mod),
+        linkinv=mod$linkinv)
 }
-
-## custom functions ???
-
+Xdol <- model.matrix(~ stratum + lmoist + method, data=dolina$samp)
+## this fits the null model (i.e. no partitions added)
+fun(Y[,"amin"], Xdol, zi_term=dolina$samp$method)
+## now we can use dist=fun
+opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab, 
+    dist=fun, zi_term=dolina$samp$method)
+}
 }
 \keyword{ models }

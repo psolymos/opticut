@@ -540,41 +540,47 @@ ylab="Model weight * Association", xlab="Partitions", ...)
             colorRampPalette(c("yellow","green"))(10))
         br <- seq(-1, 1, 0.1)
         xx <- summary(x, cut=cut, sort=sort)
-        nsplit <- xx$nsplit
-        nspp <- nrow(xx$summary)
-        #spp <- xx$species[rownames(xx$summary)]
-        ww <- sapply(xx$species[rownames(xx$summary)], "[[", "w")
-        ss <- sapply(xx$species[rownames(xx$summary)], "[[", "assoc")
-        ss[ss==0] <- 1
-        ww <- ww * ss
-        rownames(ww) <- rownames(xx$species[[1]])
-        colnames(ww) <- rownames(xx$summary)
-        llr <- sapply(xx$species[rownames(xx$summary)], "[[", "logLR")
-        ww[llr < cut] <- 0
-        ww <- ww[rowSums(ww) != 0,,drop=FALSE]
-        op <- par(las=las)
-        plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0),
-            type="n", axes=FALSE, ann=FALSE, ...)
-        title(ylab=ylab, xlab=xlab)
-        axis(2, at=1:ncol(ww)-0.5,
-            labels=colnames(ww), tick=TRUE)
-        axis(1, at=1:nrow(ww)-0.5,
-            labels=rownames(ww), tick=TRUE)
-        abline(h=1:ncol(ww)-0.5)
-        abline(v=0:nrow(ww), col="lightgrey")
-        for (i in 1:ncol(ww)) {
-            lines(rep(which.max(abs(ww[,i])), 2)-0.5, c(-0.5,0.5)+i-0.5,
-                col="grey", lwd=2)
-            for (j in 1:nrow(ww)) {
-                h <- - ww[j,i] * 0.45
-                polygon(c(0,1,1,0)+j-1, c(0,0,h,h)+i-0.5,
-                    col=COL[as.integer(cut(-h, breaks=seq(-1, 1, 0.1)))])
-                    #col=grey(1-abs(ww[j,i])))
+
+        if (nrow(xx$summary) < 2) {
+            plot(x$species[[rownames(xx$summary)]],
+                cut=cut, ylab=ylab, xlab=xlab, ...)
+        } else {
+            nsplit <- xx$nsplit
+            nspp <- nrow(xx$summary)
+            #spp <- xx$species[rownames(xx$summary)]
+            ww <- sapply(xx$species[rownames(xx$summary)], "[[", "w")
+            ss <- sapply(xx$species[rownames(xx$summary)], "[[", "assoc")
+            ss[ss==0] <- 1
+            ww <- ww * ss
+            rownames(ww) <- rownames(xx$species[[1]])
+            colnames(ww) <- rownames(xx$summary)
+            llr <- sapply(xx$species[rownames(xx$summary)], "[[", "logLR")
+            ww[llr < cut] <- 0
+            ww <- ww[rowSums(ww) != 0,,drop=FALSE]
+            op <- par(las=las)
+            plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0),
+                type="n", axes=FALSE, ann=FALSE, ...)
+            title(ylab=ylab, xlab=xlab)
+            axis(2, at=1:ncol(ww)-0.5,
+                labels=colnames(ww), tick=TRUE)
+            axis(1, at=1:nrow(ww)-0.5,
+                labels=rownames(ww), tick=TRUE)
+            abline(h=1:ncol(ww)-0.5)
+            abline(v=0:nrow(ww), col="lightgrey")
+            for (i in 1:ncol(ww)) {
+                lines(rep(which.max(abs(ww[,i])), 2)-0.5, c(-0.5,0.5)+i-0.5,
+                    col="grey", lwd=2)
+                for (j in 1:nrow(ww)) {
+                    h <- - ww[j,i] * 0.45
+                    polygon(c(0,1,1,0)+j-1, c(0,0,h,h)+i-0.5,
+                        col=COL[as.integer(cut(-h, breaks=seq(-1, 1, 0.1)))])
+                        #col=grey(1-abs(ww[j,i])))
+                }
             }
+            box()
+            par(op)
+            invisible(ww)
         }
-        box()
-        par(op)
-        invisible(ww)
     }
 }
 
