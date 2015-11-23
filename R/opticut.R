@@ -364,7 +364,8 @@ comb=c("rank", "all"), cl=NULL, ...)
 
             #parallel::clusterExport(cl, c("opticut1",".opticut1",
             #    "checkComb","allComb","kComb","rankComb","oComb"))
-            parallel::clusterEvalQ(cl, library(opticut))
+            #parallel::clusterEvalQ(cl, library(opticut))
+            parallel::clusterEvalQ(cl, requireNamespace(opticut))
             e <- new.env()
             assign("dist", dist, envir=e)
             assign("X", X, envir=e)
@@ -672,7 +673,6 @@ uncertainty.opticut <-
 function (object, which=NULL,
 type=c("asymp", "boot", "multi"), B=99, ...)
 {
-    require(pbapply)
     type <- match.arg(type)
     B <- as.integer(B)
     if (B < 1)

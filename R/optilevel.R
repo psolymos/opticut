@@ -10,7 +10,6 @@
 .optilevel <-
 function(Y, X, alpha=0, ...)
 {
-    library(mefa4)
     if (is.null(colnames(X)))
         colnames(X) <- paste0("V", seq_len(ncol(X)))
     colnames(X) <- gsub("\\s", "", colnames(X))
