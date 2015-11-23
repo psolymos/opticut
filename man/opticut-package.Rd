@@ -13,7 +13,10 @@ The DESCRIPTION file:
 \packageDESCRIPTION{opticut}
 \packageIndices{opticut}
 
-The main user interface is the \code{\link{opticut}} function.
+The main user interface is the \code{\link{opticut}} function
+to find the optimal binary partitioning.
+
+\code{\link{optilevel}} finds the optimal number of factor levels.
 }
 \author{
 \packageAuthor{opticut}

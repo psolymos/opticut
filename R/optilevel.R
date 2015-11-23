@@ -15,10 +15,6 @@ function(Y, X, alpha=0, dist="gaussian", ...)
     colnames(X) <- gsub("\\s", "", colnames(X))
 
     m_full <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
-
-    #m_full <- glm(Y ~ .-1, data=data.frame(X), ...)
-    #m_full <- glm(Y ~ .-1, data=data.frame(X), family=family)
-
     cf_full <- m_full$coef
     rnk_full <- rank(cf_full)
     k <- length(cf_full)
@@ -26,7 +22,6 @@ function(Y, X, alpha=0, dist="gaussian", ...)
     AIC_m_full <- -2*m_full$logLik + 2*k
     BIC_m_full <- -2*m_full$logLik + log(n)*k
     IC_full <- (1-alpha)*AIC_m_full + alpha*BIC_m_full
-
     cfmat <- matrix(NA, k, k)
     cfmat[1,] <- cf_full
     rnkmat <- matrix(NA, k, k)
@@ -57,17 +52,11 @@ function(Y, X, alpha=0, dist="gaussian", ...)
             XX <- mefa4::groupSums(X, 2, gr)
 
             m <- .opticut1(Y, XX, Z1=NULL, dist=dist, ...)
-            #m <- glm(Y ~ .-1, data=data.frame(XX), ...)
-            #m <- glm(Y ~ .-1, data=data.frame(XX), family=family)
-
             cf <- m$coef
             rnk <- rank(cf)
             kk <- length(cf)
             AIC_m <- -2*m$logLik + 2*kk
             BIC_m <- -2*m$logLik + log(n)*kk
-            #cf <- coef(m)
-            #rnk <- rank(cf)
-
             IC <- (1-alpha)*AIC_m + alpha*BIC_m
             IC_list[[j]][i] <- IC
             delta_list[[j]][i] <- IC - IC_best
@@ -89,7 +78,8 @@ function(Y, X, alpha=0, dist="gaussian", ...)
             break
     }
     list(delta=delta, ic=ICvec, coef=cfmat, rank=rnkmat,
-        ranklist=rnkmat_list, deltalist=delta_list, iclist=IC_list)
+        deltalist=delta_list, iclist=IC_list,
+        coeflist=cfmat_list, ranklist=rnkmat_list)
 }
 
 optilevel <-
@@ -113,6 +103,7 @@ function(y, x, alpha=0, dist="gaussian", ...)
         levi <- sapply(1:max(out$rank[i,]), function(j)
             paste(colnames(out$coef)[out$rank[i,] == j], collapse=" "))
         levs[[i]] <- levi[out$rank[i,]]
+        names(levs[[i]]) <- colnames(out$coef)
     }
     out$levels <- levs
     out
