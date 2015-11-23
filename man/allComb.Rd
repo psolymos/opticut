@@ -11,7 +11,7 @@ Finding all combinations require
 a classification vector with K > 1 partitions.
 }
 \usage{
-allComb(x, collapse = " ")
+allComb(x, collapse = getOption("ocoptions")$collapse)
 kComb(k)
 checkComb(x)
 }

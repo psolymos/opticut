@@ -35,7 +35,7 @@ function(k)
 ## with at least 2 levels
 ## and returns a model matrix with binary partitions
 allComb <-
-function(x, collapse = " ")
+function(x, collapse = getOption("ocoptions")$collapse)
 {
     f <- droplevels(as.factor(x))
     LEVELS <- gsub("\\s", "", levels(f))
@@ -80,7 +80,7 @@ checkComb <- function(x) {
 ## x is a named vector of ranks, referring to factor levels
 ## in some classification vector, 1=highest abundance.
 oComb <-
-function(x, collapse = " ")
+function(x, collapse = getOption("ocoptions")$collapse)
 {
     if (length(x) < 2L)
         stop("length of x must be >1")
@@ -103,7 +103,8 @@ function(x, collapse = " ")
 }
 
 rankComb <-
-function(Y, X, Z, dist="gaussian", collapse = " ", ...)
+function(Y, X, Z, dist="gaussian", 
+collapse = getOption("ocoptions")$collapse, ...)
 {
     if (!is.factor(Z))
         stop("Z must be a factor")
@@ -407,7 +408,10 @@ comb=c("rank", "all"), cl=NULL, ...)
     factor(Assoc, levels=c("---","--","-","0","+","++","+++"))
 }
 
-print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
+print.opticut1 <- function(x, 
+cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, 
+digits, ...) 
+{
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
     xx <- x
@@ -450,7 +454,7 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
 
 
 plot.opticut1 <-
-function(x, cut=2, ylim=c(-1,1),
+function(x, cut=getOption("ocoptions")$cut, ylim=c(-1,1),
 ylab="Model weight * Association", xlab="Partitions", ...)
 {
     w <- x$w * x$assoc
@@ -503,7 +507,9 @@ print.summary.opticut <- function(x, digits, ...) {
     invisible(x)
 }
 
-summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
+summary.opticut <- function(object, 
+cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...) 
+{
     spp <- lapply(object$species, function(z)
         as.matrix(z[order(z$w, decreasing=TRUE)[1L],]))
     sppmat <- t(sapply(spp, function(z) as.matrix(z)))
@@ -525,7 +531,8 @@ summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
 }
 
 plot.opticut <-
-function(x, which=NULL, cut=2, sort=TRUE, las=1,
+function(x, which=NULL, 
+cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, las=1,
 ylab="Model weight * Association", xlab="Partitions", ...)
 {
     if (!is.null(which) && length(which) == 1L) {

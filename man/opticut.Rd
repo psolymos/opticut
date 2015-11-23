@@ -20,15 +20,22 @@ opticut1(Y, X, Z, dist = "gaussian", ...)
 opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), cl = NULL, ...)
 
-\method{plot}{opticut1}(x, cut = 2, ylim = c(-1, 1),
-    ylab = "Model weight * Association", xlab = "Partitions", ...)
-\method{plot}{opticut}(x, which = NULL, cut = 2, sort = TRUE, las = 1,
-    ylab = "Model weight * Association", xlab = "Partitions", ...)
+cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort
 
-\method{print}{opticut1}(x, cut = 2, sort = TRUE, digits, ...)
+\method{plot}{opticut1}(x, cut = getOption("ocoptions")$cut, 
+    ylim = c(-1, 1), ylab = "Model weight * Association", 
+    xlab = "Partitions", ...)
+\method{plot}{opticut}(x, which = NULL, 
+    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, 
+    las = 1, ylab = "Model weight * Association", xlab = "Partitions", ...)
+
+\method{print}{opticut1}(x, 
+    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
+    digits, ...)
 \method{print}{opticut}(x, digits, ...)
 \method{print}{summary.opticut}(x, digits, ...)
-\method{summary}{opticut}(object, cut = 2, sort = TRUE, ...)
+\method{summary}{opticut}(object, 
+    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, ...)
 }
 \arguments{
   \item{formula}{
@@ -146,6 +153,9 @@ for partitioning algorithms.
 
 \code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
 for manipulating fitted objects.
+
+\code{\link{ocoptions}} on how to set some of the global options 
+related to the presentation of the results in the package.
 }
 \examples{
 ## --- Gaussian
