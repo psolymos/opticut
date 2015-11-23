@@ -48,7 +48,7 @@ character or function, a distribution to fit, see Details and Examples.
   \item{comb}{
 character, how to define the binary partitions.
 \code{"rank"} uses \code{\link{rankComb}},
-\code{"all"} uses \code{\link{aaComb}}.
+\code{"all"} uses \code{\link{allComb}}.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel coputations.
@@ -73,11 +73,16 @@ log likelihood ratio value for showing species.
   \item{sort}{
 logical, if species should be sorted by indicator values in the output.
 }
-  \item{ylab, xlab, las}{
+  \item{ylab, xlab, las, ylim}{
 graphical arguments.
 }
   \item{digits}{
 numeric, number of significat digits in output.
+}
+  \item{which}{
+numeric, character (can be a vector) defining
+a subset of species from the fitted object,
+or or \code{NULL} (all species, default).
 }
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.

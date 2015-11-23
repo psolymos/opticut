@@ -28,12 +28,12 @@ List of 3
   ..$ lthick  : num [1:512] 2 2 2.5 2.5 3 3 0.5 0.5 1.5 1.5 ...
  $ taxa:'data.frame':	42 obs. of  2 variables:
   ..$ scientific.name: Factor w/ 51 levels "Acanthinula aculeata",..: 1 3 39 4 5 6 13 10 16 14 ...
-  ..$ author         : Factor w/ 28 levels "(Alder, 1830)",..: 12 19 20 1 11 7 16 25 4 11 ...
+  ..$ family         : Factor w/ 19 levels "Aciculidae","Carychiidae",..: 17 11 1 11 3 3 3 3 18 3 ...
 }
 \details{
 A list with 3 elements: \code{xtab} is a sample x species matrix with counts,
 \code{samp} is a data frame with sample level attributes,
-\code{taxa} is a data frame with scientifc names and authorities for the species.
+\code{taxa} is a data frame with scientifc names and families for the species.
 
 Land snails were sampled during daylight hours between
 16 and 18 of August, 2007. Samples were taken from four
