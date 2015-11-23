@@ -23,7 +23,9 @@ weighting factor for calculating information criteria for model selection
 }
   \item{dist}{
 character, distribution argument passed to underlying functions,
-see listed on the help page of \code{\link{opticut}}.
+see listed on the help page of \code{\link{opticut}}
+(except for \code{dist = "rspf"} which does not have a sount theoretical
+basis due to non-identifiability of piecewise constant RSPF models).
 }
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.
@@ -41,6 +43,7 @@ along the selection path considering best models.
 
 \code{rank}: matrix ranks based on the coefficients 
 along the selection path considering best models.
+Ranking uses the devault \code{ties.method = "average"} in \code{\link{rank}}.
 
 \code{deltalist}: delta IC values along the selection path 
 considering all competing models.
@@ -64,13 +67,51 @@ Peter Solymos <solymos@ualberta.ca>
 \code{\link{opticut}} for finding best binary partitions.
 }
 \examples{
+## --- Factor levels with Gaussian distribution
+## simple example from Legendre 2013
+## Indicator Species: Computation, in
+## Encyclopedia of Biodiversity, Volume 4
+## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
+gr <- as.factor(paste0("X", rep(1:5, each=5)))
+spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
+    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
+    Species3=rep(c(18,2,0,0,0), each=5))
+rownames(spp) <- gr
+spp
 
-## show how to get the final merging
+ol <- optilevel(spp[,"Species3"], as.factor(gr))
+ol[c("delta", "coef", "rank", "levels")]
 
-## factor and prop based example
+## get the final factor level
+gr2 <- gr
+levels(gr2) <- ol$level[[length(ol$level)]]
+table(gr, gr2)
 
-## simul (prop) & real (dolina)???
 
+## --- Proportions with Poisson distribution
+## simulation
+set.seed(123)
+n <- 500 # number of observations
+k <- 5 # number of habitat types
+b <- c(-1, -0.2, -0.2, 0.5, 1)
+names(b) <- LETTERS[1:k]
+x <- replicate(k, exp(rnorm(n)))
+x <- x / rowSums(x) # proportions
+X <- model.matrix(~.-1, data=data.frame(x))
+lam <- exp(drop(X %*% b))
+y <- rpois(n, lam)
+
+z <- optilevel(y, x, dist="poisson")
+
+## estimates
+plogis(z$coef)
+plogis(b)
+## optimal classification
+z$rank
+
+## get the final matrix
+head(x)
+head(mefa4::groupSums(x, 2, z$levels[[length(z$levels)]]))
 }
 \keyword{ manip }
 \keyword{ models }

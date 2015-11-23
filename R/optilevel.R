@@ -10,12 +10,21 @@
 .optilevel <-
 function(Y, X, alpha=0, dist="gaussian", ...)
 {
+    if (!is.function(dist)) {
+        dist <- match.arg(dist,
+            c("gaussian","poisson","binomial","negbin",
+            "beta","zip","zinb","ordered", "rspf"))
+        if (dist == "rspf")
+            stop("dist='rspf' not supported for optilevel")
+    }
     if (is.null(colnames(X)))
         colnames(X) <- paste0("V", seq_len(ncol(X)))
     colnames(X) <- gsub("\\s", "", colnames(X))
 
     m_full <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf_full <- m_full$coef
+    if (dist %in% c("zip","zinb","beta"))
+        cf_full <- cf_full[-length(cf_full)]
     rnk_full <- rank(cf_full)
     k <- length(cf_full)
     n <- length(Y)
@@ -53,6 +62,8 @@ function(Y, X, alpha=0, dist="gaussian", ...)
 
             m <- .opticut1(Y, XX, Z1=NULL, dist=dist, ...)
             cf <- m$coef
+            if (dist %in% c("zip","zinb","beta"))
+                cf <- cf[-length(cf_full)]
             rnk <- rank(cf)
             kk <- length(cf)
             AIC_m <- -2*m$logLik + 2*kk

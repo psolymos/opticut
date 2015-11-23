@@ -119,6 +119,9 @@ uses \code{\link[MASS]{polr}} of the MASS package.
 \code{"rspf"}: presence-only data using resource selection
 probability functions,
 uses \code{\link[ResourceSelection]{rspf}} of the ResourceSelection package.
+The \code{"rspf"} works only for single species using \code{opticut1}
+because 'presence-only' type data cannot be kept in a single
+matrix-like object for multiple species.
 
 Custom distributions can be defined, see Examples.
 }
@@ -144,28 +147,43 @@ for partitioning algorithms.
 for manipulating fitted objects.
 }
 \examples{
-## simulated count data
+## --- Gaussian
+## simple example from Legendre 2013
+## Indicator Species: Computation, in
+## Encyclopedia of Biodiversity, Volume 4
+## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
+gr <- as.factor(paste0("X", rep(1:5, each=5)))
+spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
+    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
+    Species3=rep(c(18,2,0,0,0), each=5))
+rownames(spp) <- gr
+spp
+
+## all partitions
+summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
+
+## rank based partitions
+summary(ocrank <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="rank"))
+
+## --- Binomial
+## simulated binary data
 set.seed(1234)
 n <- 200
 x0 <- sample(1:4, n, TRUE)
 x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
-table(x0,x1)
-lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2)
-boxplot(lam1~x0)
-Y1 <- rpois(n, lam1)
-lam2 <- exp(0.1 + 0.5*ifelse(x0==4,1,0) + 0.2*x2)
-boxplot(lam2~x0)
-Y2 <- rpois(n, lam2)
-lam3 <- exp(0.1 + -0.2*x2)
-boxplot(lam3~x0)
-Y3 <- rpois(n, lam3)
+p1 <- plogis(0.5 + 0.5*x1 + -0.2*x2)
+Y1 <- rbinom(n, 1, p1)
+p2 <- plogis(0.1 + 0.5*ifelse(x0==4,1,0) + 0.2*x2)
+Y2 <- rbinom(n, 1, p2)
+p3 <- plogis(0.1 + -0.2*x2)
+Y3 <- rbinom(n, 1, p3)
 Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
 X <- model.matrix(~x2)
 Z <- allComb(x0)
-opticut1(Y1, X, Z, dist="poisson")
-opticut1(Y2, X, Z, dist="poisson")
-opticut1(Y3, X, Z, dist="poisson")
+opticut1(Y1, X, Z, dist="binomial")
+opticut1(Y2, X, Z, dist="binomial")
+opticut1(Y3, X, Z, dist="binomial")
 
 ## all partitions
 summary(m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
@@ -174,21 +192,40 @@ plot(m)
 ## rank based partitions
 summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
 
-## simple example from Legendre 2013
-## Indicator Species: Computation, in
-## Encyclopedia of Biodiversity, Volume 4
-## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
-gr <- rep(1:5, each=5)
-spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
-    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
-    Species3=rep(c(18,2,0,0,0), each=5))
-rownames(spp) <- gr
-spp
+\dontrun{
+## --- Zero-inflated Negative Binomial
+## dolina analysis
+data(dolina)
+## stratum as ordinal
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+## filter species to speed up things a bit
+Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 100]
+## opticut results
 
-## all partitions
-summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
+system.time(dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb"))
+summary(dol)
 
-## rank based partitions
-summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="rank"))
+## parallel computing comparisons
+library(parallel)
+cl <- makeCluster(2)
+## sequential, all combinations (2^(K-1) - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb", comb="all", cl=NULL))
+## sequential, rank based combinations (K - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb", comb="rank", cl=NULL))
+## parallel, all combinations (2^(K-1) - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb", comb="all", cl=cl))
+## parallel, rank based combinations (K - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb", comb="rank", cl=cl))
+stopCluster(cl)
+
+}
+
+## custom functions ???
+
 }
 \keyword{ models }
