@@ -1,72 +1,63 @@
 \name{allComb}
 \alias{allComb}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{kComb}
+\alias{checkComb}
 \title{
-%%  ~~function to do ... ~~
+Finding all possible binary partitions
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+These functions are used to find all possible binary partitions.
+Finding all combinations require
+a classification vector with K > 1 partitions.
 }
 \usage{
 allComb(x, collapse = " ")
+kComb(k)
+checkComb(x)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
-%%     ~~Describe \code{x} here~~
+a vector for \code{allComb} (can be of any type but treated as factor, must have at least 2 unique values); and a numeric matrix for \code{checkComb}.
 }
   \item{collapse}{
-%%     ~~Describe \code{collapse} here~~
+character, what to paste between levels.
 }
+  \item{k}{
+numeric, number of partitions in a given classification (K > 1).
 }
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+\code{kComb} returns a contrast matrix corresponding to
+all possible binary partitions of the factor with k levels.
+Complements are not counted twice, i.e.
+(0,0,1,1) is equivalent to (1,1,0,0).
+The number of such possible combinations is M = 2^(K-1) - 1.
+
+\code{allComb} this takes a classification vector with at least 2 levels
+and returns a model matrix with binary partitions.
+
+\code{checkComb} checks if combinations are unique and non-complementary
+(misfits are returned as attributes). Returns a logical value.
 }
 \author{
-%%  ~~who you are~~
+Peter Solymos <solymos@ualberta.ca>
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\link{\code{rankComb}} for alternative partitioning algorithm.
+
+\link{\code{opticut}} for the user interface.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+kComb(k = 2)
+kComb(k = 3)
+kComb(k = 4)
 
-## The function is currently defined as
-function (x, collapse = " ") 
-{
-    f <- droplevels(as.factor(x))
-    LEVELS <- gsub("\\s", "", levels(f))
-    i <- as.integer(f)
-    n <- max(i)
-    s <- seq_len(n)
-    ac <- kComb(n)
-    LABELS <- apply(ac, 2, function(z) paste(LEVELS[as.logical(z)], 
-        collapse = collapse))
-    out <- apply(ac, 2, function(z) z[match(i, s)])
-    rownames(out) <- f
-    colnames(out) <- LABELS
-    out
-  }
+(f <- rep(LETTERS[1:4], each=2))
+(mc <- allComb(f, collapse = "_"))
+checkComb(mc)
+mc2 <- cbind(z = 1 - mc[,1], mc[,c(1:ncol(mc), 1)])
+colnames(mc2) <- 1:ncol(mc2)
+mc2
+checkComb(mc2)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ manip }
