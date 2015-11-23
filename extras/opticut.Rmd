@@ -80,7 +80,7 @@ Finding all combinations does not require a model or observed responses.
 It only takes a classification vector with $K > 1$ partitions.
 
 `kComb` returns a 'contrast' matrix corresponding to
-all possible binary partitions of the factor with `n` levels.
+all possible binary partitions of the factor with `K` levels.
 Complements are not counted twice, i.e.
 (0,0,1,1) is equivalent to (1,1,0,0).
 The number of such possible combinations is $M = 2^{K-1} - 1$.
