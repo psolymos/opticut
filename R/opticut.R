@@ -773,7 +773,7 @@ type=c("asymp", "boot", "multi"), B=99, ...)
                 mod <- .extractOpticut(object, i,
                     boot=TRUE,
                     internal=FALSE,
-                    best=FALSE)[[1L]]
+                    best=FALSE, ...)[[1L]]
                 k <- which.max(mod$logLR)
                 bm[j + 1L] <- rownames(mod)[k]
                 tmp <- as.numeric(mod[k, -1L])

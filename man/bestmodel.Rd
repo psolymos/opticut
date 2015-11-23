@@ -3,6 +3,8 @@
 \alias{bestmodel.opticut}
 \alias{bestpart}
 \alias{bestpart.opticut}
+\alias{uncertainty}
+\alias{uncertainty.opticut}
 \title{
 Accessing best model and partition from fitted object
 }
@@ -12,8 +14,14 @@ Accessing best model and partition from fitted object.
 \usage{
 bestmodel(object, ...)
 \method{bestmodel}{opticut}(object, which = NULL, ...)
+
 bestpart(object, ...)
 \method{bestpart}{opticut}(object, ...)
+
+uncertainty(object, ...)
+\method{uncertainty}{opticut}(object,
+    which = NULL, type = c("asymp", "boot", "multi"),
+    B = 99, ...)
 }
 \arguments{
   \item{object}{
@@ -23,6 +31,21 @@ fitted model object from \link{\code{opticut}}.
 numeric, character (can be a vector) defining
 a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
+}
+  \item{type}{
+character, decribing the type of uncertainty calculation for
+indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}
+(\code{I = 1 - min(mu0, mu1) / max(mu0, mu1)}).
+\code{"asymp"}: asymptotic distribution is based on best partition
+found for the input object.
+\code{"boot"}: non-parametric bootstrap distribution
+based on best partition found for the input object.
+\code{"multi"}: non-parametric bootstrap distribution
+based on best partition found for the bootstrap data (i.e.
+the model ranking is re-evaluated each time).
+}
+  \item{B}{
+numeric, number of iterations.
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
@@ -34,6 +57,12 @@ manipulation (e.g. prediction).
 
 \code{bestpart} returns a matrix with the best supported
 partitions for each species (species as columns).
+
+\code{uncertainty} returns a list with species specific
+output as elements.
+Each output is a data frame with 4 columns:
+\code{best} partition, indicator value \code{I},
+and expected values \code{mu0}, and \code{mu1}.
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
@@ -51,9 +80,28 @@ lam <- exp(0.5 + 1*x1 + -0.2*x2)
 Y <- rpois(n, lam)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
+## best partition
 head(bestpart(oc))
 
-bestmodel(oc)
+## best model
+mods <- bestmodel(oc)
+## explore further
+str(predict(mods[[1]]))
+confint(mods[[1]])
+
+uc1 <- uncertainty(oc, 1, type="asymp", B=1000)
+uc2 <- uncertainty(oc, 1, type="boot", B=20)
+uc3 <- uncertainty(oc, 1, type="multi", B=20)
+
+summary(uc1[[1]])
+summary(uc2[[1]])
+summary(uc3[[1]])
+
+plot(density(uc1[[1]]$I))
+lines(density(uc2[[1]]$I), col=2)
+lines(density(uc3[[1]]$I), col=4)
+legend("topleft", lty=1, col=c(1,2,4),
+    legend=c("asymp", "boot", "multi"))
 }
 \keyword{ manip }
 \keyword{ models }
