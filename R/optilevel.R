@@ -8,17 +8,24 @@
 ## estimation
 
 .optilevel <-
-function(Y, X, alpha=0, ...)
+function(Y, X, alpha=0, dist="gaussian", ...)
 {
     if (is.null(colnames(X)))
         colnames(X) <- paste0("V", seq_len(ncol(X)))
     colnames(X) <- gsub("\\s", "", colnames(X))
-    m_full <- glm(Y ~ .-1, data=data.frame(X), ...)
+
+    m_full <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
+
+    #m_full <- glm(Y ~ .-1, data=data.frame(X), ...)
     #m_full <- glm(Y ~ .-1, data=data.frame(X), family=family)
-    IC_full <- (1-alpha)*AIC(m_full) + alpha*BIC(m_full)
-    cf_full <- coef(m_full)
+
+    cf_full <- m_full$coef
     rnk_full <- rank(cf_full)
     k <- length(cf_full)
+    n <- length(Y)
+    AIC_m_full <- -2*m_full$logLik + 2*k
+    BIC_m_full <- -2*m_full$logLik + log(n)*k
+    IC_full <- (1-alpha)*AIC_m_full + alpha*BIC_m_full
 
     cfmat <- matrix(NA, k, k)
     cfmat[1,] <- cf_full
@@ -48,13 +55,22 @@ function(Y, X, alpha=0, ...)
             l2 <- unique(gr[rnk == i+1])
             gr[gr %in% c(l1, l2)] <- paste(l1, l2, sep="+")
             XX <- mefa4::groupSums(X, 2, gr)
-            m <- glm(Y ~ .-1, data=data.frame(XX), ...)
+
+            m <- .opticut1(Y, XX, Z1=NULL, dist=dist, ...)
+            #m <- glm(Y ~ .-1, data=data.frame(XX), ...)
             #m <- glm(Y ~ .-1, data=data.frame(XX), family=family)
-            IC <- (1-alpha)*AIC(m) + alpha*BIC(m)
+
+            cf <- m$coef
+            rnk <- rank(cf)
+            kk <- length(cf)
+            AIC_m <- -2*m$logLik + 2*kk
+            BIC_m <- -2*m$logLik + log(n)*kk
+            #cf <- coef(m)
+            #rnk <- rank(cf)
+
+            IC <- (1-alpha)*AIC_m + alpha*BIC_m
             IC_list[[j]][i] <- IC
             delta_list[[j]][i] <- IC - IC_best
-            cf <- coef(m)
-            rnk <- rank(cf)
             names(cf) <- names(rnk) <- colnames(XX)
             cfmat_list[[j]][i,] <- cf[gr]
             rnkmat_list[[j]][i,] <- rnk[gr]
@@ -77,7 +93,7 @@ function(Y, X, alpha=0, ...)
 }
 
 optilevel <-
-function(y, x, alpha=0, ...)
+function(y, x, alpha=0, dist="gaussian", ...)
 {
     if (is.null(dim(x))) {
         if (!is.factor(x))
@@ -91,7 +107,7 @@ function(y, x, alpha=0, ...)
             stop("zombie (sum=0) columns in x")
         X <- as.matrix(x)
     }
-    out <- .optilevel(Y=y, X=X, alpha=alpha, ...)
+    out <- .optilevel(Y=y, X=X, alpha=alpha, dist=dist, ...)
     levs <- list()
     for (i in seq_len(length(out$ranklist))) {
         levi <- sapply(1:max(out$rank[i,]), function(j)
