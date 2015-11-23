@@ -365,7 +365,7 @@ comb=c("rank", "all"), cl=NULL, ...)
 
             #parallel::clusterExport(cl, c("opticut1",".opticut1",
             #    "checkComb","allComb","kComb","rankComb","oComb"))
-            #parallel::clusterEvalQ(cl, library(opticut))
+            parallel::clusterEvalQ(cl, library(opticut))
             parallel::clusterEvalQ(cl, requireNamespace("opticut"))
             e <- new.env()
             assign("dist", dist, envir=e)
