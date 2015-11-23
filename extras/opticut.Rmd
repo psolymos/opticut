@@ -38,7 +38,7 @@ There can also be other site descriptors denoted as $x_{ij}$
 taking discrete or continuous values ($j = 1, ..., p$; number of predictors).
 
 A suitable parametric model describe the
-relationship between the observations and the site decriptors
+relationship between the observations and the site descriptors
 through the probability density function 
 $P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$ 
 where $\theta$ is the vector of model parameters: 
@@ -149,7 +149,7 @@ use of resources. Instead, one can rank the $K$ partitions
 based on expected response values 
 ($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$, 
 where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
-This way we haveto explore only $K-1$ partitions:
+This way we have to explore only $K-1$ partitions:
 
 ```{r}
 oComb(1:4)
@@ -264,7 +264,7 @@ stopCluster(cl)
 system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl=3))
 ```
 
-## Percenages
+## Percentages
 
 ### Dune data, cover type data
 
