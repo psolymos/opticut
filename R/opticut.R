@@ -706,7 +706,7 @@ type=c("asymp", "boot", "multi"), B=99, ...)
         for (i in spp) {
             k <- which.max(object$species[[i]]$logLR)
             bm <- rownames(object$species[[i]])[k]
-            cf <- t(pbsapply(seq_len(B), function(z) {
+            cf <- t(pbapply::pbsapply(seq_len(B), function(z) {
                 .extractOpticut(object, i,
                     boot=TRUE,
                     internal=TRUE,
