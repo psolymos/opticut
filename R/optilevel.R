@@ -112,7 +112,8 @@ function(y, x, alpha=0, dist="gaussian", ...)
     levs <- list()
     for (i in seq_len(length(out$ranklist))) {
         levi <- sapply(1:max(out$rank[i,]), function(j)
-            paste(colnames(out$coef)[out$rank[i,] == j], collapse=" "))
+            paste(colnames(out$coef)[out$rank[i,] == j], 
+            collapse=getOption("ocoptions")$collapse))
         levs[[i]] <- levi[out$rank[i,]]
         names(levs[[i]]) <- colnames(out$coef)
     }
