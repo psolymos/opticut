@@ -144,7 +144,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             link <- list(...)$link
             if (is.null(link))
                 link <- "identity"
-            mod <- glm(Y ~ .-1, data=XX, family=gaussian(link), ...)
+            mod <- stats::glm(Y ~ .-1, data=XX, family=gaussian(link), ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
@@ -153,7 +153,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             link <- list(...)$link
             if (is.null(link))
                 link <- "log"
-            mod <- glm(Y ~ .-1, data=XX, family=poisson(link), ...)
+            mod <- stats::glm(Y ~ .-1, data=XX, family=poisson(link), ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
@@ -162,35 +162,31 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             link <- list(...)$link
             if (is.null(link))
                 link <- "logit"
-            mod <- glm(Y ~ .-1, data=XX, family=binomial(link), ...)
+            mod <- stats::glm(Y ~ .-1, data=XX, family=binomial(link), ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
         if (dist == "negbin") {
-            require(MASS)
-            mod <- glm.nb(Y ~ .-1, data=XX, ...)
+            mod <- MASS::glm.nb(Y ~ .-1, data=XX, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
         if (dist == "beta") {
-            require(betareg)
-            mod <- betareg(Y ~ .-1, data=XX, ...)
+            mod <- betareg::betareg(Y ~ .-1, data=XX, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$link$mean$linkinv
         }
         if (dist == "zip") {
-            require(pscl)
-            mod <- zeroinfl(Y ~ .-1 | 1, data=XX, dist="poisson", ...)
+            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist="poisson", ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
         }
         if (dist == "zinb") {
-            require(pscl)
-            mod <- zeroinfl(Y ~ .-1 | 1, data=XX, dist="negbin", ...)
+            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist="negbin", ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
@@ -199,28 +195,26 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             if (!is.null(list(...)$method))
                 if (list(...)$method != "logistic")
                     stop("only logisic model allowed for ordered")
-            require(MASS)
             Y <- as.ordered(Y)
             if (nlevels(Y) > 2) { # ordinal
                 ## need to keep the intercept
                 if (ncol(XX)==1) {
                     if (!is.null(list(...)$data))
                         stop("data argument should not be provided as part of ...")
-                    mod <- polr(Y ~ 1, method="logistic", ...)
+                    mod <- MASS::polr(Y ~ 1, method="logistic", ...)
                 } else {
-                    mod <- polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
+                    mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
                         method="logistic", ...)
                 }
                 cf <- c(0, coef(mod))
             } else {
-                mod <- glm(Y ~ .-1, data=XX, family=binomial("logit"), ...)
+                mod <- stats::glm(Y ~ .-1, data=XX, family=binomial("logit"), ...)
                 cf <- coef(mod)
             }
             ll <- as.numeric(logLik(mod))
             linv <- binomial("logit")$linkinv
         }
         if (dist == "rspf") {
-            library(ResourceSelection)
                 m <- list(...)$m
             if (is.null(m))
                 stop("'m' must be provided, see ?rspf")
@@ -230,7 +224,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             if (link == "log") {
                 stop("rsf (rspf with log link) not implemented")
             } else {
-                mod <- rspf(Y ~ ., data=XX[,-1,drop=FALSE], link=link, ...)
+                mod <- ResourceSelection::rspf(Y ~ ., data=XX[,-1,drop=FALSE],
+                    link=link, ...)
             }
             cf <- mod$coefficients
             ll <- as.numeric(mod$loglik)
@@ -354,8 +349,8 @@ comb=c("rank", "all"), cl=NULL, ...)
     ## sequential
     if (is.null(cl)) {
         ## show progress bar
-        if (ncol(Y) > 1L && interactive() && require(pbapply)) {
-            res <- pbapply(Y, 2, function(yy, ...)
+        if (ncol(Y) > 1L && interactive()) {
+            res <- pbapply::pbapply(Y, 2, function(yy, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
         ## do not show progress bar
         } else {
@@ -364,26 +359,27 @@ comb=c("rank", "all"), cl=NULL, ...)
         }
     ## parallel
     } else {
-        library(parallel)
         ## snow type cluster
         if (inherits(cl, "cluster")) {
-            clusterExport(cl, c("opticut1",".opticut1",
-                "checkComb","allComb","kComb","rankComb","oComb"))
+
+            #parallel::clusterExport(cl, c("opticut1",".opticut1",
+            #    "checkComb","allComb","kComb","rankComb","oComb"))
+            parallel::clusterEvalQ(cl, library(opticut))
             e <- new.env()
             assign("dist", dist, envir=e)
             assign("X", X, envir=e)
             assign("Z", X, envir=e)
-            clusterExport(cl, c("X","Z","dist"), envir=e)
-            res <- parApply(cl, Y, 2, function(yy, ...)
+            parallel::clusterExport(cl, c("X","Z","dist"), envir=e)
+            res <- parallel::parApply(cl, Y, 2, function(yy, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
-            clusterEvalQ(cl, rm(list=c("opticut1",".opticut1",
-                "X","Z","dist",
-                "checkComb","allComb","kComb","rankComb","oComb")))
+            #parallel::clusterEvalQ(cl, rm(list=c("opticut1",".opticut1",
+            #    "X","Z","dist",
+            #    "checkComb","allComb","kComb","rankComb","oComb")))
         ## forking
         } else {
             if (cl < 2)
                 stop("cl must be at least 2 for forking")
-            res <- mclapply(1:ncol(Y), function(i, ...)
+            res <- parallel::mclapply(1:ncol(Y), function(i, ...)
                 opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...), ...)
         }
     }
@@ -695,11 +691,10 @@ type=c("asymp", "boot", "multi"), B=99, ...)
     out <- list()
     if (type == "asymp") {
         for (i in spp) {
-            require(MASS)
             k <- which.max(object$species[[i]]$logLR)
             bm <- rownames(object$species[[i]])[k]
             m1 <- m[[i]]
-            cf <- mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
+            cf <- MASS::mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
             cf <- rbind(coef(m1)[c(1L, 2L)], cf)
             cf0 <- linkinv(cf[,1L])
             cf1 <- linkinv(cf[,1L] + cf[,2L])
@@ -737,8 +732,8 @@ type=c("asymp", "boot", "multi"), B=99, ...)
             tmp <- as.numeric(object$species[[i]][k, -1L])
             names(tmp) <- colnames(object$species[[i]])[-1L]
             mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
-            pb <- startpb(0, B)
-            on.exit(closepb(pb))
+            pb <- pbapply::startpb(0, B)
+            on.exit(pbapply::closepb(pb))
             for (j in seq_len(B)) {
                 ## Z is factor, thus 'rank' applied
                 mod <- .extractOpticut(object, i,
@@ -750,7 +745,7 @@ type=c("asymp", "boot", "multi"), B=99, ...)
                 tmp <- as.numeric(mod[k, -1L])
                 names(tmp) <- colnames(mod)[-1L]
                 mat[j + 1L, ] <- tmp[c("I", "mu0", "mu1")]
-                setpb(pb, j)
+                pbapply::setpb(pb, j)
             }
             out[[i]] <- data.frame(best=bm, mat)
         }

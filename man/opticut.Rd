@@ -137,7 +137,7 @@ Peter Solymos <solymos@ualberta.ca>
 \code{\link{allComb}}, and \code{\link{rankComb}}
 for partitioning algorithms.
 
-\link{\code{{bestmodel}}, \link{\code{{bestpart}}, and \link{\code{{uncertainty}}
+\code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
 for manipulating fitted objects.
 }
 \examples{

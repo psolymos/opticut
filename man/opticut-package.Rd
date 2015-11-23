@@ -1,6 +1,5 @@
 \name{opticut-package}
 \alias{opticut-package}
-\alias{opticut}
 \docType{package}
 \title{
 \packageTitle{opticut}
