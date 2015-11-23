@@ -1,59 +1,59 @@
 \name{bestmodel}
 \alias{bestmodel}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{bestmodel.opticut}
+\alias{bestpart}
+\alias{bestpart.opticut}
 \title{
-%%  ~~function to do ... ~~
+Accessing best model and partition from fitted object
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Accessing best model and partition from fitted object.
 }
 \usage{
 bestmodel(object, ...)
+\method{bestmodel}{opticut}(object, which = NULL, ...)
+bestpart(object, ...)
+\method{bestpart}{opticut}(object, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{
-%%     ~~Describe \code{object} here~~
+fitted model object from \link{\code{opticut}}.
+}
+  \item{which}{
+numeric, character (can be a vector) defining
+a subset of species from the fitted object,
+or or \code{NULL} (all species, default).
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+other arguments passed to the underlying functions.
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+\code{bestmodel} returns the best supported mode for further
+manipulation (e.g. prediction).
+
+\code{bestpart} returns a matrix with the best supported
+partitions for each species (species as columns).
 }
 \author{
-%%  ~~who you are~~
+Peter Solymos <solymos@ualberta.ca>
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\link{\code{opticut}} for the user interface.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+set.seed(2345)
+n <- 50
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+lam <- exp(0.5 + 1*x1 + -0.2*x2)
+Y <- rpois(n, lam)
+oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
-## The function is currently defined as
-function (object, ...) 
-UseMethod("bestmodel")
+head(bestpart(oc))
+
+bestmodel(oc)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ manip }
+\keyword{ models }

@@ -59,7 +59,7 @@ Peter Solymos <solymos@ualberta.ca>
 set.seed(1234)
 n <- 200
 x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 lam <- exp(0.5 + 0.5*x1 + -0.2*x2)
 Y <- rpois(n, lam)
