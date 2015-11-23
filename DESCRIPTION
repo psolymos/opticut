@@ -7,6 +7,7 @@ Author: Peter Solymos
 Maintainer: Peter Solymos <solymos@ualberta.ca>
 Description: likelihood based optimal partitioning for indicator species analysis.
 URL: https://github.com/psolymos/opticut
+Depends: MASS, pscl, betareg, ResourceSelection
 License: GPL-2
 LazyLoad: yes
 LazyData: true

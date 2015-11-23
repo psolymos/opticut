@@ -87,33 +87,33 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 Currently available distributions:
 
 \code{"gaussian"}: real valued continuous observations, e.g. biomass,
-uses \code{\link[stats]{lm} of the stats package.
+uses \code{\link[stats]{lm}} of the stats package.
 
 \code{"poisson"}: Poisson count data,
-uses \code{\link[stats]{glm} of the stats package.
+uses \code{\link[stats]{glm}} of the stats package.
 
 \code{"binomial"}: presence-absence (detection-nondetection) type data,
-uses \code{\link[stats]{glm} of the stats package.
+uses \code{\link[stats]{glm}} of the stats package.
 
 \code{"negbin"}: overdispersed Negative Binomial count data,
-uses \code{\link[MASS]{glm.nb} of the MASS package.
+uses \code{\link[MASS]{glm.nb}} of the MASS package.
 
 \code{"beta"}: continuous response in the unit interval, e.g. percent cover,
-uses \code{\link[betareg]{betareg}  of the betareg package.
+uses \code{\link[betareg]{betareg}}  of the betareg package.
 
 \code{"zip"}: zero-inflated Poisson counts,
-uses \code{\link[pscl]{zeroinfl} of the pscl package.
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 
 \code{"zinb"}: zero-inflated Negative Binomial counts,
-uses \code{\link[pscl]{zeroinfl} of the pscl package.
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 
 \code{"ordered"}: response measured on ordinal scale,
 e.g. ordinal vegetation cover,
-uses \code{\link[MASS]{polr} of the MASS package.
+uses \code{\link[MASS]{polr}} of the MASS package.
 
 \code{"rspf"}: presence-only data using resource selection
 probability functions,
-uses \code{\link[ResourceSelection]{rspf} of the ResourceSelection package.
+uses \code{\link[ResourceSelection]{rspf}} of the ResourceSelection package.
 
 Custom distributions can be defined, see Examples.
 }
