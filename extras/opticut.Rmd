@@ -154,7 +154,7 @@ oComb(1:4)
 ```
 
 `oComb` return the 'contrast' matrix based on the rank vector as input.
-Rank 1 means highest expected value among the partitions.
+Rank 1 means lowest expected value among the partitions.
 
 The function `rankComb` fits the model with multiple ($K > 2$) factor levels
 to find out the ranking, and returns a binary classification matrix

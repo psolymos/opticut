@@ -1,84 +1,75 @@
 \name{rankComb}
 \alias{rankComb}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{oComb}
 \title{
-%%  ~~function to do ... ~~
+Ranking based binary partitions
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Blindly fitting a model to all possible partitions is wasteful
+use of resources. Instead, one can rank the K partitions
+based on expected response values
+to explore only K-1 binary partitions along the gradient
+defined by the ranks of the expected values.
 }
 \usage{
+oComb(x, collapse = " ")
 rankComb(Y, X, Z, dist = "gaussian", collapse = " ", ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{Y}{
-%%     ~~Describe \code{Y} here~~
+numeric, vector of observations.
 }
   \item{X}{
-%%     ~~Describe \code{X} here~~
+numeric, design matrix.
 }
   \item{Z}{
-%%     ~~Describe \code{Z} here~~
+factor, must have at least 2 unique levels.
 }
   \item{dist}{
-%%     ~~Describe \code{dist} here~~
+character, distribution argument passed to underlying functions,
+see listed on the help page of \link{\code{opticut}}.
+}
+  \item{x}{
+a vector for \code{allComb} (can be of any type but treated as factor, must have at least 2 unique values); and a numeric matrix for \code{checkComb}.
 }
   \item{collapse}{
-%%     ~~Describe \code{collapse} here~~
+character, what to paste between levels.
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+other arguments passed to the underlying functions, see \link{\code{opticut}}.
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
+\code{oComb} return the 'contrast' matrix based on the rank vector as input.
+Ranked from lowest to highest expected value among the partitions.
+
+The function \code{rankComb} fits the model with multiple (K > 2) factor levels
+to find out the ranking, and returns a binary classification matrix.
 }
 \author{
-%%  ~~who you are~~
+Peter Solymos <solymos@ualberta.ca>
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\link{\code{allComb}} for alternative partitioning algorithm.
+
+\link{\code{opticut}} for the user interface.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+## simulate some data
+set.seed(1234)
+n <- 200
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+lam <- exp(0.5 + 0.5*x1 + -0.2*x2)
+Y <- rpois(n, lam)
 
-## The function is currently defined as
-function (Y, X, Z, dist = "gaussian", collapse = " ", ...) 
-{
-    if (!is.factor(Z)) 
-        stop("Z must be a factor")
-    Z0 <- model.matrix(~Z)
-    m <- .opticut1(Y, X, Z1 = Z0[, -1L, drop = FALSE], linkinv = TRUE, 
-        dist = dist, ...)
-    lc <- c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)])
-    names(lc) <- levels(Z)
-    x <- rank(-lc)
-    oc <- oComb(x, collapse = collapse)
-    out <- oc[match(Z, rownames(oc)), ]
-    attr(out, "est") <- m$linkinv(lc)
-    out
-  }
+## binary partitions
+head(rc <- rankComb(Y, model.matrix(~x2), as.factor(x0), dist="poisson"))
+attr(rc, "est") # expected values in factor levels
+
+oComb(1:4)
+oComb(attr(rc, "est"))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ manip }
+\keyword{ misc }
