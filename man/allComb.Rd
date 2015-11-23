@@ -61,3 +61,4 @@ mc2
 checkComb(mc2)
 }
 \keyword{ manip }
+\keyword{ misc }
