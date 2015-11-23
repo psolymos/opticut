@@ -97,38 +97,38 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 \details{
 Currently available distributions:
 
-\item{\code{"gaussian"}}{real valued continuous observations, e.g. biomass,
+\code{"gaussian"}: real valued continuous observations, e.g. biomass,
 uses \code{\link[stats]{lm}} of the stats package.
-}
-\item{\code{"poisson"}}{Poisson count data,
+
+\code{"poisson"}: Poisson count data,
 uses \code{\link[stats]{glm}} of the stats package.
-}
-\item{\code{"binomial"}}{presence-absence (detection-nondetection) type data,
+
+\code{"binomial"}: presence-absence (detection-nondetection) type data,
 uses \code{\link[stats]{glm}} of the stats package.
-}
-\item{\code{"negbin"}}{overdispersed Negative Binomial count data,
+
+\code{"negbin"}: overdispersed Negative Binomial count data,
 uses \code{\link[MASS]{glm.nb}} of the MASS package.
-}
-\item{\code{"beta"}}{continuous response in the unit interval, e.g. percent cover,
+
+\code{"beta"}: continuous response in the unit interval, e.g. percent cover,
 uses \code{\link[betareg]{betareg}}  of the betareg package.
-}
-\item{\code{"zip"}}{zero-inflated Poisson counts,
+
+\code{"zip"}: zero-inflated Poisson counts,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
-}
-\item{\code{"zinb"}}{zero-inflated Negative Binomial counts,
+
+\code{"zinb"}: zero-inflated Negative Binomial counts,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
-}
-\item{\code{"ordered"}}{response measured on ordinal scale,
+
+\code{"ordered"}: response measured on ordinal scale,
 e.g. ordinal vegetation cover,
 uses \code{\link[MASS]{polr}} of the MASS package.
-}
-\item{\code{"rspf"}}{presence-only data using resource selection
+
+\code{"rspf"}: presence-only data using resource selection
 probability functions,
 uses \code{\link[ResourceSelection]{rspf}} of the ResourceSelection package.
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-}
+
 Custom distributions can be defined, see Examples.
 }
 \value{
