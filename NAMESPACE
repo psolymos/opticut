@@ -1,1 +1,20 @@
-exportPattern("^[[:alpha:]]+")
+export("opticut", "optilevel", "opticut1",
+    "allComb", "kComb", "checkComb", "rankComb", "oComb",
+    "bestmodel", "bestpart", "uncertainty")
+S3method("bestmodel", "opticut")
+S3method("bestpart", "opticut")
+S3method("plot", "opticut")
+S3method("plot", "opticut1")
+S3method("print", "opticut")
+S3method("print", "opticut1")
+S3method("print", "summary.opticut")
+S3method("summary", "opticut")
+S3method("uncertainty", "opticut")
+
+importFrom("grDevices", "colorRampPalette")
+importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
+           "par", "plot", "polygon", "title")
+importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
+           "model.matrix", "model.response", "poisson", "terms",
+           "vcov")
+importFrom("utils", "combn")
