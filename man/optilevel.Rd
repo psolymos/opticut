@@ -98,7 +98,7 @@ names(b) <- LETTERS[1:k]
 x <- replicate(k, exp(rnorm(n)))
 x <- x / rowSums(x) # proportions
 X <- model.matrix(~.-1, data=data.frame(x))
-lam <- exp(drop(X %*% b))
+lam <- exp(drop(X \%*\% b))
 y <- rpois(n, lam)
 
 z <- optilevel(y, x, dist="poisson")
