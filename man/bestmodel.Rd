@@ -25,7 +25,7 @@ uncertainty(object, ...)
 }
 \arguments{
   \item{object}{
-fitted model object from \link{\code{opticut}}.
+fitted model object from \code{\link{opticut}}.
 }
   \item{which}{
 numeric, character (can be a vector) defining
@@ -68,7 +68,7 @@ and expected values \code{mu0}, and \code{mu1}.
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\link{\code{opticut}} for the user interface.
+\code{\link{opticut}} for the user interface.
 }
 \examples{
 set.seed(2345)

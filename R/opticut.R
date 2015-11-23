@@ -76,23 +76,6 @@ checkComb <- function(x) {
     out
 }
 
-if (FALSE) {
-kComb(2)
-kComb(3)
-kComb(4)
-x <- sample(LETTERS[1:4], 10, TRUE)
-allComb(x, "_")
-x <- sample(LETTERS[1:5], 100, TRUE)
-allComb(x, "_")
-checkComb(allComb(x, "_"))
-## check if this is working OK
-f <- function(n) {
-    sum(sapply(1:(n-1), function(z) choose(n, z)))
-}
-x1 <- sapply(2:10, function(z) ncol(kComb(z))*2)
-x2 <- sapply(2:10, f)
-all(x1==x2)
-}
 
 ## x is a named vector of ranks, referring to factor levels
 ## in some classification vector, 1=highest abundance.
@@ -415,7 +398,7 @@ comb=c("rank", "all"), cl=NULL, ...)
     out
 }
 
-parseAssoc <- function(x) {
+.parseAssoc <- function(x) {
     LRc <- rep(1L, nrow(x))
     LRc[x$logLR > 2] <- 2L
     LRc[x$logLR > 8] <- 3L
@@ -433,7 +416,7 @@ print.opticut1 <- function(x, cut=2, sort=TRUE, digits, ...) {
     xx <- x
     if (sort)
         xx <- xx[order(xx$I, decreasing=TRUE),]
-    xx$assoc <- parseAssoc(xx)
+    xx$assoc <- .parseAssoc(xx)
     if (any(xx$logLR >= cut)) {
         SHOW <- which(xx$logLR >= cut)
         tmp <- if (length(SHOW) > 1L)
@@ -475,17 +458,11 @@ ylab="Model weight * Association", xlab="Partitions", ...)
 {
     w <- x$w * x$assoc
     names(w) <- rownames(x)
-#    cs <- cumsum(w[order(w, decreasing=TRUE)])
-#    r <- cs <= coverage
-#    r[1] <- TRUE
-#    w <- w[names(w) %in% names(r[r])]
     if (!any(x$logLR >= cut)) {
         warning("All logLR < cut: cut ignored")
     } else {
         w <- w[x$logLR >= cut]
     }
-#    if (length(w) < 1L)
-#        stop("All logLR < cut: try lowering cut value")
     COL <- c(colorRampPalette(c("red","yellow"))(10),
         colorRampPalette(c("yellow","green"))(10))
     br <- seq(-1, 1, 0.1)
@@ -494,12 +471,9 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         ylim=ylim, xlab=xlab, ylab=ylab, ...)
     lines(rep(which.max(abs(w))-0.5, 2), c(-1,1), col="grey", lwd=2)
     barplot(w, width=1, space=0, #border=NA,
-        #col=rev(heat.colors(100))[floor(w*100)+1],
-        #col=grey(1-abs(w)),
         col=COL[as.integer(cut(w, breaks=seq(-1, 1, 0.1)))],
         ylim=ylim, xlab="", ylab="", add=TRUE, ...)
     abline(0,0)
-    #points(which.max(x$w)-0.5, 0)
     box()
     invisible(x)
 }
@@ -540,7 +514,7 @@ summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
     #hab <- factor(hab, levels=unique(hab))
     colnames(sppmat) <- colnames(object$species[[1L]])
     res <- data.frame(split=hab, sppmat)
-    res$assoc <- parseAssoc(res)
+    res$assoc <- .parseAssoc(res)
     if (sort)
         res <- res[order(res$split, 1-res$I, decreasing=FALSE),]
     res <- res[res$logLR >= min(max(res$logLR), cut),,drop=FALSE]
@@ -554,7 +528,7 @@ summary.opticut <- function(object, cut=2, sort=TRUE, ...) {
 }
 
 plot.opticut <-
-function(x, which=NULL, cut=2, sort=TRUE, coverage=0.95, las=1,
+function(x, which=NULL, cut=2, sort=TRUE, las=1,
 ylab="Model weight * Association", xlab="Partitions", ...)
 {
     if (!is.null(which) && length(which) == 1L) {
@@ -751,13 +725,10 @@ type=c("asymp", "boot", "multi"), B=99, ...)
             out[[i]] <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
         }
     }
-    ## this is just a concept
-    ## hard to keep track when comb="all"
     if (type == "multi") {
         for (i in spp) {
             if (object$comb == "all")
                 stop("comb='all' is no good, use 'rank' instead")
-            #warning("Experimental feature, excercise caution!")
             k <- which.max(object$species[[i]]$logLR)
             bm <- character(B + 1L)
             bm[1L] <- rownames(object$species[[i]])[k]
@@ -787,17 +758,3 @@ type=c("asymp", "boot", "multi"), B=99, ...)
     out
 }
 
-if (FALSE) {
-object=opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
-a1=uncertainty(object,2,"asymp", B=999)
-a2=uncertainty(object,2,"boot", B=999)
-a3=uncertainty(object,2,"multi", B=999)
-aa <- data.frame(table(a3[[1]]$best))
-aa[order(aa$Freq, decreasing=TRUE),]
-
-plot(density(a2[[1]]$I))
-lines(density(a1[[1]]$I), col=2)
-
-a=uncertainty(object,type="asymp", B=999)
-lapply(a, summary)
-}

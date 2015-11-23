@@ -43,9 +43,9 @@ and returns a model matrix with binary partitions.
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\link{\code{rankComb}} for alternative partitioning algorithm.
+\code{\link{rankComb}} for alternative partitioning algorithm.
 
-\link{\code{opticut}} for the user interface.
+\code{\link{opticut}} for the user interface.
 }
 \examples{
 kComb(k = 2)

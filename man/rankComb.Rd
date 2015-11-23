@@ -27,7 +27,7 @@ factor, must have at least 2 unique levels.
 }
   \item{dist}{
 character, distribution argument passed to underlying functions,
-see listed on the help page of \link{\code{opticut}}.
+see listed on the help page of \code{\link{opticut}}.
 }
   \item{x}{
 a vector for \code{allComb} (can be of any type but treated as factor, must have at least 2 unique values); and a numeric matrix for \code{checkComb}.
@@ -36,7 +36,7 @@ a vector for \code{allComb} (can be of any type but treated as factor, must have
 character, what to paste between levels.
 }
   \item{\dots}{
-other arguments passed to the underlying functions, see \link{\code{opticut}}.
+other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
 }
 \value{
@@ -50,9 +50,9 @@ to find out the ranking, and returns a binary classification matrix.
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\link{\code{allComb}} for alternative partitioning algorithm.
+\code{\link{allComb}} for alternative partitioning algorithm.
 
-\link{\code{opticut}} for the user interface.
+\code{\link{opticut}} for the user interface.
 }
 \examples{
 ## simulate some data

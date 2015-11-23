@@ -1,151 +1,182 @@
 \name{opticut}
 \alias{opticut}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{opticut1}
+\alias{plot.opticut}
+\alias{plot.opticut1}
+\alias{print.opticut}
+\alias{print.opticut1}
+\alias{summary.opticut}
+\alias{print.summary.opticut}
 \title{
-%%  ~~function to do ... ~~
+Likelihood based optimal partitioning for indicator species analysis
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The functions find the best binary partition for each species based on
+model selection. Possibly controlling for modifying/confounding
+variables. The general algorithm is described in Kemencei et al. 2014.
 }
 \usage{
-opticut(formula, data, strata, dist = "gaussian", comb = c("rank", "all"), cl = NULL, ...)
+opticut1(Y, X, Z, dist = "gaussian", ...)
+opticut(formula, data, strata, dist = "gaussian",
+    comb = c("rank", "all"), cl = NULL, ...)
+
+\method{plot}{opticut1}(x, cut = 2, ylim = c(-1, 1),
+    ylab = "Model weight * Association", xlab = "Partitions", ...)
+\method{plot}{opticut}(x, which = NULL, cut = 2, sort = TRUE, las = 1,
+    ylab = "Model weight * Association", xlab = "Partitions", ...)
+
+\method{print}{opticut1}(x, cut = 2, sort = TRUE, digits, ...)
+\method{print}{opticut}(x, digits, ...)
+\method{print}{summary.opticut}(x, digits, ...)
+\method{summary}{opticut}(object, cut = 2, sort = TRUE, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{formula}{
-%%     ~~Describe \code{formula} here~~
+two sided model formula, response species data (matrix) in the left-hand side,
+model terms in the right-hand side
+(its structure depending on the underlying functions).
 }
   \item{data}{
-%%     ~~Describe \code{data} here~~
+data.
 }
   \item{strata}{
-%%     ~~Describe \code{strata} here~~
+vector, unique values define partitions.
 }
   \item{dist}{
-%%     ~~Describe \code{dist} here~~
+character or function, a distribution to fit, see Details and Examples.
 }
   \item{comb}{
-%%     ~~Describe \code{comb} here~~
+character, how to define the binary partitions.
+\code{"rank"} uses \code{\link{rankComb}},
+\code{"all"} uses \code{\link{aaComb}}.
 }
   \item{cl}{
-%%     ~~Describe \code{cl} here~~
+a cluster object, or an integer for multiple cores in parallel coputations.
+}
+  \item{Y}{
+numeric, vector of observations.
+}
+  \item{X}{
+numeric, design matrix.
+}
+  \item{Z}{
+factor (must have at least 2 unique levels,
+this triggers \code{\link{rankComb}}),
+or a design matrix (custom matrix or as returned by \code{\link{allComb}}.
+}
+  \item{x, object}{
+object to plot, print, sommarize.
+}
+  \item{cut}{
+log likelihood ratio value for showing species.
+}
+  \item{sort}{
+logical, if species should be sorted by indicator values in the output.
+}
+  \item{ylab, xlab, las}{
+graphical arguments.
+}
+  \item{digits}{
+numeric, number of significat digits in output.
 }
   \item{\dots}{
-%%     ~~Describe \code{\dots} here~~
+other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
 }
 \details{
-%%  ~~ If necessary, more details than the description above ~~
+Currently available distributions:
+
+\code{"gaussian"}: real valued continuous observations, e.g. biomass,
+uses \code{\link[stats]{lm} of the stats package.
+
+\code{"poisson"}: Poisson count data,
+uses \code{\link[stats]{glm} of the stats package.
+
+\code{"binomial"}: presence-absence (detection-nondetection) type data,
+uses \code{\link[stats]{glm} of the stats package.
+
+\code{"negbin"}: overdispersed Negative Binomial count data,
+uses \code{\link[MASS]{glm.nb} of the MASS package.
+
+\code{"beta"}: continuous response in the unit interval, e.g. percent cover,
+uses \code{\link[betareg]{betareg}  of the betareg package.
+
+\code{"zip"}: zero-inflated Poisson counts,
+uses \code{\link[pscl]{zeroinfl} of the pscl package.
+
+\code{"zinb"}: zero-inflated Negative Binomial counts,
+uses \code{\link[pscl]{zeroinfl} of the pscl package.
+
+\code{"ordered"}: response measured on ordinal scale,
+e.g. ordinal vegetation cover,
+uses \code{\link[MASS]{polr} of the MASS package.
+
+\code{"rspf"}: presence-only data using resource selection
+probability functions,
+uses \code{\link[ResourceSelection]{rspf} of the ResourceSelection package.
+
+Custom distributions can be defined, see Examples.
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+\code{opticut1} returns an object of class opticut1.
+
+\code{opticut} returns an object of class opticut.
 }
 \references{
-%% ~put references to the literature/web site here ~
+Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014): Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. Community Ecology 15:180--186.
 }
 \author{
-%%  ~~who you are~~
+Peter Solymos <solymos@ualberta.ca>
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{allComb}}, and \code{\link{rankComb}}
+for partitioning algorithms.
+
+\link\code{{bestmodel}}, \link\code{{bestpart}}, and \link\code{{uncertainty}}
+for manipulating fitted objects.
 }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+## simulated count data
+set.seed(1234)
+n <- 200
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+table(x0,x1)
+lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2)
+boxplot(lam1~x0)
+Y1 <- rpois(n, lam1)
+lam2 <- exp(0.1 + 0.5*ifelse(x0==4,1,0) + 0.2*x2)
+boxplot(lam2~x0)
+Y2 <- rpois(n, lam2)
+lam3 <- exp(0.1 + -0.2*x2)
+boxplot(lam3~x0)
+Y3 <- rpois(n, lam3)
+Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
+X <- model.matrix(~x2)
+Z <- allComb(x0)
+opticut1(Y1, X, Z, dist="poisson")
+opticut1(Y2, X, Z, dist="poisson")
+opticut1(Y3, X, Z, dist="poisson")
 
-## The function is currently defined as
-function (formula, data, strata, dist = "gaussian", comb = c("rank", 
-    "all"), cl = NULL, ...) 
-{
-    comb <- match.arg(comb)
-    if (missing(data)) 
-        data <- parent.frame()
-    mf <- match.call(expand.dots = FALSE)
-    mm <- match(c("formula", "data"), names(mf), 0)
-    mf <- mf[c(1, mm)]
-    mf$drop.unused.levels <- TRUE
-    mf[[1]] <- as.name("model.frame")
-    mf <- eval(mf, parent.frame())
-    Y <- model.response(mf, "numeric")
-    Y <- data.matrix(Y)
-    if (is.null(colnames(Y))) 
-        colnames(Y) <- paste("Species", seq_len(ncol(Y)))
-    if (any(duplicated(colnames(Y)))) 
-        stop("Duplicate colnames found in LHS")
-    ff <- formula
-    ff[[2]] <- NULL
-    mt <- terms(ff, data = data)
-    X <- model.matrix(mt, mf)
-    if (missing(strata)) 
-        stop("strata is missing")
-    if (is.null(dim(strata))) {
-        if (comb == "rank") {
-            Z <- droplevels(as.factor(strata))
-            levels(Z) <- gsub(" +", "", levels(Z))
-        }
-        if (comb == "all") {
-            Z <- allComb(strata)
-        }
-    }
-    else {
-        Z <- as.matrix(strata)
-        comb <- NA
-    }
-    Y <- data.matrix(Y)
-    if (!is.function(dist)) 
-        if (dist == "rspf" && ncol(Y) > 1L) 
-            stop("rspf is only available for single species in RHS")
-    if (is.null(cl)) {
-        if (ncol(Y) > 1L && interactive() && require(pbapply)) {
-            res <- pbapply(Y, 2, function(yy, ...) opticut1(Y = yy, 
-                X = X, Z = Z, dist = dist, ...), ...)
-        }
-        else {
-            res <- apply(Y, 2, function(yy, ...) opticut1(Y = yy, 
-                X = X, Z = Z, dist = dist, ...), ...)
-        }
-    }
-    else {
-        library(parallel)
-        if (inherits(cl, "cluster")) {
-            clusterExport(cl, c("opticut1", ".opticut1", "checkComb", 
-                "allComb", "kComb", "rankComb", "oComb"))
-            e <- new.env()
-            assign("dist", dist, envir = e)
-            assign("X", X, envir = e)
-            assign("Z", X, envir = e)
-            clusterExport(cl, c("X", "Z", "dist"), envir = e)
-            res <- parApply(cl, Y, 2, function(yy, ...) opticut1(Y = yy, 
-                X = X, Z = Z, dist = dist, ...), ...)
-            clusterEvalQ(cl, rm(list = c("opticut1", ".opticut1", 
-                "X", "Z", "dist", "checkComb", "allComb", "kComb", 
-                "rankComb", "oComb")))
-        }
-        else {
-            if (cl < 2) 
-                stop("cl must be at least 2 for forking")
-            res <- mclapply(1:ncol(Y), function(i, ...) opticut1(Y = Y[, 
-                i], X = X, Z = Z, dist = dist, ...), ...)
-        }
-    }
-    out <- list(call = match.call(), species = res, X = X, Y = Y, 
-        strata = Z, dist = dist, comb = comb)
-    class(out) <- "opticut"
-    out
-  }
+## all partitions
+summary(m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
+plot(m)
+
+## rank based partitions
+summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
+
+## simple example from Legendre 2013
+## Indicator Species: Computation, in
+## Encyclopedia of Biodiversity, Volume 4
+## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
+gr <- rep(1:5, each=5)
+spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
+    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
+    Species3=rep(c(18,2,0,0,0), each=5))
+rownames(spp) <- gr
+spp
+summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
+summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="rank"))
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ models }
