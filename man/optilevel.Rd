@@ -79,14 +79,19 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
 rownames(spp) <- gr
 spp
 
-ol <- optilevel(spp[,"Species3"], as.factor(gr))
+ol <- optilevel(spp[,"Species3"], gr)
 ol[c("delta", "coef", "rank", "levels")]
 
 ## get the final factor level
-gr2 <- gr
-levels(gr2) <- ol$level[[length(ol$level)]]
-table(gr, gr2)
+gr1 <- gr
+levels(gr1) <- ol$level[[length(ol$level)]]
+table(gr, gr1)
 
+## compare the models
+o0 <- lm(spp[,"Species3"] ~ gr - 1)
+o1 <- lm(spp[,"Species3"] ~ gr1 - 1)
+data.frame(AIC(o0, o1), delta=AIC(o0, o1)$AIC - AIC(o0))
+ol$delta # should be identical
 
 ## --- Proportions with Poisson distribution
 ## simulation
@@ -110,8 +115,15 @@ plogis(b)
 z$rank
 
 ## get the final matrix
+x1 <- mefa4::groupSums(x, 2, z$levels[[length(z$levels)]])
 head(x)
-head(mefa4::groupSums(x, 2, z$levels[[length(z$levels)]]))
+head(x1)
+
+## compare the models
+m0 <- glm(y ~ x - 1, family="poisson")
+m1 <- glm(y ~ x1 - 1, family="poisson")
+data.frame(AIC(m0, m1), delta=AIC(m0, m1)$AIC - AIC(m0))
+z$delta # should be identical
 }
 \keyword{ manip }
 \keyword{ models }
