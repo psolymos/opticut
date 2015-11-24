@@ -520,7 +520,7 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
     res$assoc <- .parseAssoc(res)
     res$logL <- NULL
     bp <- bestpart(object)
-    bp <- nonDuplicated(bp, rownames(bp), TRUE)
+    bp <- mefa4::nonDuplicated(bp, rownames(bp), TRUE)
     bp <- bp[order(rownames(bp)),]
     sgn <- sign(c(-3, -2, -1, 0, 1, 2, 3)[as.integer(res$assoc)])
     lab <- character(ncol(bp))
