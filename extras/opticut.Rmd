@@ -1,8 +1,12 @@
 ---
 title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
-author: Peter Solymos, Ermias T. Azeria, Bela Tothmeresz
+author: "Peter Solymos, Ermias T. Azeria, Bela Tothmeresz"
 date: "November 17, 2015"
-output: pdf_document
+output:
+  pdf_document:
+    keep_tex: yes
+    number_sections: yes
+    toc: yes
 ---
 
 # Introduction
