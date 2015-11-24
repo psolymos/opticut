@@ -1,8 +1,8 @@
 \name{opticut}
 \alias{opticut}
 \alias{opticut1}
-\alias{plot.opticut}
-\alias{plot.opticut1}
+\alias{wplot.opticut}
+\alias{wplot.opticut1}
 \alias{print.opticut}
 \alias{print.opticut1}
 \alias{summary.opticut}
@@ -20,10 +20,10 @@ opticut1(Y, X, Z, dist = "gaussian", ...)
 opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), cl = NULL, ...)
 
-\method{plot}{opticut1}(x, cut = getOption("ocoptions")$cut, 
+\method{wplot}{opticut1}(x, cut = getOption("ocoptions")$cut, 
     ylim = c(-1, 1), ylab = "Model weight * Association", 
     xlab = "Partitions", ...)
-\method{plot}{opticut}(x, which = NULL, 
+\method{wplot}{opticut}(x, which = NULL, 
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, 
     las = 1, ylab = "Model weight * Association", xlab = "Partitions", ...)
 
@@ -71,7 +71,7 @@ this triggers \code{\link{rankComb}}),
 or a design matrix (custom matrix or as returned by \code{\link{allComb}}.
 }
   \item{x, object}{
-object to plot, print, sommarize.
+object to plot, print, summarize.
 }
   \item{cut}{
 log likelihood ratio value for showing species.
@@ -202,7 +202,7 @@ m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
 summary(m)
 ## show all species
 summary(m, cut=0)
-plot(m)
+wplot(m)
 
 ## rank based partitions, multiple species
 summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))

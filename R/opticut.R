@@ -268,7 +268,7 @@ function(Y, X, Z, dist="gaussian", ...)
     if (is.null(colnames(Z)))
         colnames(Z) <- paste0("split.", seq_len(ncol(Z)))
     if (!checkComb(Z))
-        stop("complementary design variables found: use 'checkComb'")
+        stop("complementary design variables found:\nuse 'checkComb'")
     if (length(unique(c(length(Y), nrow(X), nrow(Z)))) > 1)
         stop("dimension mismatch")
     if (is.null(rownames(Z))) {
@@ -456,33 +456,6 @@ digits, ...)
     invisible(x)
 }
 
-
-plot.opticut1 <-
-function(x, cut=getOption("ocoptions")$cut, ylim=c(-1,1),
-ylab="Model weight * Association", xlab="Partitions", ...)
-{
-    w <- x$w * x$assoc
-    names(w) <- rownames(x)
-    if (!any(x$logLR >= cut)) {
-        warning("All logLR < cut: cut ignored")
-    } else {
-        w <- w[x$logLR >= cut]
-    }
-    COL <- c(colorRampPalette(c("red","yellow"))(10),
-        colorRampPalette(c("yellow","green"))(10))
-    br <- seq(-1, 1, 0.1)
-    barplot(rep(0, length(w)), width=1, space=0,
-        col=COL[as.integer(cut(w, breaks=seq(-1, 1, 0.1)))],
-        ylim=ylim, xlab=xlab, ylab=ylab, ...)
-    lines(rep(which.max(abs(w))-0.5, 2), c(-1,1), col="grey", lwd=2)
-    barplot(w, width=1, space=0, #border=NA,
-        col=COL[as.integer(cut(w, breaks=seq(-1, 1, 0.1)))],
-        ylim=ylim, xlab="", ylab="", add=TRUE, ...)
-    abline(0,0)
-    box()
-    invisible(x)
-}
-
 print.opticut <- function(x, digits, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
@@ -558,7 +531,44 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
     object
 }
 
-plot.opticut <-
+## general plot interface
+optiplot <- function (x, ...)
+    UseMethod("optiplot")
+
+wplot <- function (x, ...)
+    UseMethod("wplot")
+
+## plotting model weights, single species
+wplot.opticut1 <-
+function(x, cut=getOption("ocoptions")$cut, ylim=c(-1,1),
+ylab="Model weight * Association", xlab="Partitions", ...)
+{
+    w <- x$w * x$assoc
+    names(w) <- rownames(x)
+    if (!any(x$logLR >= cut)) {
+        warning("All logLR < cut: cut ignored")
+    } else {
+        w <- w[x$logLR >= cut]
+    }
+    COL <- c(colorRampPalette(c("red","yellow"))(10),
+         colorRampPalette(c("yellow","green"))(10))
+    br <- seq(-1, 1, 0.1)
+    op <- par(las=las)
+    on.exit(par(op))
+    barplot(rep(0, length(w)), width=1, space=0,
+        col=COL[as.integer(cut(w, breaks=seq(-1, 1, 0.1)))],
+        ylim=ylim, xlab=xlab, ylab=ylab, ...)
+    lines(rep(which.max(abs(w))-0.5, 2), c(-1,1), col="grey", lwd=2)
+    barplot(w, width=1, space=0, #border=NA,
+        col=COL[as.integer(cut(w, breaks=seq(-1, 1, 0.1)))],
+        ylim=ylim, xlab="", ylab="", add=TRUE, ...)
+    abline(0,0)
+    box()
+    invisible(x)
+}
+
+## plotting model weights, multi species
+wplot.opticut <-
 function(x, which=NULL,
 cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, las=1,
 ylab="Model weight * Association", xlab="Partitions", ...)
@@ -567,8 +577,10 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         plot(x$species[[which]],
             cut=cut, ylab=ylab, xlab=xlab, ...)
     } else {
+        if (is.na(x$comb))
+            stop("Plot single species (user defined strata matrix, comb=NA):\nspecify 'which' argument")
         if (x$comb == "rank")
-            stop("Plot single species (comb='rank'): specify 'which' argument")
+            stop("Plot single species (comb='rank'):\nspecify 'which' argument")
         if (!is.null(which) && length(which) > 1L)
             x$species <- x$species[which]
         COL <- c(colorRampPalette(c("red","yellow"))(10),
@@ -593,6 +605,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
             ww[llr < cut] <- 0
             ww <- ww[rowSums(ww) != 0,,drop=FALSE]
             op <- par(las=las)
+            on.exit(par(op))
             plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0),
                 type="n", axes=FALSE, ann=FALSE, ...)
             title(ylab=ylab, xlab=xlab)
@@ -613,7 +626,6 @@ ylab="Model weight * Association", xlab="Partitions", ...)
                 }
             }
             box()
-            par(op)
             invisible(ww)
         }
     }
