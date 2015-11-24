@@ -268,9 +268,13 @@ function(Y, X, Z, dist="gaussian", ...)
     if (is.null(colnames(Z)))
         colnames(Z) <- paste0("split.", seq_len(ncol(Z)))
     if (!checkComb(Z))
-        stop("complementary design variables found")
+        stop("complementary design variables found: use 'checkComb'")
     if (length(unique(c(length(Y), nrow(X), nrow(Z)))) > 1)
         stop("dimension mismatch")
+    if (is.null(rownames(Z))) {
+        warning("row names added to binary split matrix Z (it was NULL)")
+        rownames(Z) <- apply(Z, 1, paste, collapse="")
+    }
     N <- ncol(Z)
     res0 <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf <- matrix(0, N, length(res0$coef)+1)
@@ -521,25 +525,32 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
     res$logL <- NULL
     bp <- bestpart(object)
     bp <- mefa4::nonDuplicated(bp, rownames(bp), TRUE)
-    bp <- bp[order(rownames(bp)),]
     sgn <- sign(c(-3, -2, -1, 0, 1, 2, 3)[as.integer(res$assoc)])
-    lab <- character(ncol(bp))
+    lab1 <- character(ncol(bp))
+    lab0 <- character(ncol(bp))
     for (i in seq_len(ncol(bp))) {
         if (sgn[i] < 0)
             bp[,i] <- 1 - bp[,i]
-        lab[i] <- paste(rownames(bp)[bp[,i] == 1],
+        lab1[i] <- paste(rownames(bp)[bp[,i] == 1],
+            collapse=getOption("ocoptions")$collapse)
+        lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
             collapse=getOption("ocoptions")$collapse)
     }
-    o <- order(colSums(bp), lab, res$I, decreasing=TRUE)
+    oo <- if (sort)
+        order(-rowSums(bp), rownames(bp)) else order(rownames(bp))
+    bp <- bp[oo,]
+    o <- order(colSums(bp), lab1, res$I, decreasing=TRUE)
     if (sort) {
         res <- res[o,]
-        lab <- lab[o]
+        lab1 <- lab1[o]
+        lab0 <- lab0[o]
         bp <- bp[,o]
     }
     keep <- res$logLR >= min(max(res$logLR), cut)
     object$summary <- res[keep,]
     object$highmat <- t(bp[,keep])
-    object$highlabel <- lab[keep]
+    object$highlabel <- lab1[keep]
+    object$lowlabel <- lab0[keep]
     object$nsplit <- if (is.factor(object$strata))
         nlevels(object$strata) else ncol(object$strata)
     object$missing <- length(object$species) - nrow(res)
