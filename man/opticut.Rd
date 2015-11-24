@@ -21,8 +21,9 @@ opticut1(Y, X, Z, dist = "gaussian", ...)
 opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), cl = NULL, ...)
 
+wplot(x, ...)
 \method{wplot}{opticut1}(x, cut = getOption("ocoptions")$cut, 
-    ylim = c(-1, 1), ylab = "Model weight * Association", 
+    ylim = c(-1, 1), las=1, ylab = "Model weight * Association", 
     xlab = "Partitions", ...)
 \method{wplot}{opticut}(x, which = NULL, 
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, 

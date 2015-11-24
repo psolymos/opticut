@@ -537,7 +537,7 @@ wplot <- function (x, ...)
 
 ## plotting model weights, single species
 wplot.opticut1 <-
-function(x, cut=getOption("ocoptions")$cut, ylim=c(-1,1),
+function(x, cut=getOption("ocoptions")$cut, ylim=c(-1,1), las=1,
 ylab="Model weight * Association", xlab="Partitions", ...)
 {
     w <- x$w * x$assoc
