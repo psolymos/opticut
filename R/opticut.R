@@ -574,7 +574,7 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, las=1,
 ylab="Model weight * Association", xlab="Partitions", ...)
 {
     if (!is.null(which) && length(which) == 1L) {
-        plot(x$species[[which]],
+        wplot.opticut1(x$species[[which]],
             cut=cut, ylab=ylab, xlab=xlab, ...)
     } else {
         if (is.na(x$comb))
@@ -589,7 +589,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         xx <- summary(x, cut=cut, sort=sort)
 
         if (nrow(xx$summary) < 2) {
-            plot(x$species[[rownames(xx$summary)]],
+            wplot.opticut1(x$species[[rownames(xx$summary)]],
                 cut=cut, ylab=ylab, xlab=xlab, ...)
         } else {
             nsplit <- xx$nsplit
