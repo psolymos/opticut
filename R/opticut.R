@@ -103,7 +103,7 @@ function(x, collapse = getOption("ocoptions")$collapse)
 }
 
 rankComb <-
-function(Y, X, Z, dist="gaussian", 
+function(Y, X, Z, dist="gaussian",
 collapse = getOption("ocoptions")$collapse, ...)
 {
     if (!is.factor(Z))
@@ -408,9 +408,9 @@ comb=c("rank", "all"), cl=NULL, ...)
     factor(Assoc, levels=c("---","--","-","0","+","++","+++"))
 }
 
-print.opticut1 <- function(x, 
-cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, 
-digits, ...) 
+print.opticut1 <- function(x,
+cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort,
+digits, ...)
 {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
@@ -507,8 +507,8 @@ print.summary.opticut <- function(x, digits, ...) {
     invisible(x)
 }
 
-summary.opticut <- function(object, 
-cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...) 
+summary.opticut <- function(object,
+cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
 {
     spp <- lapply(object$species, function(z)
         as.matrix(z[order(z$w, decreasing=TRUE)[1L],]))
@@ -518,11 +518,28 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
     colnames(sppmat) <- colnames(object$species[[1L]])
     res <- data.frame(split=hab, sppmat)
     res$assoc <- .parseAssoc(res)
-    if (sort)
-        res <- res[order(res$split, 1-res$I, decreasing=FALSE),]
-    res <- res[res$logLR >= min(max(res$logLR), cut),,drop=FALSE]
     res$logL <- NULL
-    object$summary <- res
+    bp <- bestpart(object)
+    bp <- nonDuplicated(bp, rownames(bp), TRUE)
+    bp <- bp[order(rownames(bp)),]
+    sgn <- sign(c(-3, -2, -1, 0, 1, 2, 3)[as.integer(res$assoc)])
+    lab <- character(ncol(bp))
+    for (i in seq_len(ncol(bp))) {
+        if (assoc[i] < 0)
+            bp[,i] <- 1 - bp[,i]
+        lab[i] <- paste(rownames(bp)[bp[,i] == 1],
+            collapse=getOption("ocoptions")$collapse)
+    }
+    o <- order(colSums(bp), lab, res$I, decreasing=TRUE)
+    if (sort) {
+        res <- res[o,]
+        lab <- lab[o]
+        bp <- bp[,o]
+    }
+    keep <- res$logLR >= min(max(res$logLR), cut)
+    object$summary <- res[keep,]
+    object$highmat <- t(bp[,keep])
+    object$highlabel <- lab[keep]
     object$nsplit <- if (is.factor(object$strata))
         nlevels(object$strata) else ncol(object$strata)
     object$missing <- length(object$species) - nrow(res)
@@ -531,7 +548,7 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
 }
 
 plot.opticut <-
-function(x, which=NULL, 
+function(x, which=NULL,
 cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, las=1,
 ylab="Model weight * Association", xlab="Partitions", ...)
 {
@@ -765,4 +782,6 @@ type=c("asymp", "boot", "multi"), B=99, ...)
     }
     out
 }
+
+
 
