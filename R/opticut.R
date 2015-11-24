@@ -531,10 +531,7 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
     object
 }
 
-## general plot interface
-optiplot <- function (x, ...)
-    UseMethod("optiplot")
-
+## generic for plotting model weights
 wplot <- function (x, ...)
     UseMethod("wplot")
 
@@ -630,6 +627,51 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         }
     }
 }
+
+
+plot.opticut <-
+function(x,
+cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, las=1,
+ylab="Relative abundance", xlab="Partitions",
+palette=colorRampPalette(c("blue","green","red")), ...)
+{
+    xx <- summary(x, cut=cut, sort=sort)
+    bp <- xx$highmat
+    iv <- xx$summary[,c("I", "mu0", "mu1")]
+    iv$h0 <- pmin(iv$mu0, iv$mu1) / (iv$mu0 + iv$mu1)
+    iv$h1 <- pmax(iv$mu0, iv$mu1) / (iv$mu0 + iv$mu1)
+    n <- nrow(bp)
+    p <- ncol(bp)
+    op <- par(las=las)
+    on.exit(par(op))
+    plot(0, xlim=c(0, p), ylim=c(n-0.5, 0.5),
+        type="n", axes=FALSE, ann=FALSE, ...)
+    #plot(0, xlim=c(0, p), ylim=c(n, 0),
+    #    type="n", axes=FALSE, ann=FALSE)
+    title(ylab=ylab, xlab=xlab)
+    axis(2, at=seq_len(n)-0.5,
+        labels=rownames(bp), tick=TRUE)
+    axis(1, at=seq_len(ncol(bp))-0.5,
+        labels=colnames(bp), tick=TRUE)
+#    abline(h=1:n-0.5)
+#    abline(v=0:p, col="lightgrey")
+    Cols <- palette(101)
+    Br <- seq(0, 1, length=101)
+    for (i in seq_len(n)) {
+        for (j in seq_len(p)) {
+            h <- if (bp[i,j] == 1)
+                iv$h1[i] else iv$h0[i]
+            #Col <- grey(1-(h/1.2))
+            #Col <- grey(1-h)
+            Col <- Cols[which.min(h > Br)[1L]]
+            polygon(c(0,1,1,0)+j-1, 0.45*c(-h,-h,h,h)+i-0.5,
+                col=Col, border=NA)
+        }
+    }
+    box()
+    invisible(x)
+}
+
 
 bestpart <- function (object, ...)
     UseMethod("bestpart")
