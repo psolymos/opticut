@@ -1,6 +1,7 @@
 \name{opticut}
 \alias{opticut}
 \alias{opticut1}
+\alias{plot.opticut}
 \alias{wplot.opticut}
 \alias{wplot.opticut1}
 \alias{print.opticut}
@@ -26,6 +27,10 @@ opticut(formula, data, strata, dist = "gaussian",
 \method{wplot}{opticut}(x, which = NULL, 
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, 
     las = 1, ylab = "Model weight * Association", xlab = "Partitions", ...)
+\method{plot}{opticut}(x,
+    cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, 
+    las=1, ylab="Relative abundance", xlab="Partitions",
+    palette=colorRampPalette(c("blue","green","red")), ...)
 
 \method{print}{opticut1}(x, 
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
@@ -78,6 +83,10 @@ log likelihood ratio value for showing species.
 }
   \item{sort}{
 logical, if species should be sorted by indicator values in the output.
+}
+  \item{palette}{
+a function, used to interpolate the colors,
+see \code{\link{colorRampPalette}} on how to change the default settings.
 }
   \item{ylab, xlab, las, ylim}{
 graphical arguments.
@@ -202,7 +211,10 @@ m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
 summary(m)
 ## show all species
 summary(m, cut=0)
+## model weights
 wplot(m)
+## associations
+plot(m)
 
 ## rank based partitions, multiple species
 summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
