@@ -525,7 +525,7 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
     sgn <- sign(c(-3, -2, -1, 0, 1, 2, 3)[as.integer(res$assoc)])
     lab <- character(ncol(bp))
     for (i in seq_len(ncol(bp))) {
-        if (res$assoc[i] < 0)
+        if (sgn[i] < 0)
             bp[,i] <- 1 - bp[,i]
         lab[i] <- paste(rownames(bp)[bp[,i] == 1],
             collapse=getOption("ocoptions")$collapse)
