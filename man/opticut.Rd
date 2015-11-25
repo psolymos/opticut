@@ -50,8 +50,7 @@ model terms in the right-hand side
 (its structure depending on the underlying functions).
 }
   \item{data}{
-an optional data frame, list or environment (or object coercible by 
-\code{\link{as.data.frame}} to a data frame) containing the variables 
+an optional data frame, list or environment containing the variables 
 in the model. If not found in data, the variables are taken from 
 \code{parent.frame()}, typically the environment 
 from which \code{opticut} is called.

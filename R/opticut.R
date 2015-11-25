@@ -316,7 +316,6 @@ comb=c("rank", "all"), cl=NULL, ...)
     comb <- match.arg(comb)
     if (missing(data))
         data <- parent.frame()
-    data <- as.data.frame(data)
     if (missing(strata))
         stop("strata is missing")
     Strata <- deparse(substitute(strata))
@@ -374,7 +373,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             #parallel::clusterExport(cl, c("opticut1",".opticut1",
             #    "checkComb","allComb","kComb","rankComb","oComb"))
             parallel::clusterEvalQ(cl, library(opticut))
-            parallel::clusterEvalQ(cl, requireNamespace("opticut"))
+            #parallel::clusterEvalQ(cl, requireNamespace("opticut"))
             e <- new.env()
             assign("dist", dist, envir=e)
             assign("X", X, envir=e)
@@ -525,8 +524,8 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
         bp <- bp[,o,drop=FALSE]
     }
     keep <- res$logLR >= min(max(res$logLR), cut)
-    object$summary <- res[keep,]
-    object$highmat <- t(bp[,keep])
+    object$summary <- res[keep,,drop=FALSE]
+    object$highmat <- t(bp[,keep,drop=FALSE])
     object$highlabel <- lab1[keep]
     object$lowlabel <- lab0[keep]
     object$nsplit <- if (is.factor(object$strata))
