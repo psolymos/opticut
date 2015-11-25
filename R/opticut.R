@@ -394,7 +394,8 @@ comb=c("rank", "all"), cl=NULL, ...)
         X=X,
         Y=Y,
         strata=Z,
-        dist=dist,
+        dist=if (is.function(dist))
+            deparse(substitute(dist)) else dist,
         comb=comb)
     class(out) <- "opticut"
     out
