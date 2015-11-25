@@ -316,6 +316,12 @@ comb=c("rank", "all"), cl=NULL, ...)
     comb <- match.arg(comb)
     if (missing(data))
         data <- parent.frame()
+    data <- as.data.frame(data)
+    if (missing(strata))
+        stop("strata is missing")
+    Strata <- deparse(substitute(strata))
+    if (Strata %in% names(data))
+        strata <- data[[Strata]]
     mf <- match.call(expand.dots = FALSE)
     mm <- match(c("formula", "data"), names(mf), 0)
     mf <- mf[c(1, mm)]
@@ -332,8 +338,6 @@ comb=c("rank", "all"), cl=NULL, ...)
     ff[[2]] <- NULL
     mt <- terms(ff, data = data)
     X <- model.matrix(mt, mf)
-    if (missing(strata))
-        stop("strata is missing")
     if (is.null(dim(strata))) {
         if (comb == "rank") {
             Z <- droplevels(as.factor(strata)) # factor
