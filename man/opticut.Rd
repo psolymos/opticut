@@ -32,7 +32,8 @@ wplot(x, ...)
 \method{plot}{opticut}(x, show_I = TRUE, show_S = TRUE, hr = TRUE,
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
     las = 1, ylab = "Relative abundance", xlab = "Partitions",
-    palette = colorRampPalette(c("blue", "green", "red")), ...)
+    palette = colorRampPalette(c("blue", "green", "red")),
+    mar = c(5, 4, 4, 4) + 0.1, ...)
 
 \method{print}{opticut1}(x,
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
@@ -98,6 +99,9 @@ logical, if horizontal rules should be added.
   \item{palette}{
 a function, used to interpolate the colors,
 see \code{\link{colorRampPalette}} on how to change the default settings.
+}
+  \item{mar}{
+numeric, graphical parameters for plot margin \code{\link{par}}.
 }
   \item{ylab, xlab, las, ylim}{
 graphical arguments.
