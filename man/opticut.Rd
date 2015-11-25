@@ -2,6 +2,7 @@
 \alias{opticut}
 \alias{opticut1}
 \alias{plot.opticut}
+\alias{wplot}
 \alias{wplot.opticut}
 \alias{wplot.opticut1}
 \alias{print.opticut}
