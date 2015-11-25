@@ -512,13 +512,13 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
     }
     oo <- if (sort)
         order(-rowSums(bp), rownames(bp)) else order(rownames(bp))
-    bp <- bp[oo,]
+    bp <- bp[oo,,drop=FALSE]
     o <- order(colSums(bp), lab1, res$I, decreasing=TRUE)
     if (sort) {
-        res <- res[o,]
+        res <- res[o,,drop=FALSE]
         lab1 <- lab1[o]
         lab0 <- lab0[o]
-        bp <- bp[,o]
+        bp <- bp[,o,drop=FALSE]
     }
     keep <- res$logLR >= min(max(res$logLR), cut)
     object$summary <- res[keep,]
