@@ -647,7 +647,7 @@ mar=c(5, 4, 4, 4) + 0.1, ...)
     p <- ncol(bp)
     op <- par(las=las, mar=mar)
     on.exit(par(op))
-    plot(0, xlim=c(0, p), ylim=c(n-0.5, 0.5),
+    plot(0, xlim=c(0, p), ylim=c(n, 0),
         type="n", axes=FALSE, ann=FALSE, ...)
     title(ylab=ylab, xlab=xlab)
     axis(1, at=seq_len(ncol(bp))-0.5,
