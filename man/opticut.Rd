@@ -23,23 +23,23 @@ opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), cl = NULL, ...)
 
 wplot(x, ...)
-\method{wplot}{opticut1}(x, cut = getOption("ocoptions")$cut, 
-    ylim = c(-1, 1), las=1, ylab = "Model weight * Association", 
+\method{wplot}{opticut1}(x, cut = getOption("ocoptions")$cut,
+    ylim = c(-1, 1), las=1, ylab = "Model weight * Association",
     xlab = "Partitions", ...)
-\method{wplot}{opticut}(x, which = NULL, 
-    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, 
+\method{wplot}{opticut}(x, which = NULL,
+    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
     las = 1, ylab = "Model weight * Association", xlab = "Partitions", ...)
-\method{plot}{opticut}(x,
-    cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, 
-    las=1, ylab="Relative abundance", xlab="Partitions",
-    palette=colorRampPalette(c("blue","green","red")), ...)
+\method{plot}{opticut}(x, show_I = TRUE, show_S = TRUE, hr = TRUE,
+    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
+    las = 1, ylab = "Relative abundance", xlab = "Partitions",
+    palette = colorRampPalette(c("blue", "green", "red")), ...)
 
-\method{print}{opticut1}(x, 
+\method{print}{opticut1}(x,
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
     digits, ...)
 \method{print}{opticut}(x, digits, ...)
 \method{print}{summary.opticut}(x, digits, ...)
-\method{summary}{opticut}(object, 
+\method{summary}{opticut}(object,
     cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, ...)
 }
 \arguments{
@@ -85,6 +85,15 @@ log likelihood ratio value for showing species.
 }
   \item{sort}{
 logical, if species should be sorted by indicator values in the output.
+}
+  \item{show_I}{
+logical, if indicator values should be shown.
+}
+  \item{show_S}{
+logical, if number of indicator species should be shown.
+}
+  \item{hr}{
+logical, if horizontal rules should be added.
 }
   \item{palette}{
 a function, used to interpolate the colors,
@@ -148,9 +157,9 @@ Custom distributions can be defined, see Examples.
 \code{opticut} returns an object of class opticut.
 }
 \references{
-Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, 
-E. & Solymos, P. (2014): Microhabitat associations of land snails in 
-forested dolinas: implications for coarse filter conservation. 
+Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
+E. & Solymos, P. (2014): Microhabitat associations of land snails in
+forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
 }
 \author{
@@ -163,7 +172,7 @@ for partitioning algorithms.
 \code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
 for manipulating fitted objects.
 
-\code{\link{ocoptions}} on how to set some of the global options 
+\code{\link{ocoptions}} on how to set some of the global options
 related to the presentation of the results in the package.
 }
 \examples{
@@ -228,11 +237,12 @@ data(dolina)
 ## stratum as ordinal
 dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 ## filter species to speed up things a bit
-Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 100]
+Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
 ## opticut results
 dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist="zinb")
 summary(dol)
+plot(dol)
 
 ## parallel computing comparisons
 library(parallel)
@@ -265,8 +275,10 @@ Xdol <- model.matrix(~ stratum + lmoist + method, data=dolina$samp)
 ## this fits the null model (i.e. no partitions added)
 fun(Y[,"amin"], Xdol, zi_term=dolina$samp$method)
 ## now we can use dist=fun
-opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab, 
+opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
     dist=fun, zi_term=dolina$samp$method)
+dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
 }
 }
 \keyword{ models }
