@@ -10,16 +10,19 @@
     factor(Assoc, levels=c("---","--","-","0","+","++","+++"))
 }
 
-print.opticut1 <- function(x,
-cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort,
-digits, ...)
+print.opticut1 <- function(x, cut, sort, digits, ...)
 {
+    if (missing(cut))
+        cut <- getOption("ocoptions")$cut
+    if (missing(sort))
+        sort <- getOption("ocoptions")$sort
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
     xx <- x
+    xx$assoc <- .parseAssoc(xx)
+    xx <- xx[, c("assoc", "I", "mu0", "mu1", "logLR", "w")]
     if (sort)
         xx <- xx[order(xx$I, decreasing=TRUE),]
-    xx$assoc <- .parseAssoc(xx)
     if (any(xx$logLR >= cut)) {
         SHOW <- which(xx$logLR >= cut)
         tmp <- if (length(SHOW) > 1L)
@@ -69,13 +72,13 @@ print.opticut <- function(x, digits, ...) {
     invisible(x)
 }
 
-print.summary.opticut <- function(x, digits, cut, sort, ...) {
-    if (missing(digits))
-        digits <- max(3L, getOption("digits") - 3L)
+print.summary.opticut <- function(x, cut, sort, digits, ...) {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
     if (missing(sort))
         sort <- getOption("ocoptions")$sort
+    if (missing(digits))
+        digits <- max(3L, getOption("digits") - 3L)
     xx <- x$summary[, c("split", "assoc", "I", "mu0", "mu1", "logLR", "w")]
     if (sort) {
         xx <- xx[attr(x$bestpart, "row.order"),]
@@ -86,7 +89,7 @@ print.summary.opticut <- function(x, digits, cut, sort, ...) {
         "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
-    print(format.data.frame(xx, digits=digits))
+    print(format.data.frame(xx, digits=digits), ...)
     cat(x$nsplit, "binary", ifelse(x$nsplit > 1, "splits\n", "split\n"))
     if (Missing)
         cat(Missing, "species not shown\n")
