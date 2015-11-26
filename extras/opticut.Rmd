@@ -4,7 +4,7 @@ author: "Peter Solymos, Ermias T. Azeria, Bela Tothmeresz"
 date: "November 17, 2015"
 output:
   pdf_document:
-    keep_tex: yes
+    keep_tex: no
     number_sections: yes
     toc: yes
 ---
