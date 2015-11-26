@@ -116,14 +116,14 @@ summary.opticut <- function(object, ...)
     for (i in seq_len(ncol(bp))) {
         if (sgn[i] < 0)
             bp[,i] <- 1 - bp[,i]
-#        lab1[i] <- paste(rownames(bp)[bp[,i] == 1],
-#            collapse=getOption("ocoptions")$collapse)
-#        lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
-#            collapse=getOption("ocoptions")$collapse)
         lab1[i] <- paste(rownames(bp)[bp[,i] == 1],
-            collapse=" ")
+            collapse=getOption("ocoptions")$collapse)
         lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
-            collapse=" ")
+            collapse=getOption("ocoptions")$collapse)
+#        lab1[i] <- paste(rownames(bp)[bp[,i] == 1],
+#            collapse=" ")
+#        lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
+#            collapse=" ")
     }
     bp <- t(bp[order(rownames(bp)),,drop=FALSE])
     attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
