@@ -5,7 +5,7 @@ wplot <- function (x, ...)
 ## plotting model weights, single species
 wplot.opticut1 <-
 function(x, cut, ylim=c(-1,1), las=1,
-ylab="Model weight * Association", xlab="Partitions", ...)
+ylab="Model weight * Association", xlab="Partitions", theme, ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
@@ -16,8 +16,9 @@ ylab="Model weight * Association", xlab="Partitions", ...)
     } else {
         w <- w[x$logLR >= cut]
     }
-    COL <- c(colorRampPalette(c("red","yellow"))(10),
-         colorRampPalette(c("yellow","green"))(10))
+    COL <- occolors(theme)(20)
+#    COL <- c(colorRampPalette(c("red","yellow"))(10),
+#         colorRampPalette(c("yellow","green"))(10))
     br <- seq(-1, 1, 0.1)
     op <- par(las=las)
     on.exit(par(op))
@@ -36,7 +37,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
 ## plotting model weights, multi species
 wplot.opticut <-
 function(x, which=NULL, cut, sort, las=1,
-ylab="Model weight * Association", xlab="Partitions", ...)
+ylab="Model weight * Association", xlab="Partitions", theme, ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
@@ -44,7 +45,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         sort <- getOption("ocoptions")$sort
     if (!is.null(which) && length(which) == 1L) {
         wplot.opticut1(x$species[[which]],
-            cut=cut, las=las, ylab=ylab, xlab=xlab, ...)
+            cut=cut, las=las, ylab=ylab, xlab=xlab, theme=theme, ...)
     } else {
         if (is.na(x$comb))
             stop("Plot single species (user defined strata matrix, comb=NA):",
@@ -54,8 +55,9 @@ ylab="Model weight * Association", xlab="Partitions", ...)
                 ,"\nspecify 'which' argument")
         if (!is.null(which) && length(which) > 1L)
             x$species <- x$species[which]
-        COL <- c(colorRampPalette(c("red","yellow"))(10),
-            colorRampPalette(c("yellow","green"))(10))
+        COL <- occolors(theme)(20)
+#        COL <- c(colorRampPalette(c("red","yellow"))(10),
+#            colorRampPalette(c("yellow","green"))(10))
         br <- seq(-1, 1, 0.1)
         sss <- summary(x)
         xx <- sss$summary
@@ -65,7 +67,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         xx <- xx[xx$logLR >= cut, , drop=FALSE]
         if (nrow(xx) < 2) {
             wplot.opticut1(x$species[[rownames(xx$summary)]],
-                cut=cut, las=las, ylab=ylab, xlab=xlab, ...)
+                cut=cut, las=las, ylab=ylab, xlab=xlab, theme=theme, ...)
         } else {
             nsplit <- xx$nsplit
             nspp <- nrow(xx)
@@ -110,8 +112,7 @@ plot.opticut <-
 function(x, which = NULL, cut, sort,
 las=1, ylab="Relative abundance", xlab="Partitions",
 show_I=TRUE, show_S=TRUE, hr=TRUE,
-palette=colorRampPalette(c("blue","green","red")),
-mar=c(5, 4, 4, 4) + 0.1, ...)
+theme, mar=c(5, 4, 4, 4) + 0.1, ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
@@ -151,7 +152,7 @@ mar=c(5, 4, 4, 4) + 0.1, ...)
     if (show_I)
         axis(4, at=seq_len(n)-0.5,
             labels=format(round(xx$I, 2), nsmall=2), tick=FALSE)
-    Cols <- palette(101)
+    Cols <- occolors(theme)(101)
     Br <- seq(0, 1, length=101)
     if (hr)
         abline(h=1:n-0.5, col=Cols[1L])

@@ -25,14 +25,14 @@ opticut(formula, data, strata, dist = "gaussian",
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut,
     ylim = c(-1, 1), las=1, ylab = "Model weight * Association",
-    xlab = "Partitions", ...)
+    xlab = "Partitions", theme, ...)
 \method{wplot}{opticut}(x, which = NULL, cut, sort,
-    las = 1, ylab = "Model weight * Association", xlab = "Partitions", ...)
+    las = 1, ylab = "Model weight * Association",
+    xlab = "Partitions", theme, ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
     las = 1, ylab = "Relative abundance", xlab = "Partitions",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
-    palette = colorRampPalette(c("blue", "green", "red")),
-    mar = c(5, 4, 4, 4) + 0.1, ...)
+    theme, mar = c(5, 4, 4, 4) + 0.1, ...)
 
 \method{print}{opticut1}(x, cut, sort, digits, ...)
 \method{print}{opticut}(x, digits, ...)
@@ -95,9 +95,8 @@ logical, if number of indicator species should be shown.
   \item{hr}{
 logical, if horizontal rules should be added.
 }
-  \item{palette}{
-a function, used to interpolate the colors,
-see \code{\link{colorRampPalette}} on how to change the default settings.
+  \item{theme}{
+color theme as defined by \code{\link{occolors}}.
 }
   \item{mar}{
 numeric, graphical parameters for plot margin \code{\link{par}}.
