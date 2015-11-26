@@ -44,7 +44,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         sort <- getOption("ocoptions")$sort
     if (!is.null(which) && length(which) == 1L) {
         wplot.opticut1(x$species[[which]],
-            cut=cut, ylab=ylab, xlab=xlab, ...)
+            cut=cut, las=las, ylab=ylab, xlab=xlab, ...)
     } else {
         if (is.na(x$comb))
             stop("Plot single species (user defined strata matrix, comb=NA):",
@@ -57,15 +57,18 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         COL <- c(colorRampPalette(c("red","yellow"))(10),
             colorRampPalette(c("yellow","green"))(10))
         br <- seq(-1, 1, 0.1)
-        xx <- summary(x, cut=cut, sort=sort)
-
+        xx <- summary(x)
+        if (sort) {
+            xx <- xx[attr(x$bestpart, "row.order"),]
+        }
+        xx <- xx[xx$logLR >= cut, , drop=FALSE]
         if (nrow(xx$summary) < 2) {
             wplot.opticut1(x$species[[rownames(xx$summary)]],
-                cut=cut, ylab=ylab, xlab=xlab, ...)
+                cut=cut, las=las, ylab=ylab, xlab=xlab, ...)
         } else {
             nsplit <- xx$nsplit
             nspp <- nrow(xx$summary)
-            #spp <- xx$species[rownames(xx$summary)]
+            ## subsetting according to xx$summary (sorted & cut)
             ww <- sapply(xx$species[rownames(xx$summary)], "[[", "w")
             ss <- sapply(xx$species[rownames(xx$summary)], "[[", "assoc")
             ss[ss==0] <- 1
@@ -93,10 +96,9 @@ ylab="Model weight * Association", xlab="Partitions", ...)
                     h <- - ww[j,i] * 0.45
                     polygon(c(0,1,1,0)+j-1, c(0,0,h,h)+i-0.5,
                         col=COL[as.integer(base::cut(-h, breaks=seq(-1, 1, 0.1)))])
-                        #col=grey(1-abs(ww[j,i])))
                 }
             }
-            box()
+            box(col="grey")
             invisible(ww)
         }
     }
