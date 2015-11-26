@@ -57,7 +57,8 @@ digits, ...)
 print.opticut <- function(x, digits, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
-    cat("Multivariate opticut results, comb = ", x$comb, ", dist =", x$dist, "\n", sep="")
+    cat("Multivariate opticut results, comb = ", x$comb, ", dist = ", x$dist,
+        "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
     cat(length(x$species), "species, ")
@@ -68,22 +69,32 @@ print.opticut <- function(x, digits, ...) {
     invisible(x)
 }
 
-print.summary.opticut <- function(x, digits, ...) {
+print.summary.opticut <- function(x, digits, cut, sort, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
-    cat("Multivariate opticut results, comb = ", x$comb, ", dist =", x$dist, "\n", sep="")
+    if (missing(cut))
+        cut <- getOption("ocoptions")$cut
+    if (missing(sort))
+        sort <- getOption("ocoptions")$sort
+    xx <- x$summary[, c("split", "assoc", "I", "mu0", "mu1", "logLR", "w")]
+    if (sort) {
+        xx <- xx[attr(x$bestpart, "row.order"),]
+    }
+    xx <- xx[xx$logLR >= cut, , drop=FALSE]
+    Missing <- nrow(x$summary) - nrow(xx)
+    cat("Multivariate opticut results, comb = ", x$comb, ", dist = ", x$dist,
+        "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
-    print(format.data.frame(x$summary, digits=digits))
+    print(format.data.frame(xx, digits=digits))
     cat(x$nsplit, "binary", ifelse(x$nsplit > 1, "splits\n", "split\n"))
-    if (x$missing)
-        cat(x$missing, "species not shown\n")
+    if (Missing)
+        cat(Missing, "species not shown\n")
     cat("\n")
     invisible(x)
 }
 
-summary.opticut <- function(object,
-cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
+summary.opticut <- function(object, ...)
 {
     spp <- lapply(object$species, function(z)
         as.matrix(z[order(z$w, decreasing=TRUE)[1L],]))
@@ -107,24 +118,18 @@ cut=getOption("ocoptions")$cut, sort=getOption("ocoptions")$sort, ...)
         lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
             collapse=getOption("ocoptions")$collapse)
     }
-    oo <- if (sort)
-        order(-rowSums(bp), rownames(bp)) else order(rownames(bp))
-    bp <- bp[oo,,drop=FALSE]
-    o <- order(colSums(bp), lab1, res$I, decreasing=TRUE)
-    if (sort) {
-        res <- res[o,,drop=FALSE]
-        lab1 <- lab1[o]
-        lab0 <- lab0[o]
-        bp <- bp[,o,drop=FALSE]
-    }
-    keep <- res$logLR >= min(max(res$logLR), cut)
-    object$summary <- res[keep,,drop=FALSE]
-    object$highmat <- t(bp[,keep,drop=FALSE])
-    object$highlabel <- lab1[keep]
-    object$lowlabel <- lab0[keep]
+    bp <- t(bp[order(rownames(bp)),])
+    attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
+    attr(bp, "row.order") <- order(ncol(bp) - rowSums(bp),
+        lab1, 1 - res$I, decreasing=FALSE)
+    res$label0 <- lab0
+    res$label1 <- lab1
+    object$summary <- res
+    object$bestpart <- bp
     object$nsplit <- if (is.factor(object$strata))
         nlevels(object$strata) else ncol(object$strata)
-    object$missing <- length(object$species) - nrow(res)
+    #object$missing <- length(object$species) - nrow(res)
+    object$species <- NULL
     class(object) <- c("summary.opticut")
     object
 }
