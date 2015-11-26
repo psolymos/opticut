@@ -57,25 +57,27 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         COL <- c(colorRampPalette(c("red","yellow"))(10),
             colorRampPalette(c("yellow","green"))(10))
         br <- seq(-1, 1, 0.1)
-        xx <- summary(x)
+        sss <- summary(x)
+        xx <- sss$summary
         if (sort) {
-            xx <- xx[attr(xx$bestpart, "row.order"),]
+            xx <- xx[attr(sss$bestpart, "row.order"),]
         }
         xx <- xx[xx$logLR >= cut, , drop=FALSE]
-        if (nrow(xx$summary) < 2) {
+        if (nrow(xx) < 2) {
             wplot.opticut1(x$species[[rownames(xx$summary)]],
                 cut=cut, las=las, ylab=ylab, xlab=xlab, ...)
         } else {
             nsplit <- xx$nsplit
-            nspp <- nrow(xx$summary)
-            ## subsetting according to xx$summary (sorted & cut)
-            ww <- sapply(xx$species[rownames(xx$summary)], "[[", "w")
-            ss <- sapply(xx$species[rownames(xx$summary)], "[[", "assoc")
+            nspp <- nrow(xx)
+            sppnam <- rownames(xx)
+            ## subsetting according to xx (sorted & cut)
+            ww <- sapply(x$species[sppnam], "[[", "w")
+            ss <- sapply(x$species[sppnam], "[[", "assoc")
             ss[ss==0] <- 1
             ww <- ww * ss
-            rownames(ww) <- rownames(xx$species[[1]])
-            colnames(ww) <- rownames(xx$summary)
-            llr <- sapply(xx$species[rownames(xx$summary)], "[[", "logLR")
+            rownames(ww) <- rownames(x$species[[1]])
+            colnames(ww) <- rownames(xx)
+            llr <- sapply(x$species[sppnam], "[[", "logLR")
             ww[llr < cut] <- 0
             ww <- ww[rowSums(ww) != 0,,drop=FALSE]
             op <- par(las=las)
