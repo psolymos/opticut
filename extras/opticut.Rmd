@@ -91,7 +91,7 @@ The number of such possible combinations is $M = 2^{K-1} - 1$.
 
 Get the package and load it:
 ```{r}
-#devtools::install_github("psolymos/opticut")
+devtools::install_github("psolymos/opticut")
 library(opticut)
 ```
 

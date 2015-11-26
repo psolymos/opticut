@@ -80,7 +80,7 @@ checkComb <- function(x) {
 ## x is a named vector of ranks, referring to factor levels
 ## in some classification vector, 1=highest abundance.
 oComb <-
-function(x, collapse = getOption("ocoptions")$collapse)
+function(x, collapse = " ")
 {
     if (length(x) < 2L)
         stop("length of x must be >1")
@@ -97,14 +97,12 @@ function(x, collapse = getOption("ocoptions")$collapse)
             rownames(out)[out[,i] > 0]],
             collapse = collapse)
     }
-    #out <- 1L - out
     attr(out, "rank") <- o
     out
 }
 
 rankComb <-
-function(Y, X, Z, dist="gaussian",
-collapse = getOption("ocoptions")$collapse, ...)
+function(Y, X, Z, dist="gaussian", ...)
 {
     if (!is.factor(Z))
         stop("Z must be a factor")
@@ -114,7 +112,7 @@ collapse = getOption("ocoptions")$collapse, ...)
     lc <- c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)])
     names(lc) <- levels(Z)
     x <- rank(-lc)
-    oc <- oComb(x, collapse = collapse)
+    oc <- oComb(x, collapse = getOption("ocoptions")$collapse)
     out <- oc[match(Z, rownames(oc)),]
     attr(out, "est") <- m$linkinv(lc)
     out

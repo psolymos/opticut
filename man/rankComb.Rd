@@ -12,9 +12,8 @@ to explore only K-1 binary partitions along the gradient
 defined by the ranks of the expected values.
 }
 \usage{
-oComb(x, collapse = getOption("ocoptions")$collapse)
-rankComb(Y, X, Z, dist = "gaussian", 
-    collapse = getOption("ocoptions")$collapse, ...)
+oComb(x, collapse = " ")
+rankComb(Y, X, Z, dist = "gaussian", ...)
 }
 \arguments{
   \item{Y}{
@@ -69,7 +68,7 @@ Y <- rpois(n, lam)
 head(rc <- rankComb(Y, model.matrix(~x2), as.factor(x0), dist="poisson"))
 attr(rc, "est") # expected values in factor levels
 
-oComb(1:4)
+oComb(1:4, "+")
 oComb(attr(rc, "est"))
 }
 \keyword{ manip }

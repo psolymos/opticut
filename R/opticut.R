@@ -247,11 +247,7 @@ comb=c("rank", "all"), cl=NULL, ...)
     } else {
         ## snow type cluster
         if (inherits(cl, "cluster")) {
-
-            #parallel::clusterExport(cl, c("opticut1",".opticut1",
-            #    "checkComb","allComb","kComb","rankComb","oComb"))
             parallel::clusterEvalQ(cl, library(opticut))
-            #parallel::clusterEvalQ(cl, requireNamespace("opticut"))
             e <- new.env()
             assign("dist", dist, envir=e)
             assign("X", X, envir=e)
@@ -259,9 +255,6 @@ comb=c("rank", "all"), cl=NULL, ...)
             parallel::clusterExport(cl, c("X","Z","dist"), envir=e)
             res <- parallel::parApply(cl, Y, 2, function(yy, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
-            #parallel::clusterEvalQ(cl, rm(list=c("opticut1",".opticut1",
-            #    "X","Z","dist",
-            #    "checkComb","allComb","kComb","rankComb","oComb")))
         ## forking
         } else {
             if (cl < 2)
