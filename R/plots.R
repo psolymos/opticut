@@ -156,7 +156,7 @@ mar=c(5, 4, 4, 4) + 0.1, ...)
     for (i in seq_len(n)) {
         for (j in seq_len(p)) {
             h <- if (bp[i,j] == 1)
-                iv$h1[i] else iv$h0[i]
+                xx$h1[i] else xx$h0[i]
             Col <- Cols[which.min(h >= Br)[1L]]
             polygon(c(0,1,1,0)+j-1, 0.45*c(-h,-h,h,h)+i-0.5,
                 col=Col, border=NA)
