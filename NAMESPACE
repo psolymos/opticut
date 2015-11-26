@@ -13,6 +13,7 @@ S3method("print", "summary.opticut")
 S3method("summary", "opticut")
 S3method("uncertainty", "opticut")
 
+importFrom("mefa4", "groupSums", "nonDuplicated")
 importFrom("grDevices", "colorRampPalette")
 importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
            "par", "plot", "polygon", "title")
