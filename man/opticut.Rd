@@ -23,25 +23,21 @@ opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), cl = NULL, ...)
 
 wplot(x, ...)
-\method{wplot}{opticut1}(x, cut = getOption("ocoptions")$cut,
+\method{wplot}{opticut1}(x, cut,
     ylim = c(-1, 1), las=1, ylab = "Model weight * Association",
     xlab = "Partitions", ...)
-\method{wplot}{opticut}(x, which = NULL,
-    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
+\method{wplot}{opticut}(x, which = NULL, cut, sort,
     las = 1, ylab = "Model weight * Association", xlab = "Partitions", ...)
-\method{plot}{opticut}(x, show_I = TRUE, show_S = TRUE, hr = TRUE,
-    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
+\method{plot}{opticut}(x, which = NULL, cut, sort,
     las = 1, ylab = "Relative abundance", xlab = "Partitions",
+    show_I = TRUE, show_S = TRUE, hr = TRUE,
     palette = colorRampPalette(c("blue", "green", "red")),
     mar = c(5, 4, 4, 4) + 0.1, ...)
 
-\method{print}{opticut1}(x,
-    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort,
-    digits, ...)
+\method{print}{opticut1}(x, cut, sort, digits, ...)
 \method{print}{opticut}(x, digits, ...)
-\method{print}{summary.opticut}(x, digits, ...)
-\method{summary}{opticut}(object,
-    cut = getOption("ocoptions")$cut, sort = getOption("ocoptions")$sort, ...)
+\method{print}{summary.opticut}(x, cut, sort, digits, ...)
+\method{summary}{opticut}(object, ...)
 }
 \arguments{
   \item{formula}{
@@ -50,13 +46,13 @@ model terms in the right-hand side
 (its structure depending on the underlying functions).
 }
   \item{data}{
-an optional data frame, list or environment containing the variables 
-in the model. If not found in data, the variables are taken from 
-\code{parent.frame()}, typically the environment 
+an optional data frame, list or environment containing the variables
+in the model. If not found in data, the variables are taken from
+\code{parent.frame()}, typically the environment
 from which \code{opticut} is called.
 }
   \item{strata}{
-vector, unique values define partitions. 
+vector, unique values define partitions.
 }
   \item{dist}{
 character or function, a distribution to fit, see Details and Examples.
