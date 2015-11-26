@@ -59,7 +59,7 @@ ylab="Model weight * Association", xlab="Partitions", ...)
         br <- seq(-1, 1, 0.1)
         xx <- summary(x)
         if (sort) {
-            xx <- xx[attr(x$bestpart, "row.order"),]
+            xx <- xx[attr(xx$bestpart, "row.order"),]
         }
         xx <- xx[xx$logLR >= cut, , drop=FALSE]
         if (nrow(xx$summary) < 2) {
