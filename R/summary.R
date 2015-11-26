@@ -121,7 +121,7 @@ summary.opticut <- function(object, ...)
         lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
             collapse=getOption("ocoptions")$collapse)
     }
-    bp <- t(bp[order(rownames(bp)),])
+    bp <- t(bp[order(rownames(bp)),,drop=FALSE])
     attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
     attr(bp, "row.order") <- order(ncol(bp) - rowSums(bp),
         lab1, 1 - res$I, decreasing=FALSE)
