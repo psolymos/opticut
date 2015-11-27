@@ -144,12 +144,22 @@ uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 e.g. ordinal vegetation cover,
 uses \code{\link[MASS]{polr}} of the MASS package.
 
+\code{"rsf"}: presence-only data using resource selection
+functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
+in the ResourceSelection package.
+The \code{"rsf"} works only for single species using \code{opticut1}
+because 'presence-only' type data cannot be kept in a single
+matrix-like object for multiple species.
+Intercept only model is accepted for \code{"rsf"}.
+
 \code{"rspf"}: presence-only data using resource selection
-probability functions,
-uses \code{\link[ResourceSelection]{rspf}} of the ResourceSelection package.
+probability functions (RSPF)
+as explained in \code{\link[ResourceSelection]{rspf}} 
+in the ResourceSelection package.
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
+Intercept only model is not accepted for \code{"rspf"}.
 
 Custom distributions can be defined, see Examples.
 }

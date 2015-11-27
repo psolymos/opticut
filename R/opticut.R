@@ -95,12 +95,10 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
         }
         if (dist %in% c("rsf", "rspf")) {
                 m <- list(...)$m
-            if (is.null(m))
-                stop("'m' must be provided, have you checked help('rspf') ?")
             link <- list(...)$link
-            if (is.null(link) && dist == "rspf")
-                link <- "logit"
             if (dist == "rsf") {
+                if (is.null(m))
+                    stop("'m' must be provided, have you checked help('rsf') ?")
                 if (!is.null(link) && link != "log")
                     warning("link argument ignored for dist='rsf' (log link used by default)")
                 link <- "log" # this is needed for linkinv below
@@ -110,6 +108,10 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 ## and this can cause problems in X %*% theta
                 cf <- c(0, mod$coefficients)
             } else {
+                if (is.null(m))
+                    stop("'m' must be provided, have you checked help('rspf') ?")
+                if (is.null(link))
+                    link <- "logit"
                 mod <- ResourceSelection::rspf(Y ~ ., data=XX[,-1,drop=FALSE],
                     link=link, ...)
                 cf <- mod$coefficients
@@ -246,8 +248,8 @@ comb=c("rank", "all"), cl=NULL, ...)
     }
     Y <- data.matrix(Y)
     if (!is.function(dist))
-        if (dist=="rspf" && ncol(Y) > 1L)
-            stop("rspf is only available for single species in RHS")
+        if (dist %in% c("rsf","rspf") && ncol(Y) > 1L)
+            stop("rsf/rspf is only available for single species in RHS")
 
     ## sequential
     if (is.null(cl)) {
