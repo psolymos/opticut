@@ -93,6 +93,7 @@ Get the package and load it:
 ```{r}
 #devtools::install_github("psolymos/opticut")
 #devtools::install("~/repos/opticut")
+#devtools::build("~/repos/opticut", binary=TRUE)
 library(opticut)
 ```
 
@@ -266,6 +267,7 @@ cl <- makeCluster(3)
 system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl=cl))
 stopCluster(cl)
 ## forking -- will not work on Windows
+if (!.Platform$OS.type == "windows")
 system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl=3))
 ```
 
