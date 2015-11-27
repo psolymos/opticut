@@ -18,7 +18,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
     if (!is.function(dist)) {
         dist <- match.arg(dist,
             c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rspf"))
+            "beta","zip","zinb","ordered", "rsf", "rspf"))
         if (dist == "gaussian") {
             link <- list(...)$link
             if (is.null(link))
@@ -73,13 +73,13 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
         if (dist == "ordered") {
             if (!is.null(list(...)$method))
                 if (list(...)$method != "logistic")
-                    stop("only logisic model allowed for ordered")
+                    stop("Sorry but only logisic model allowed for ordered.")
             Y <- as.ordered(Y)
             if (nlevels(Y) > 2) { # ordinal
                 ## need to keep the intercept
                 if (ncol(XX)==1) {
                     if (!is.null(list(...)$data))
-                        stop("data argument should not be provided as part of ...")
+                        stop("Note: data argument should not be provided as part of ...")
                     mod <- MASS::polr(Y ~ 1, method="logistic", ...)
                 } else {
                     mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
@@ -93,20 +93,27 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             ll <- as.numeric(logLik(mod))
             linv <- binomial("logit")$linkinv
         }
-        if (dist == "rspf") {
+        if (dist %in% c("rsf", "rspf")) {
                 m <- list(...)$m
             if (is.null(m))
-                stop("'m' must be provided, see ?rspf")
+                stop("'m' must be provided, have you checked help('rspf') ?")
             link <- list(...)$link
-            if (is.null(link))
+            if (is.null(link) && dist == "rspf")
                 link <- "logit"
-            if (link == "log") {
-                stop("rsf (rspf with log link) not implemented")
+            if (dist == "rsf") {
+                if (!is.null(link) && link != "log")
+                    warning("link argument ignored for dist='rsf' (log link used by default)")
+                link <- "log" # this is needed for linkinv below
+                mod <- ResourceSelection::rsf(Y ~ ., data=XX[,-1,drop=FALSE],
+                    ...)
+                ## intercept is not reported by rsf
+                ## and this can cause problems in X %*% theta
+                cf <- c(0, mod$coefficients)
             } else {
                 mod <- ResourceSelection::rspf(Y ~ ., data=XX[,-1,drop=FALSE],
                     link=link, ...)
+                cf <- mod$coefficients
             }
-            cf <- mod$coefficients
             ll <- as.numeric(mod$loglik)
             linv <- binomial(link)$linkinv
         }
@@ -115,7 +122,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
         out <- list(coef=cf, logLik=ll, linkinv=linv)
     } else {
         if (full_model)
-            stop("custom distribution function: cannot return full model")
+            stop("Unable to return full model for custom distribution function.")
         out <- dist(Y, XX, linkinv, ...)
     }
     if (full_model)
@@ -146,11 +153,11 @@ function(Y, X, Z, dist="gaussian", ...)
     if (is.null(colnames(Z)))
         colnames(Z) <- paste0("split.", seq_len(ncol(Z)))
     if (!checkComb(Z))
-        stop("complementary design variables found:\nuse 'checkComb'")
+        stop("Guess what! Complementary design variables found:\nuse 'checkComb'")
     if (length(unique(c(length(Y), nrow(X), nrow(Z)))) > 1)
-        stop("dimension mismatch")
+        stop("Dimension mismatch: check you input.")
     if (is.null(rownames(Z))) {
-        warning("row names added to binary split matrix Z (it was NULL)")
+        warning("Row names added to binary split matrix Z (it was NULL). You are welcome.")
         rownames(Z) <- apply(Z, 1, paste, collapse="")
     }
     N <- ncol(Z)
@@ -195,7 +202,7 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (missing(data))
         data <- parent.frame()
     if (missing(strata))
-        stop("strata is missing")
+        stop("It looks like that strata is missing.")
     Strata <- deparse(substitute(strata))
     if (Strata %in% names(data))
         strata <- data[[Strata]]
@@ -210,11 +217,12 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (is.null(colnames(Y)))
         colnames(Y) <- paste("Species", seq_len(ncol(Y)))
     if (any(duplicated(colnames(Y))))
-        stop("Duplicate colnames found in LHS")
+        stop("Duplicate colnames found in LHS, please fix.")
     ff <- formula
     ff[[2]] <- NULL
     mt <- terms(ff, data = data)
     X <- model.matrix(mt, mf)
+
     if (is.null(dim(strata))) {
         if (comb == "rank") {
             Z <- droplevels(as.factor(strata)) # factor
@@ -256,6 +264,8 @@ comb=c("rank", "all"), cl=NULL, ...)
     } else {
         ## snow type cluster
         if (inherits(cl, "cluster")) {
+            if (length(cl) < 2)
+                stop("Are you kidding? Set cl to utilize at least 2 workers.")
             parallel::clusterEvalQ(cl, library(opticut))
             e <- new.env()
             assign("dist", dist, envir=e)
@@ -269,7 +279,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         ## forking
         } else {
             if (cl < 2)
-                stop("cl must be at least 2 for forking")
+                stop("Are you kidding? Set cl to utilize at least 2 workers.")
             res <- parallel::mclapply(1:ncol(Y), function(i, ...)
                 opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...), ...)
         }
