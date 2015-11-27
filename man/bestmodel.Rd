@@ -85,6 +85,7 @@ head(bestpart(oc))
 
 ## best model
 mods <- bestmodel(oc)
+mods
 ## explore further
 str(predict(mods[[1]]))
 confint(mods[[1]])
