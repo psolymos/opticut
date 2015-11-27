@@ -352,7 +352,10 @@ Y <- dd$status
 X <- model.matrix(~ x1 + x2, dd)
 Z <- allComb(as.integer(dd$x0))
 
-(mod <- opticut1(Y, X, dd$x0, dist="rspf", m=0, B=0))
+mod1 <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rsf", m=0, B=0)
+mod1$species
+mod2 <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rspf", m=0, B=0)
+mod2$species
 ```
 
 # Custom distributions
