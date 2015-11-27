@@ -163,7 +163,7 @@ function(Y, X, Z, dist="gaussian", ...)
         rownames(Z) <- apply(Z, 1, paste, collapse="")
     }
     if (!is.function(dist) && dist %in% c("rsf", "rspf")) {
-        warning("The use of opticut1 with rsf/rspf is discouraged:",
+        warning("The use of opticut1 with rspf is discouraged:",
             "\nhard to check covariate assumptions, use opticut instead.")
     }
     N <- ncol(Z)
