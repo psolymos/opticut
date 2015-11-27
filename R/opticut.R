@@ -280,10 +280,14 @@ comb=c("rank", "all"), cl=NULL, ...)
             parallel::clusterEvalQ(cl, detach(package:opticut))
         ## forking
         } else {
+            if (.Platform$OS.type == "windows" && cl != 1)
+                stop("Unfortunately forking (cl > 1) does not work on Windows:",
+                     "try cl as a cluster instead.")
             if (cl < 2)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             res <- parallel::mclapply(1:ncol(Y), function(i, ...)
-                opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...), ...)
+                opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...),
+                mc.cores = cl, ...)
         }
     }
     out <- list(call=match.call(),
