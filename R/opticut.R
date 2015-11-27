@@ -94,7 +94,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             linv <- binomial("logit")$linkinv
         }
         if (dist %in% c("rsf", "rspf")) {
-                m <- list(...)$m
+            m <- list(...)$m
             link <- list(...)$link
             if (dist == "rsf") {
                 if (is.null(m))
@@ -161,6 +161,10 @@ function(Y, X, Z, dist="gaussian", ...)
     if (is.null(rownames(Z))) {
         warning("Row names added to binary split matrix Z (it was NULL). You are welcome.")
         rownames(Z) <- apply(Z, 1, paste, collapse="")
+    }
+    if (!is.function(dist) && dist %in% c("rsf", "rspf")) {
+        warning("The use of opticut1 with rsf/rspf is discouraged:",
+            "\nhard to check covariate assumptions, use opticut instead.")
     }
     N <- ncol(Z)
     res0 <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
@@ -247,9 +251,17 @@ comb=c("rank", "all"), cl=NULL, ...)
         comb <- NA # user supplied matrix, not checked
     }
     Y <- data.matrix(Y)
-    if (!is.function(dist))
-        if (dist %in% c("rsf","rspf") && ncol(Y) > 1L)
+
+    ## sanity check for rsf/rspf
+    if (!is.function(dist) && dist %in% c("rsf", "rspf")) {
+        if (ncol(Y) > 1L)
             stop("rsf/rspf is only available for single species in RHS")
+        if (identical(as.character(ff[[2]]), "1"))
+            stop("invalid formula, no covariates")
+        factonly <- all(unique(sapply(mf, .MFclass)[-1]) %in% c("ordered", "factor"))
+        if (factonly && dist == "rspf")
+            stop("provide at least 1 continuous covariate for RSPF")
+    }
 
     ## sequential
     if (is.null(cl)) {
