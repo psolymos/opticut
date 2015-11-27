@@ -22,7 +22,7 @@ print.opticut1 <- function(x, cut, sort, digits, ...)
     xx$assoc <- .parseAssoc(xx)
     xx <- xx[, c("assoc", "I", "mu0", "mu1", "logLR", "w")]
     if (sort)
-        xx <- xx[order(xx$I, decreasing=TRUE),]
+        xx <- xx[order(xx$logLR, decreasing=TRUE),]
     if (any(xx$logLR >= cut)) {
         SHOW <- which(xx$logLR >= cut)
         tmp <- if (length(SHOW) > 1L)
@@ -65,9 +65,7 @@ print.opticut <- function(x, digits, ...) {
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
     cat(length(x$species), "species, ")
-    nstr <- if (is.factor(x$strata))
-        nlevels(x$strata) else ncol(x$strata)
-    cat(nstr, ifelse(nstr > 1, "binary splits\n", "binary split\n"))
+    cat(x$nsplit, ifelse(x$nsplit > 1, "binary splits\n", "binary split\n"))
     cat("\n")
     invisible(x)
 }
@@ -133,9 +131,6 @@ summary.opticut <- function(object, ...)
     res$label1 <- lab1
     object$summary <- res
     object$bestpart <- bp
-    object$nsplit <- if (is.factor(object$strata))
-        nlevels(object$strata) else ncol(object$strata)
-    #object$missing <- length(object$species) - nrow(res)
     object$species <- NULL
     class(object) <- c("summary.opticut")
     object

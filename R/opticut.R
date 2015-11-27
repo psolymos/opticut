@@ -268,6 +268,8 @@ comb=c("rank", "all"), cl=NULL, ...)
         X=X,
         Y=Y,
         strata=Z,
+        nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
+            (nlevels(Z) - 1L) else ncol(Z),
         dist=if (is.function(dist))
             deparse(substitute(dist)) else dist,
         comb=comb)
