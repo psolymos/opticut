@@ -222,7 +222,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             levels(Z) <- make.names(levels(Z), unique = FALSE)
             ## make sure that collapse value is stripped
             levels(Z) <- gsub(getOption("ocoptions")$collapse, "",
-                clevels(Z))
+                levels(Z))
         }
         if (comb == "all") {
             Z <- allComb(strata) # matrix
