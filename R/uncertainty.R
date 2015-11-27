@@ -1,12 +1,8 @@
 ## internal wrapper to do single species
 .uncertaintyOpticut1 <-
 function (object, which=NULL,
-type=c("asymp", "boot", "multi"), B=99, ...)
+type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
 {
-#    type <- match.arg(type)
-#    B <- as.integer(B)
-#    if (B < 1)
-#        stop("B must be > 0")
     if (missing(which))
         stop("specify which argument")
     if (!length(which))
@@ -21,74 +17,71 @@ type=c("asymp", "boot", "multi"), B=99, ...)
         internal=TRUE,
         full_model=TRUE,
         best=TRUE, ...)[[1L]]
-#    i <- which
     obj <- object$species[[which]]
     k <- which.max(obj$logLR)
     bm <- rownames(obj)[k]
-#    spp <- names(m)
-#    out <- list()
-#    for (i in spp) {
-        if (type == "asymp") {
-#            k <- which.max($logLR)
-            bm <- rownames(obj)[k]
-#            m1 <- m[[i]]
-            cf <- MASS::mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
-            cf <- rbind(coef(m1)[c(1L, 2L)], cf)
-            cf0 <- linkinv(cf[,1L])
-            cf1 <- linkinv(cf[,1L] + cf[,2L])
-            I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-#            out[[i]] <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
-            out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
-        }
-        if (type == "boot") {
-#            k <- which.max(obj$logLR)
-            bm <- rownames(obj)[k]
-            cf <- t(pbapply::pbsapply(seq_len(B), function(z) {
+    if (type == "asymp") {
+        bm <- rownames(obj)[k]
+        cf <- MASS::mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
+        cf <- rbind(coef(m1)[c(1L, 2L)], cf)
+        cf0 <- linkinv(cf[,1L])
+        cf1 <- linkinv(cf[,1L] + cf[,2L])
+        I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+        out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
+    }
+    if (type == "boot") {
+        bm <- rownames(obj)[k]
+        cf <- if (pb) {
+            t(pbapply::pbsapply(seq_len(B), function(z) {
                 .extractOpticut(object, which,
                     boot=TRUE,
                     internal=TRUE,
                     full_model=FALSE,
                     best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
-#            cf <- rbind(coef(m[[i]])[c(1L, 2L)], cf)
-            cf <- rbind(coef(m1)[c(1L, 2L)], cf)
-            cf0 <- linkinv(cf[,1L])
-            cf1 <- linkinv(cf[,1L] + cf[,2L])
-            I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-#            out[[i]] <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
-            out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
-        }
-        if (type == "multi") {
-#            if (object$comb == "all")
-#                stop("comb='all' incompatible with type='multi':",
-#                    "\nuse comb='rank' instead")
-#            k <- which.max(obj$logLR)
-            bm <- character(B + 1L)
-            bm[1L] <- rownames(obj)[k]
-            mat <- matrix(NA, B + 1L, 3)
-            colnames(mat) <- c("I", "mu0", "mu1")
-            tmp <- as.numeric(obj[k, -1L])
-            names(tmp) <- colnames(obj)[-1L]
-            mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
-#            pb <- pbapply::startpb(0, B)
-#            on.exit(pbapply::closepb(pb))
-            for (j in seq_len(B)) {
-                ## Z is factor, thus 'rank' applied
-                mod <- .extractOpticut(object, which,
+        } else {
+            t(sapply(seq_len(B), function(z) {
+                .extractOpticut(object, which,
                     boot=TRUE,
-                    internal=FALSE,
-                    best=FALSE, ...)[[1L]]
-                k <- which.max(mod$logLR)
-                bm[j + 1L] <- rownames(mod)[k]
-                tmp <- as.numeric(mod[k, -1L])
-                names(tmp) <- colnames(mod)[-1L]
-                mat[j + 1L, ] <- tmp[c("I", "mu0", "mu1")]
-#                pbapply::setpb(pb, j)
-            }
-#            out[[i]] <- data.frame(best=bm, mat)
-            out <- data.frame(best=bm, mat)
+                    internal=TRUE,
+                    full_model=FALSE,
+                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
+            }))
         }
-#    }
+        cf <- rbind(coef(m1)[c(1L, 2L)], cf)
+        cf0 <- linkinv(cf[,1L])
+        cf1 <- linkinv(cf[,1L] + cf[,2L])
+        I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+        out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
+    }
+    if (type == "multi") {
+        bm <- character(B + 1L)
+        bm[1L] <- rownames(obj)[k]
+        mat <- matrix(NA, B + 1L, 3)
+        colnames(mat) <- c("I", "mu0", "mu1")
+        tmp <- as.numeric(obj[k, -1L])
+        names(tmp) <- colnames(obj)[-1L]
+        mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
+        if (pb) {
+            pb <- pbapply::startpb(0, B)
+            on.exit(pbapply::closepb(pb))
+        }
+        for (j in seq_len(B)) {
+            ## Z is factor, thus 'rank' applied
+            mod <- .extractOpticut(object, which,
+                boot=TRUE,
+                internal=FALSE,
+                best=FALSE, ...)[[1L]]
+            k <- which.max(mod$logLR)
+            bm[j + 1L] <- rownames(mod)[k]
+            tmp <- as.numeric(mod[k, -1L])
+            names(tmp) <- colnames(mod)[-1L]
+            mat[j + 1L, ] <- tmp[c("I", "mu0", "mu1")]
+            if (pb)
+                pbapply::setpb(pb, j)
+        }
+        out <- data.frame(best=bm, mat)
+    }
     class(out) <- "uncertainty1"
     attr(out, "B") <- B
     attr(out, "type") <- type
@@ -132,18 +125,18 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
 
     ## sequential
     if (is.null(cl)) {
-        ## show progress bar
+        ## show progress bar by species
         if (length(spp) > 1L && interactive()) {
             res <- pbapply::pblapply(spp, function(i, ...)
                 .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    ...), ...)
-        ## do not show progress bar
+                    pb = FALSE, ...), ...)
+        ## show progress bar when interactive (by B iterations)
         } else {
             res <- lapply(spp, function(i, ...)
                 .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    ...), ...)
+                    pb = interactive(), ...), ...)
         }
-    ## parallel
+    ## parallel (not showing progress)
     } else {
         ## snow type cluster
         if (inherits(cl, "cluster")) {
@@ -157,7 +150,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
             parallel::clusterExport(cl, c("object","type","B"), envir=e)
             res <- parallel::parLapply(cl, spp, function(i, ...)
                 .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    ...), ...)
+                    pb = FALSE, ...), ...)
             parallel::clusterEvalQ(cl, rm(list=c("object","type","B")))
             parallel::clusterEvalQ(cl, detach(package:opticut))
         ## forking
@@ -169,7 +162,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             res <- parallel::mclapply(spp, function(i, ...)
                 .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    ...), mc.cores = cl, ...)
+                    pb = FALSE, ...), mc.cores = cl, ...)
         }
     }
     out$uncertainty <- res
