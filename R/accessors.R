@@ -11,8 +11,9 @@ function (object, ...)
             i <- rownames(obj)[which.max(obj$logLR)]
             ## collapse value is taken from object
             ## so that post-hoc changes are not in effect
+            ## avoid regexp
             out[[spp]] <- ifelse(object$strata %in%
-                strsplit(i, object$collapse)[[1L]], 1L, 0L)
+                strsplit(i, object$collapse, fixed=TRUE)[[1L]], 1L, 0L)
         }
         out <- do.call(cbind, out)
         rownames(out) <- object$strata

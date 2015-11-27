@@ -222,7 +222,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             levels(Z) <- make.names(levels(Z), unique = FALSE)
             ## make sure that collapse value is stripped
             levels(Z) <- gsub(getOption("ocoptions")$collapse, "",
-                levels(Z))
+                levels(Z), fixed=TRUE) # avoid regexp
         }
         if (comb == "all") {
             Z <- allComb(strata) # matrix
@@ -230,7 +230,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             colnames(Z) <- make.names(colnames(Z), unique = FALSE)
             ## make sure that collapse value is stripped
             colnames(Z) <- gsub(getOption("ocoptions")$collapse, "",
-                colnames(Z))
+                colnames(Z), fixed=TRUE) # avoid regexp
         }
     } else {
         Z <- as.matrix(strata) # matrix
