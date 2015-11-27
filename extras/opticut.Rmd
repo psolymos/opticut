@@ -328,6 +328,8 @@ par(op)
 
 ## Presence-only data
 
+Describe RSF/RSPF differences aspecially related to covariates.
+
 ```{r}
 ## presence-only data
 ## single species model only:
