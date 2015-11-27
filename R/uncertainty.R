@@ -63,8 +63,8 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         names(tmp) <- colnames(obj)[-1L]
         mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
         if (pb) {
-            pb <- pbapply::startpb(0, B)
-            on.exit(pbapply::closepb(pb))
+            pbar <- pbapply::startpb(0, B)
+            on.exit(pbapply::closepb(pbar))
         }
         for (j in seq_len(B)) {
             ## Z is factor, thus 'rank' applied
@@ -78,7 +78,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             names(tmp) <- colnames(mod)[-1L]
             mat[j + 1L, ] <- tmp[c("I", "mu0", "mu1")]
             if (pb)
-                pbapply::setpb(pb, j)
+                pbapply::setpb(pbar, j)
         }
         out <- data.frame(best=bm, mat)
     }
