@@ -218,10 +218,19 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (is.null(dim(strata))) {
         if (comb == "rank") {
             Z <- droplevels(as.factor(strata)) # factor
-            levels(Z) <- gsub(" +", "", levels(Z))
+            ## make syntactically valid names
+            levels(Z) <- make.names(levels(Z), unique = FALSE)
+            ## make sure that collapse value is stripped
+            levels(Z) <- gsub(getOption("ocoptions")$collapse, "",
+                clevels(Z))
         }
         if (comb == "all") {
             Z <- allComb(strata) # matrix
+            ## make syntactically valid names
+            colnames(Z) <- make.names(colnames(Z), unique = FALSE)
+            ## make sure that collapse value is stripped
+            colnames(Z) <- gsub(getOption("ocoptions")$collapse, "",
+                colnames(Z))
         }
     } else {
         Z <- as.matrix(strata) # matrix
@@ -270,6 +279,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         strata=Z,
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
             (nlevels(Z) - 1L) else ncol(Z),
+        collapse=getOption("ocoptions")$collapse,
         dist=if (is.function(dist))
             deparse(substitute(dist)) else dist,
         comb=comb)

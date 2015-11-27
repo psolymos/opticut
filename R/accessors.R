@@ -7,14 +7,19 @@ function (object, ...)
     out <- list()
     if (object$comb == "rank") {
         for (spp in names(object$species)) {
-            i <- rownames(object$species[[spp]])[which.max(object$species[[spp]]$logLR)]
-            out[[spp]] <- ifelse(object$strata %in% strsplit(i, " ")[[1L]], 1L, 0L)
+            obj <- object$species[[spp]]
+            i <- rownames(obj)[which.max(obj$logLR)]
+            ## collapse value is taken from object
+            ## so that post-hoc changes are not in effect
+            out[[spp]] <- ifelse(object$strata %in%
+                strsplit(i, object$collapse)[[1L]], 1L, 0L)
         }
         out <- do.call(cbind, out)
         rownames(out) <- object$strata
     } else {
         for (spp in names(object$species)) {
-            i <- rownames(object$species[[spp]])[which.max(object$species[[spp]]$logLR)]
+            obj <- object$species[[spp]]
+            i <- rownames(obj)[which.max(obj$logLR)]
             out[[spp]] <- object$strata[,i]
         }
         out <- do.call(cbind, out)
