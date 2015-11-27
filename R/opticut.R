@@ -264,6 +264,8 @@ comb=c("rank", "all"), cl=NULL, ...)
             parallel::clusterExport(cl, c("X","Z","dist"), envir=e)
             res <- parallel::parApply(cl, Y, 2, function(yy, ...)
                 opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+            parallel::clusterEvalQ(cl, rm(list=c("X","Z","dist")))
+            parallel::clusterEvalQ(cl, detach(package:opticut))
         ## forking
         } else {
             if (cl < 2)
