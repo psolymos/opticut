@@ -162,10 +162,10 @@ function(Y, X, Z, dist="gaussian", ...)
         warning("Row names added to binary split matrix Z (it was NULL). You are welcome.")
         rownames(Z) <- apply(Z, 1, paste, collapse="")
     }
-    if (!is.function(dist) && dist %in% c("rsf", "rspf")) {
-        warning("The use of opticut1 with rspf is discouraged:",
-            "\nhard to check covariate assumptions, use opticut instead.")
-    }
+#    if (!is.function(dist) && dist %in% c("rspf")) {
+#        warning("The use of opticut1 with rspf is discouraged:",
+#            "\nhard to check covariate assumptions, use opticut instead.")
+#    }
     N <- ncol(Z)
     res0 <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf <- matrix(0, N, length(res0$coef)+1)

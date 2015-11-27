@@ -41,8 +41,9 @@ wplot(x, ...)
 }
 \arguments{
   \item{formula}{
-two sided model formula, response species data (matrix) in the left-hand side,
-model terms in the right-hand side
+two sided model formula, response species data (matrix, 
+or possible a vector for single species case) in the left-hand side,
+model terms for mudifying effects in the right-hand side
 (its structure depending on the underlying functions).
 }
   \item{data}{
@@ -162,6 +163,14 @@ matrix-like object for multiple species.
 Intercept only model is not accepted for \code{"rspf"}.
 
 Custom distributions can be defined, see Examples.
+}
+\section{Warning}{
+The use of the \code{opticut1} function is generally discouraged.
+Use the \code{opticut} function instead with a single species in the left-hand
+side of the formuls. Some of the internal checks are not quaranteed to
+flag issues when the formula-to-model-matrix translation is side-stepped
+(this is what is happening when the modifier variables are supplied
+as \code{X} argument in \code{opticut1}).
 }
 \value{
 \code{opticut1} returns an object of class opticut1.
