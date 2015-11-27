@@ -94,19 +94,19 @@ mods
 str(predict(mods[[1]]))
 confint(mods[[1]])
 
-uc1 <- uncertainty(oc, 1, type="asymp", B=1000)
-uc2 <- uncertainty(oc, 1, type="boot", B=20)
-uc3 <- uncertainty(oc, 1, type="multi", B=20)
+uc1 <- uncertainty(oc, type="asymp", B=1000)
+uc2 <- uncertainty(oc, type="boot", B=20)
+uc3 <- uncertainty(oc, type="multi", B=20)
 
-summary(uc1[[1]])
-summary(uc2[[1]])
-summary(uc3[[1]])
+#summary(uc1[[1]])
+#summary(uc2[[1]])
+#summary(uc3[[1]])
 
-plot(density(uc1[[1]]$I))
-lines(density(uc2[[1]]$I), col=2)
-lines(density(uc3[[1]]$I), col=4)
-legend("topleft", lty=1, col=c(1,2,4),
-    legend=c("asymp", "boot", "multi"))
+#plot(density(uc1[[1]]$I))
+#lines(density(uc2[[1]]$I), col=2)
+#lines(density(uc3[[1]]$I), col=4)
+#legend("topleft", lty=1, col=c(1,2,4),
+#    legend=c("asymp", "boot", "multi"))
 }
 \keyword{ manip }
 \keyword{ models }
