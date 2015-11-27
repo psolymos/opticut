@@ -21,7 +21,7 @@ bestpart(object, ...)
 uncertainty(object, ...)
 \method{uncertainty}{opticut}(object,
     which = NULL, type = c("asymp", "boot", "multi"),
-    B = 99, ...)
+    B = 99, cl = NULL, ...)
 }
 \arguments{
   \item{object}{
@@ -46,6 +46,10 @@ the model ranking is re-evaluated each time).
 }
   \item{B}{
 numeric, number of iterations.
+}
+  \item{cl}{
+a cluster object, or an integer for multiple cores in parallel coputations
+(this does nothing on Windows).
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
