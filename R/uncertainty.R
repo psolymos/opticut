@@ -127,12 +127,13 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
     out <- summary(object)
     out$B <- B
     out$type <- type
+    out$Y <- out$Y[,spp,drop=FALSE]
     class(out) <- "uncertainty"
 
     ## sequential
     if (is.null(cl)) {
         ## show progress bar
-        if (ncol(Y) > 1L && interactive()) {
+        if (length(spp) > 1L && interactive()) {
             res <- pbapply::pblapply(spp, function(i, ...)
                 .uncertaintyOpticut1(object=object, i, type=type, B=B,
                     ...), ...)
