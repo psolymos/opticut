@@ -534,6 +534,5 @@ system.time(uncertainty(o, type="boot", B=200, cl=cl))
 system.time(uncertainty(o, type="multi", B=200))
 system.time(uncertainty(o, type="multi", B=200, cl=cl))
 stopCluster(cl)
-
 ```
 

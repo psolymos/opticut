@@ -118,10 +118,6 @@ summary.opticut <- function(object, ...)
             collapse=getOption("ocoptions")$collapse)
         lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
             collapse=getOption("ocoptions")$collapse)
-#        lab1[i] <- paste(rownames(bp)[bp[,i] == 1],
-#            collapse=" ")
-#        lab0[i] <- paste(rownames(bp)[bp[,i] == 0],
-#            collapse=" ")
     }
     bp <- t(bp[order(rownames(bp)),,drop=FALSE])
     attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
@@ -134,5 +130,15 @@ summary.opticut <- function(object, ...)
     object$species <- NULL
     class(object) <- c("summary.opticut")
     object
+}
+
+print.uncertainty1 <-
+function(x, ...)
+{
+    cat("Univariate opticut uncertainty results",
+        ", type = ", attr(x, "type"), ", B = ", attr(x, "B"),
+        "\n\n", sep="")
+    print(summary(x), ...)
+    invisible(x)
 }
 

@@ -181,3 +181,28 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
     box(col="grey")
     invisible(xx)
 }
+
+plot.uncertainty1 <-
+function(x, ...)
+{
+    dI <- density(x$I)
+    d0 <- density(x$mu0)
+    d1 <- density(x$mu1)
+    n <- if (attr(x, "type") == "multi") 3 else 2
+    op <- par(mfrow=c(1, n), ...)
+    on.exit(par(op))
+    plot(dI, xlim=c(0,1), lwd=2, col=1, main="I", xlab="",
+        sub=paste0("type = ", attr(x, "type")))
+    plot(d0, xlim=range(d0$x, d1$x), ylim=c(0, max(d0$y, d1$y)),
+         lwd=2, main="mu0, mu1", col=occolors()(2)[1],
+         xlab="", sub=paste0("B = ", attr(x, "B")))
+    lines(d1, lwd=2, col=occolors()(2)[2])
+    if (attr(x, "type") == "multi") {
+        f <- sort(table(x$best) / nrow(x))
+        #par(cex.axis=0.5)
+        barplot(f, col=occolors()(length(f)),
+            ylim=c(0,1), main="Selection")
+        box()
+    }
+    invisible(object)
+}

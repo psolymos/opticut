@@ -5,6 +5,8 @@
 \alias{bestpart.opticut}
 \alias{uncertainty}
 \alias{uncertainty.opticut}
+\alias{print.uncertainty1}
+\alias{plot.uncertainty1}
 \title{
 Accessing best model and partition from fitted object
 }
@@ -22,6 +24,9 @@ uncertainty(object, ...)
 \method{uncertainty}{opticut}(object,
     which = NULL, type = c("asymp", "boot", "multi"),
     B = 99, cl = NULL, ...)
+
+\method{print}{uncertainty1}(x, ...)
+\method{plot}{uncertainty1}(x, ...)
 }
 \arguments{
   \item{object}{
