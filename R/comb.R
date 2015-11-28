@@ -117,6 +117,6 @@ function(Y, X, Z, dist="gaussian", ...)
 #    oc <- oComb(x, collapse = " ")
     out <- oc[match(Z, rownames(oc)),]
     attr(out, "est") <- m$linkinv(lc)
-    attr(out, "collapse") <- collapse
+    attr(out, "collapse") <- getOption("ocoptions")$collapse
     out
 }

@@ -7,6 +7,7 @@
 \alias{uncertainty.opticut}
 \alias{print.uncertainty1}
 \alias{plot.uncertainty1}
+\alias{wplot.uncertainty1}
 \title{
 Accessing best model and partition from fitted object
 }
@@ -27,6 +28,7 @@ uncertainty(object, ...)
 
 \method{print}{uncertainty1}(x, ...)
 \method{plot}{uncertainty1}(x, ...)
+\method{wplot}{uncertainty1}(x, ylab, ...)
 }
 \arguments{
   \item{object}{
@@ -55,6 +57,12 @@ numeric, number of iterations.
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel coputations
 (this does nothing on Windows).
+}
+  \item{x}{
+an object to be printed or plotted.
+}
+  \item{ylab}{
+label for the y axis.
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
