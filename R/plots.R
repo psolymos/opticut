@@ -16,7 +16,7 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
     } else {
         w <- w[x$logLR >= cut]
     }
-    if (is.character(theme))
+    if (!missing(theme) && is.character(theme))
         if (length(theme) == 1L)
             if (theme == "bw")
                 #warning("'bw' theme not best suited for wplot")
@@ -60,7 +60,7 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
                 ,"\nspecify 'which' argument")
         if (!is.null(which) && length(which) > 1L)
             x$species <- x$species[which]
-        if (is.character(theme))
+        if (!missing(theme) && is.character(theme))
             if (length(theme) == 1L)
                 if (theme == "bw")
                     #warning("'bw' theme not best suited for wplot")

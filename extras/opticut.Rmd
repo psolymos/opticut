@@ -508,15 +508,12 @@ uc1 <- uncertainty(o, type="asymp", B=5000)
 uc2 <- uncertainty(o, type="boot", B=200)
 uc3 <- uncertainty(o, type="multi", B=200)
 
-summary(uc1$uncertainty[[1]])
-summary(uc2$uncertainty[[1]])
-summary(uc3$uncertainty[[1]])
+uc1$uncertainty[[1]]
+uc2$uncertainty[[1]]
+uc3$uncertainty[[1]]
 
-plot(density(uc1$uncertainty[[1]]$I), ylim=c(0,7))
-lines(density(uc2$uncertainty[[1]]$I), col=2)
-lines(density(uc3$uncertainty[[1]]$I), col=4)
-legend("topleft", lty=1, col=c(1,2,4),
-    legend=c("asymp", "boot", "multi"))
+plot(uc3$uncertainty[[1]])
+wplot(uc3$uncertainty[[1]])
 
 ## performance comparisons for 10 species
 YYY <- cbind(Y, Y, Y, Y, Y, Y, Y, Y, Y, Y)
@@ -528,11 +525,11 @@ cl <- makeCluster(2)
 system.time(uncertainty(o, type="asymp", B=5000))
 system.time(uncertainty(o, type="asymp", B=5000, cl=cl))
 
-system.time(uncertainty(o, type="boot", B=200))
-system.time(uncertainty(o, type="boot", B=200, cl=cl))
+system.time(uncertainty(o, type="boot", B=100))
+system.time(uncertainty(o, type="boot", B=100, cl=cl))
 
-system.time(uncertainty(o, type="multi", B=200))
-system.time(uncertainty(o, type="multi", B=200, cl=cl))
+system.time(uncertainty(o, type="multi", B=100))
+system.time(uncertainty(o, type="multi", B=100, cl=cl))
 stopCluster(cl)
 ```
 
