@@ -188,8 +188,7 @@ function(x, ...)
     dI <- density(x$I)
     d0 <- density(x$mu0)
     d1 <- density(x$mu1)
-    n <- if (attr(x, "type") == "multi") 3 else 2
-    op <- par(mfrow=c(1, n), ...)
+    op <- par(mfrow=c(1, 2), ...)
     on.exit(par(op))
     plot(dI, xlim=c(0,1), lwd=2, col=1, main="I", xlab="",
         sub=paste0("type = ", attr(x, "type")))
@@ -197,16 +196,28 @@ function(x, ...)
          lwd=2, main="mu0, mu1", col=occolors()(2)[1],
          xlab="", sub=paste0("B = ", attr(x, "B")))
     lines(d1, lwd=2, col=occolors()(2)[2])
-    if (attr(x, "type") == "multi") {
-        f <- sort(table(x$best) / nrow(x))
-        #par(cex.axis=0.5)
-        barplot(f, col=occolors()(length(f)),
-            ylim=c(0,1), main="Selection")
-        box()
-    }
     invisible(list(I=dI, m0=d0, m1=d1))
 }
 
 ## frequency in wplot.uncertainty1
 ## use oComb(attr(x, "est")) to get habitats
 ## return B x K matrix (0,1)
+wplot.uncertainty1 <-
+function(x, ylab, ...)
+{
+    if (missing(ylab))
+        ylab <- "Selection"
+    cm <- oComb(attr(x, "est"))
+    mat <- matrix(0L, nrow(x), nrow(cm))
+    colnames(mat) <- rownames(cm)
+    for (i in seq_len(nrow(x))) {
+        j <- strsplit(as.character(x$best[i]),
+            attr(x, "collapse"), fixed=TRUE)[[1L]]
+        mat[i,j] <- 1L
+    }
+    f <- rev(sort(colSums(mat) / nrow(x)))
+    barplot(f, col=rev(occolors()(length(f))),
+        ylim=c(0,1), ylab=ylab, ...)
+    box()
+    invisible(mat)
+}

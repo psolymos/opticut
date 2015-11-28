@@ -86,6 +86,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     class(out) <- c("uncertainty1", "data.frame")
     attr(out, "B") <- B
     attr(out, "type") <- type
+    attr(out, "collapse") <- object$collapse
     out
 }
 #str(.uncertaintyOpticut1(oc, 1, type="asymp", B=1000))
