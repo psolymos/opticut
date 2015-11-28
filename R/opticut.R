@@ -312,7 +312,8 @@ comb=c("rank", "all"), cl=NULL, ...)
         collapse=getOption("ocoptions")$collapse,
         dist=if (is.function(dist))
             deparse(substitute(dist)) else dist,
-        comb=comb)
+        comb=comb,
+        collapse=getOption("ocoptions")$collapse)
     class(out) <- "opticut"
     out
 }

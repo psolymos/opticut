@@ -204,5 +204,9 @@ function(x, ...)
             ylim=c(0,1), main="Selection")
         box()
     }
-    invisible(object)
+    invisible(list(I=dI, m0=d0, m1=d1))
 }
+
+## frequency in wplot.uncertainty1
+## use oComb(attr(x, "est")) to get habitats
+## return B x K matrix (0,1)

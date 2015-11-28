@@ -123,8 +123,8 @@ summary.opticut <- function(object, ...)
     attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
     attr(bp, "row.order") <- order(ncol(bp) - rowSums(bp),
         lab1, 1 - res$I, decreasing=FALSE)
-    res$label0 <- lab0
-    res$label1 <- lab1
+    res$lablo <- lab0
+    res$labhi <- lab1
     object$summary <- res
     object$bestpart <- bp
     object$species <- NULL
@@ -139,6 +139,29 @@ function(x, ...)
         ", type = ", attr(x, "type"), ", B = ", attr(x, "B"),
         "\n\n", sep="")
     print(summary(x), ...)
+    invisible(x)
+}
+
+## summary:
+## - highest % split label
+## - selection freq
+## - I
+## - confint
+## plot also uses level argument
+summary.uncertainty <-
+function(object, level=0.95, ...)
+{
+    object$uctab <- NA
+    class(object) <- "summary.uncertainty"
+    object
+}
+print.summary.uncertainty <-
+function(x, ...)
+{
+    cat("Multivariate opticut uncertainty results",
+        ", type = ", attr(x, "type"), ", B = ", attr(x, "B"),
+        "\n\n", sep="")
+    print(x$uctab[,c()], ...)
     invisible(x)
 }
 

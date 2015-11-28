@@ -48,6 +48,7 @@ function(x, collapse = getOption("ocoptions")$collapse)
     out <- apply(ac, 2, function(z) z[match(i, s)])
     rownames(out) <- f
     colnames(out) <- LABELS
+    attr(out, "collapse") <- collapse
     out
 }
 
@@ -116,5 +117,6 @@ function(Y, X, Z, dist="gaussian", ...)
 #    oc <- oComb(x, collapse = " ")
     out <- oc[match(Z, rownames(oc)),]
     attr(out, "est") <- m$linkinv(lc)
+    attr(out, "collapse") <- collapse
     out
 }

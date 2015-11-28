@@ -81,6 +81,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                 pbapply::setpb(pbar, j)
         }
         out <- data.frame(best=bm, mat)
+        attr(out, "est") <- attr(obj, "est")
     }
     class(out) <- c("uncertainty1", "data.frame")
     attr(out, "B") <- B
@@ -100,6 +101,9 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
 {
     ## sanity checks
     type <- match.arg(type)
+    if (type == "multi" && is.na(object$comb))
+        stop("Custom conbinations incompatible with type='multi':",
+                "\nuse comb='rank' instead")
     if (type == "multi" && object$comb == "all")
         stop("comb='all' incompatible with type='multi':",
                 "\nuse comb='rank' instead")

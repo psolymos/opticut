@@ -1,6 +1,7 @@
 bestpart <- function (object, ...)
     UseMethod("bestpart")
 
+## this returns an n x #spp matrix
 bestpart.opticut <-
 function (object, ...)
 {
