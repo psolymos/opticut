@@ -10,8 +10,7 @@ Description: Likelihood based optimal partitioning for indicator
   based on model selection, possibly controlling for modifying/confounding
   variables as described in Kemencei et al. (2014, Com. Ecol. 15:180--186).
 URL: https://github.com/psolymos/opticut
-Depends: mefa4 (>= 0.3-3)
-Imports: MASS, pscl, betareg, ResourceSelection, parallel, pbapply
+Imports: MASS, pscl, betareg, ResourceSelection, parallel, pbapply, mefa4
 License: GPL-2
 LazyLoad: yes
 LazyData: true
