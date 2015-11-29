@@ -8,6 +8,9 @@
 \alias{print.uncertainty1}
 \alias{plot.uncertainty1}
 \alias{wplot.uncertainty1}
+\alias{print.uncertainty}
+\alias{print.summary.uncertainty}
+\alias{summary.uncertainty}
 \title{
 Accessing best model and partition from fitted object
 }
@@ -29,6 +32,9 @@ uncertainty(object, ...)
 \method{print}{uncertainty1}(x, ...)
 \method{plot}{uncertainty1}(x, ...)
 \method{wplot}{uncertainty1}(x, ylab, ...)
+\method{print}{uncertainty}(x, ...)
+\method{print}{summary.uncertainty}(x, ...)
+\method{summary}{uncertainty}(x, level = 0.95, ...)
 }
 \arguments{
   \item{object}{
@@ -50,6 +56,8 @@ based on best partition found for the input object.
 \code{"multi"}: non-parametric bootstrap distribution
 based on best partition found for the bootstrap data (i.e.
 the model ranking is re-evaluated each time).
+\code{"multi"} works only if \code{comb = "rank"} in the
+\code{\link{opticut}} call.
 }
   \item{B}{
 numeric, number of iterations.
@@ -64,7 +72,10 @@ an object to be printed or plotted.
   \item{ylab}{
 label for the y axis.
 }
-  \item{\dots}{
+  \item{level}{
+the confidence level required.
+}
+\item{\dots}{
 other arguments passed to the underlying functions.
 }
 }
@@ -111,15 +122,18 @@ uc1 <- uncertainty(oc, type="asymp", B=1000)
 uc2 <- uncertainty(oc, type="boot", B=20)
 uc3 <- uncertainty(oc, type="multi", B=20)
 
-#summary(uc1[[1]])
-#summary(uc2[[1]])
-#summary(uc3[[1]])
+## selection frequencies (w) for best supported split
+## and confidence intervals for I
+summary(uc3)
 
-#plot(density(uc1[[1]]$I))
-#lines(density(uc2[[1]]$I), col=2)
-#lines(density(uc3[[1]]$I), col=4)
-#legend("topleft", lty=1, col=c(1,2,4),
-#    legend=c("asymp", "boot", "multi"))
+## individual species results
+uc3$uncertainty
+
+## density plots
+plot(uc3$uncertainty[[1]])
+## selection frequencies for partitions
+## (only for type = 'multi')
+wplot(uc3$uncertainty[[1]])
 }
 \keyword{ manip }
 \keyword{ models }
