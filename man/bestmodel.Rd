@@ -38,7 +38,8 @@ uncertainty(object, ...)
 }
 \arguments{
   \item{object}{
-fitted model object from \code{\link{opticut}}.
+fitted model object from \code{\link{opticut}} (or an output from
+\code{uncertainty} for the \code{summary} method).
 }
   \item{which}{
 numeric, character (can be a vector) defining
@@ -66,7 +67,7 @@ numeric, number of iterations.
 a cluster object, or an integer for multiple cores in parallel coputations
 (this does nothing on Windows).
 }
-  \item{x, object}{
+  \item{x}{
 an object to be printed or plotted.
 }
   \item{ylab}{
