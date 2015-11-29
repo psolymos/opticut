@@ -34,7 +34,7 @@ uncertainty(object, ...)
 \method{wplot}{uncertainty1}(x, ylab, ...)
 \method{print}{uncertainty}(x, ...)
 \method{print}{summary.uncertainty}(x, ...)
-\method{summary}{uncertainty}(x, level = 0.95, ...)
+\method{summary}{uncertainty}(object, level = 0.95, ...)
 }
 \arguments{
   \item{object}{
@@ -66,7 +66,7 @@ numeric, number of iterations.
 a cluster object, or an integer for multiple cores in parallel coputations
 (this does nothing on Windows).
 }
-  \item{x}{
+  \item{x, object}{
 an object to be printed or plotted.
 }
   \item{ylab}{
