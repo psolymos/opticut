@@ -12,8 +12,11 @@ S3method("wplot", "opticut1")
 S3method("print", "opticut")
 S3method("print", "opticut1")
 S3method("print", "uncertainty1")
+S3method("print", "uncertainty")
+S3method("print", "summary.uncertainty")
 S3method("print", "summary.opticut")
 S3method("summary", "opticut")
+S3method("summary", "uncertainty")
 S3method("uncertainty", "opticut")
 
 importFrom("mefa4", "groupSums", "nonDuplicated")
@@ -22,5 +25,5 @@ importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
            "par", "plot", "polygon", "title")
 importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
-           "vcov")
+           "vcov", "density")
 importFrom("utils", "combn")
