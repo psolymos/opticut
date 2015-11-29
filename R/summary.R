@@ -151,17 +151,37 @@ function(x, ...)
 summary.uncertainty <-
 function(object, level=0.95, ...)
 {
-    object$uctab <- NA
+    p <- c((1-level)/2, 1-(1-level)/2)
+    ucq <- sapply(object$uncertainty, function(z)
+        quantile(z$I, p))
+    ucl <- lapply(object$uncertainty, function(z)
+        rev(sort(table(z$best)))[1L] / (object$B + 1))
+    object$uctab <- data.frame(split=sapply(ucl, names),
+        w=unname(unlist(ucl)),
+        I=object$summary$I,
+        lower=ucq[1L,], upper=ucq[2L,])
+    object$level <- level
     class(object) <- "summary.uncertainty"
     object
 }
+
+## do not cut, but sort???
 print.summary.uncertainty <-
 function(x, ...)
 {
     cat("Multivariate opticut uncertainty results",
-        ", type = ", attr(x, "type"), ", B = ", attr(x, "B"),
+        ", type = ", x$type, ", B = ", x$B,
+        "\nlevel = ", format(round(x$level, 2), nsmall=2),
         "\n\n", sep="")
-    print(x$uctab[,c()], ...)
+    uct <- x$uctab
+    print(uct, ...)
     invisible(x)
 }
 
+print.uncertainty <-
+function(x, ...)
+{
+    cat("Multivariate opticut uncertainty results",
+        ", type = ", x$type, ", B = ", x$B, "\n\n", sep="")
+    invisible(x)
+}

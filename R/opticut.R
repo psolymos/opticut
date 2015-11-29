@@ -223,7 +223,8 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (is.null(colnames(Y)))
         colnames(Y) <- paste("Species", seq_len(ncol(Y)))
     if (any(duplicated(colnames(Y))))
-        stop("Duplicate colnames found in LHS, please fix.")
+        warning("Duplicate column names found and renamed in LHS.")
+    colnames(Y) <- make.names(colnames(Y))
     ff <- formula
     ff[[2]] <- NULL
     mt <- terms(ff, data = data)
