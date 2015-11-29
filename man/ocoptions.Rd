@@ -43,7 +43,7 @@ Tags are the following:
 \author{
 Peter Solymos <solymos@ualberta.ca>
 
-Hexadecimel values for the built-in palettes are taken from
+Hexadecimal values for the built-in palettes are taken from
 \url{http://colorbrewer2.org/}.
 }
 \examples{
