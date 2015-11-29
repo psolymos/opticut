@@ -41,7 +41,7 @@ wplot(x, ...)
 }
 \arguments{
   \item{formula}{
-two sided model formula, response species data (matrix, 
+two sided model formula, response species data (matrix,
 or possible a vector for single species case) in the left-hand side,
 model terms for mudifying effects in the right-hand side
 (its structure depending on the underlying functions).
@@ -136,9 +136,19 @@ uses \code{\link[MASS]{glm.nb}} of the MASS package.
 uses \code{\link[betareg]{betareg}}  of the betareg package.
 
 \code{"zip"}: zero-inflated Poisson counts,
+indicative properties are tested as part of the abundance model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 
 \code{"zinb"}: zero-inflated Negative Binomial counts,
+indicative properties are tested as part of the abundance model,
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+
+\code{"zip2"}: zero-inflated Poisson counts,
+indicative properties are tested as part of the zero-model,
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+
+\code{"zinb2"}: zero-inflated Negative Binomial counts,
+indicative properties are tested as part of the zero-model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 
 \code{"ordered"}: response measured on ordinal scale,
@@ -155,7 +165,7 @@ Intercept only model is accepted for \code{"rsf"}.
 
 \code{"rspf"}: presence-only data using resource selection
 probability functions (RSPF)
-as explained in \code{\link[ResourceSelection]{rspf}} 
+as explained in \code{\link[ResourceSelection]{rspf}}
 in the ResourceSelection package.
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single

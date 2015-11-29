@@ -18,7 +18,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
     if (!is.function(dist)) {
         dist <- match.arg(dist,
             c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rsf", "rspf"))
+            "beta","zip","zinb","ordered", "rsf", "rspf",
+            "zip2", "zinb2"))
         if (dist == "gaussian") {
             link <- list(...)$link
             if (is.null(link))
@@ -69,6 +70,36 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
+        }
+        if (dist == "zip2") {
+            ZZ <- if (is.null(Z1)) {
+                data.matrix(X[,1,drop=FALSE])
+            } else {
+                data.matrix(cbind(X[,1,drop=FALSE], Z1))
+            }
+            link <- list(...)$link
+            if (is.null(link))
+                link <- "logit"
+            mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist="poisson",
+                link=link, ...)
+            cf <- c(coef(mod, "zero"), coef(mod, "count"))
+            ll <- as.numeric(logLik(mod))
+            linv <- function(eta) 1 - binomial("logit")$linkinv(eta)
+        }
+        if (dist == "zinb2") {
+            ZZ <- if (is.null(Z1)) {
+                data.matrix(X[,1,drop=FALSE])
+            } else {
+                data.matrix(cbind(X[,1,drop=FALSE], Z1))
+            }
+            link <- list(...)$link
+            if (is.null(link))
+                link <- "logit"
+            mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist="negbin",
+                link=link, ...)
+            cf <- c(coef(mod, "zero"), coef(mod, "count"))
+            ll <- as.numeric(logLik(mod))
+            linv <- function(eta) 1 - binomial("logit")$linkinv(eta)
         }
         if (dist == "ordered") {
             if (!is.null(list(...)$method))
