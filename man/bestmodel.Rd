@@ -20,6 +20,11 @@ bestpart(object, ...)
   \item{object}{
 fitted model object from \code{\link{opticut}}.
 }
+  \item{which}{
+numeric, character (can be a vector) defining
+a subset of species from the fitted object,
+or or \code{NULL} (all species, default).
+}
 \item{\dots}{
 other arguments passed to the underlying functions.
 }
