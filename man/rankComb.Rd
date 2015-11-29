@@ -40,11 +40,12 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
 }
 \value{
-\code{oComb} return the 'contrast' matrix based on the rank vector as input.
+\code{oComb} returns the 'contrast' matrix based on the rank vector as input.
 Ranked from lowest to highest expected value among the partitions.
 
 The function \code{rankComb} fits the model with multiple (K > 2) factor levels
-to find out the ranking, and returns a binary classification matrix.
+to find out the ranking, and returns a binary classification matrix
+as returned by \code{oComb} corresponding to the ranking.
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
@@ -67,8 +68,11 @@ Y <- rpois(n, lam)
 ## binary partitions
 head(rc <- rankComb(Y, model.matrix(~x2), as.factor(x0), dist="poisson"))
 attr(rc, "est") # expected values in factor levels
+aggregate(exp(0.5 + 0.5*x1), list(x0=x0), mean) # true values
 
+## simple example
 oComb(1:4, "+")
+## using estimates
 oComb(attr(rc, "est"))
 }
 \keyword{ manip }
