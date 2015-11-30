@@ -20,7 +20,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     obj <- object$species[[which]]
     k <- which.max(obj$logLR)
     bm <- rownames(obj)[k]
-    n <- length(object$Y)
+    n <- nobs(object)
     if (type == "asymp") {
         if (length(B) > 1)
             stop("Provide single integer for B.")

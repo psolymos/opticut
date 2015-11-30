@@ -338,6 +338,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         X=X,
         Y=Y,
         strata=Z,
+        nobs=NROW(Y),
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
             (nlevels(Z) - 1L) else ncol(Z),
         collapse=getOption("ocoptions")$collapse,
