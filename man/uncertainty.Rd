@@ -99,7 +99,8 @@ oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 uc1 <- uncertainty(oc, type="asymp", B=1000)
 uc2 <- uncertainty(oc, type="boot", B=20)
 ## use user-supplied indices
-uc3 <- uncertainty(oc, type="multi", B=20)
+B <- replicate(20, sample.int(n, replace=TRUE))
+uc3 <- uncertainty(oc, type="multi", B=B)
 
 ## selection frequencies (w) for best supported split
 ## and confidence intervals for I
@@ -109,6 +110,7 @@ summary(uc3)
 uc3$uncertainty
 
 ## density plots
+## note: multimodality is due to uncertainty on partitions
 plot(uc3$uncertainty[[1]])
 ## selection frequencies for partitions
 ## (only for type = 'multi')
