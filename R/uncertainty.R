@@ -34,8 +34,8 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
     } else {
         if (length(B) == 1) {
-            BB <- replicate(B, sample.int(n, replace=TRUE))
             niter <- B
+            BB <- replicate(niter, sample.int(n, replace=TRUE))
         } else {
             BB <- B
             niter <- ncol(B)
@@ -59,7 +59,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
 #                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
 #            }))
         } else {
-            t(sapply(BB, function(z) {
+            t(apply(BB, 2, function(z) {
                 .extractOpticut(object, which,
                     boot=z,
                     internal=TRUE,
