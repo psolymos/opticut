@@ -263,12 +263,12 @@ comb=c("rank", "all"), cl=NULL, ...)
 
     if (is.null(dim(strata))) {
         if (nchar(getOption("ocoptions")$collapse) < 1)
-            stop("nchar(getOption("ocoptions")$collapse) must be > 0")
+            stop("nchar(getOption('ocoptions')$collapse) must be > 0")
         strata <- droplevels(as.factor(strata)) # factor
         ## make syntactically valid names
         levels(strata) <- make.names(levels(strata), unique = TRUE)
         ## make sure that collapse is not in levels
-        if (any(grepl(getOption("ocoptions")$collapse, levels(Z), fixed=TRUE)))
+        if (any(grepl(getOption('ocoptions')$collapse, levels(Z), fixed=TRUE)))
             stop("Collapse value found in levels.")
         if (comb == "rank") {
             Z <- strata
