@@ -268,7 +268,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         ## make syntactically valid names
         levels(strata) <- make.names(levels(strata), unique = TRUE)
         ## make sure that collapse is not in levels
-        if (any(grepl(getOption('ocoptions')$collapse, levels(Z), fixed=TRUE)))
+        if (any(grepl(getOption('ocoptions')$collapse, levels(strata), fixed=TRUE)))
             stop("Collapse value found in levels.")
         if (comb == "rank") {
             Z <- strata
