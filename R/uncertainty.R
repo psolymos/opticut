@@ -59,7 +59,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
 #                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
 #            }))
         } else {
-            t(spply(BB, function(z) {
+            t(sapply(BB, function(z) {
                 .extractOpticut(object, which,
                     boot=z,
                     internal=TRUE,
