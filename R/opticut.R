@@ -262,24 +262,23 @@ comb=c("rank", "all"), cl=NULL, ...)
     X <- model.matrix(mt, mf)
 
     if (is.null(dim(strata))) {
+        if (nchar(getOption("ocoptions")$collapse) < 1)
+            stop("nchar(getOption("ocoptions")$collapse) must be > 0")
+        strata <- droplevels(as.factor(strata)) # factor
+        ## make syntactically valid names
+        levels(strata) <- make.names(levels(strata), unique = TRUE)
+        ## make sure that collapse is not in levels
+        if (any(grepl(getOption("ocoptions")$collapse, levels(Z), fixed=TRUE)))
+            stop("Collapse value found in levels.")
         if (comb == "rank") {
-            Z <- droplevels(as.factor(strata)) # factor
-            ## make syntactically valid names
-            levels(Z) <- make.names(levels(Z), unique = FALSE)
-            ## make sure that collapse value is stripped
-            levels(Z) <- gsub(getOption("ocoptions")$collapse, "",
-                levels(Z), fixed=TRUE) # avoid regexp
+            Z <- strata
         }
         if (comb == "all") {
             Z <- allComb(strata) # matrix
-            ## make syntactically valid names
-            colnames(Z) <- make.names(colnames(Z), unique = FALSE)
-            ## make sure that collapse value is stripped
-            colnames(Z) <- gsub(getOption("ocoptions")$collapse, "",
-                colnames(Z), fixed=TRUE) # avoid regexp
         }
     } else {
         Z <- as.matrix(strata) # matrix
+        colnames(Z) <- make.names(colnames(Z), unique = TRUE)
         comb <- NA # user supplied matrix, not checked
     }
     Y <- data.matrix(Y)
