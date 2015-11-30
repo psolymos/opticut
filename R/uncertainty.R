@@ -20,33 +20,59 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     obj <- object$species[[which]]
     k <- which.max(obj$logLR)
     bm <- rownames(obj)[k]
+    n <- length(object$Y)
     if (type == "asymp") {
+        if (length(B) > 1)
+            stop("Provide single integer for B.")
+        niter <- B
         bm <- rownames(obj)[k]
-        cf <- MASS::mvrnorm(B, coef(m1), vcov(m1))[,c(1L, 2L)]
+        cf <- MASS::mvrnorm(niter, coef(m1), vcov(m1))[,c(1L, 2L)]
         cf <- rbind(coef(m1)[c(1L, 2L)], cf)
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
         I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
+    } else {
+        if (length(B) == 1) {
+            BB <- replicate(B, sample.int(n, replace=TRUE))
+            niter <- B
+        } else {
+            BB <- B
+            niter <- ncol(B)
+        }
     }
     if (type == "boot") {
         bm <- rownames(obj)[k]
         cf <- if (pb) {
-            t(pbapply::pbsapply(seq_len(B), function(z) {
+            t(pbapply::pbapply(BB, 2, function(z) {
                 .extractOpticut(object, which,
-                    boot=TRUE,
+                    boot=z,
                     internal=TRUE,
                     full_model=FALSE,
                     best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
+#            t(pbapply::pbsapply(seq_len(B), function(z) {
+#                .extractOpticut(object, which,
+#                    boot=TRUE,
+#                    internal=TRUE,
+#                    full_model=FALSE,
+#                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
+#            }))
         } else {
-            t(sapply(seq_len(B), function(z) {
+            t(spply(BB, function(z) {
                 .extractOpticut(object, which,
-                    boot=TRUE,
+                    boot=z,
                     internal=TRUE,
                     full_model=FALSE,
                     best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
+#            t(sapply(seq_len(B), function(z) {
+#                .extractOpticut(object, which,
+#                    boot=TRUE,
+#                    internal=TRUE,
+#                    full_model=FALSE,
+#                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
+#            }))
         }
         cf <- rbind(coef(m1)[c(1L, 2L)], cf)
         cf0 <- linkinv(cf[,1L])
@@ -55,23 +81,27 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
     }
     if (type == "multi") {
-        bm <- character(B + 1L)
+        bm <- character(niter + 1L)
         bm[1L] <- rownames(obj)[k]
-        mat <- matrix(NA, B + 1L, 3)
+        mat <- matrix(NA, niter + 1L, 3)
         colnames(mat) <- c("I", "mu0", "mu1")
         tmp <- as.numeric(obj[k, -1L])
         names(tmp) <- colnames(obj)[-1L]
         mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
         if (pb) {
-            pbar <- pbapply::startpb(0, B)
+            pbar <- pbapply::startpb(0, niter)
             on.exit(pbapply::closepb(pbar))
         }
-        for (j in seq_len(B)) {
+        for (j in seq_len(niter)) {
             ## Z is factor, thus 'rank' applied
             mod <- .extractOpticut(object, which,
-                boot=TRUE,
+                boot=BB[,j],
                 internal=FALSE,
                 best=FALSE, ...)[[1L]]
+#            mod <- .extractOpticut(object, which,
+#                boot=TRUE,
+#                internal=FALSE,
+#                best=FALSE, ...)[[1L]]
             k <- which.max(mod$logLR)
             bm[j + 1L] <- rownames(mod)[k]
             tmp <- as.numeric(mod[k, -1L])
@@ -84,7 +114,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         attr(out, "est") <- attr(obj, "est")
     }
     class(out) <- c("uncertainty1", "data.frame")
-    attr(out, "B") <- B
+    attr(out, "B") <- niter
     attr(out, "type") <- type
     attr(out, "collapse") <- object$collapse
     out
@@ -108,10 +138,23 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
     if (type == "multi" && object$comb == "all")
         stop("comb='all' incompatible with type='multi':",
                 "\nuse comb='rank' instead")
-    B <- as.integer(B)
-    if (B < 1)
-        stop("Are you kidding? B must be > 0")
-
+    if (length(B) < 2) {
+        B <- as.integer(B)
+        if (B < 1)
+            stop("Are you kidding? B must be > 0")
+        niter <- B
+    } else {
+        if (type == "asymp")
+            stop("B must be a single integer")
+        if (is.null(dim(B)))
+            stop("B must be a matrix-like object")
+        B <- as.matrix(B)
+        if (nrow(B) != length(object$Y))
+            stop("rows in B must match the length of observations")
+        if (ncol(B) < 2)
+            stop("Are you kidding? ncol(B) must be > 0")
+        niter <- ncol(B)
+    }
     ## subset
     if (is.null(which))
         which <- names(object$species)
@@ -123,7 +166,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
 
     ## template for return value
     out <- summary(object)
-    out$B <- B
+    out$B <- niter
     out$type <- type
     out$Y <- out$Y[,spp,drop=FALSE]
     class(out) <- "uncertainty"

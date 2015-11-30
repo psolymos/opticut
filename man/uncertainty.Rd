@@ -51,7 +51,9 @@ the model ranking is re-evaluated each time).
 \code{\link{opticut}} call.
 }
   \item{B}{
-numeric, number of iterations.
+numeric, number of iterations. For \code{type = "boot"} and
+\code{type = "multi"} it can be a user-supplied matrix with indices for
+resampling with dimensions length of observations times B.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel coputations
@@ -96,6 +98,7 @@ oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
 uc1 <- uncertainty(oc, type="asymp", B=1000)
 uc2 <- uncertainty(oc, type="boot", B=20)
+## use user-supplied indices
 uc3 <- uncertainty(oc, type="multi", B=20)
 
 ## selection frequencies (w) for best supported split
