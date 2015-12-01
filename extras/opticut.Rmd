@@ -19,13 +19,14 @@ Previous attempts: historical review, highlighting IndVal.
 
 Issues with previous attempts:
 
-* summary statistics & Monte Carlo randomization, no model,
+* summary statistics & Monte Carlo randomization with p-values, no model,
 * data types not always compatible with randomization (i.e. decimals),
-* confounding effects to classification accuracy can impact power.
+* confounding effects to classification can impact power,
+* assessing the ranking of partitions without inferential statements.
 
 Goals: 
 
-* describe a general and extensible approach,
+* describe a general and extensible approach that addresses the above limitations,
 * implement a computationally efficient algorithm,
 * tools for exploring the results (i.e. summaries, plots) in a object oriented framework.
 
