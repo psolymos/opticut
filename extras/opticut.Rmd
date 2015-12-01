@@ -1,6 +1,6 @@
 ---
 title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
-author: "Peter Solymos, Ermias T. Azeria, Bela Tothmeresz"
+author: "Peter Solymos, Ermias T. Azeria"
 date: "November 17, 2015"
 output:
   pdf_document:
@@ -441,7 +441,7 @@ print(opticut1(Y, X, as.factor(x0), dist="poisson"), cut=-Inf)
 print(opticut1(Y, X, as.factor(x0), dist=svfun), cut=-Inf)
 ```
 
-## Sampling error differences: using offsets
+## Sampling differences: using offsets
 
 Not accounting for unequal sampling effort can be quite misleading, especially
 if that is related to habitat classes. This example shows how to take
