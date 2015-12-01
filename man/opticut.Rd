@@ -43,7 +43,7 @@ wplot(x, ...)
   \item{formula}{
 two sided model formula, response species data (matrix,
 or possible a vector for single species case) in the left-hand side,
-model terms for mudifying effects in the right-hand side
+model terms for modifying effects in the right-hand side
 (its structure depending on the underlying functions).
 }
   \item{data}{
@@ -64,7 +64,7 @@ character, how to define the binary partitions.
 \code{"all"} uses \code{\link{allComb}}.
 }
   \item{cl}{
-a cluster object, or an integer for multiple cores in parallel coputations
+a cluster object, or an integer for multiple cores in parallel computations
 (this does nothing on Windows).
 }
   \item{Y}{
@@ -106,7 +106,7 @@ numeric, graphical parameters for plot margin \code{\link{par}}.
 graphical arguments.
 }
   \item{digits}{
-numeric, number of significat digits in output.
+numeric, number of significant digits in output.
 }
   \item{which}{
 numeric, character (can be a vector) defining
@@ -177,7 +177,7 @@ Custom distributions can be defined, see Examples.
 \section{Warning}{
 The use of the \code{opticut1} function is generally discouraged.
 Use the \code{opticut} function instead with a single species in the left-hand
-side of the formuls. Some of the internal checks are not quaranteed to
+side of the formula. Some of the internal checks are not guaranteed to
 flag issues when the formula-to-model-matrix translation is side-stepped
 (this is what is happening when the modifier variables are supplied
 as \code{X} argument in \code{opticut1}).

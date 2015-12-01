@@ -16,6 +16,8 @@ function(Y, X, alpha=0, dist="gaussian", ...)
             "beta","zip","zinb","ordered", "rspf"))
         if (dist == "rspf")
             stop("dist='rspf' not supported for optilevel")
+        if (dist == "rsf")
+            stop("dist='rsf' not supported for optilevel")
     }
     if (is.null(colnames(X)))
         colnames(X) <- paste0("V", seq_len(ncol(X)))

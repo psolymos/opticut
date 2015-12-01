@@ -37,7 +37,7 @@ a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
 }
   \item{type}{
-character, decribing the type of uncertainty calculation for
+character, describing the type of uncertainty calculation for
 indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}
 (\code{I = 1 - min(mu0, mu1) / max(mu0, mu1)}).
 \code{"asymp"}: asymptotic distribution is based on best partition
@@ -56,7 +56,7 @@ numeric, number of iterations. For \code{type = "boot"} and
 resampling with dimensions length of observations times B.
 }
   \item{cl}{
-a cluster object, or an integer for multiple cores in parallel coputations
+a cluster object, or an integer for multiple cores in parallel computations
 (this does nothing on Windows).
 }
   \item{x}{

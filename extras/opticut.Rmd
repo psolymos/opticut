@@ -63,7 +63,7 @@ where $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
 and corresponding log-likelihood value for the null model: 
 $l(\widehat{\theta^{(0)}}; y)$.
 
-The log-likelihood ratio for each cadidate partition can be
+The log-likelihood ratio for each candidate partition can be
 calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
 The best supported binary partition is
 the model with the highest log-likelihood ratio value.
@@ -331,7 +331,7 @@ par(op)
 
 ## Presence-only data
 
-Describe RSF/RSPF differences aspecially related to covariates.
+Describe RSF/RSPF differences especially related to covariates.
 
 ```{r}
 ## presence-only data

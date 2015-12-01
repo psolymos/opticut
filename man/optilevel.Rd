@@ -15,7 +15,7 @@ vector of observations.
 }
   \item{x}{
 a factor or a matrix of proportions (i.e. the values 0 and 1 should have
-consistent meaning actoss the columns, often through a unit sum constraint).
+consistent meaning across the columns, often through a unit sum constraint).
 }
   \item{alpha}{
 weighting factor for calculating information criteria for model selection
@@ -24,8 +24,9 @@ weighting factor for calculating information criteria for model selection
   \item{dist}{
 character, distribution argument passed to underlying functions,
 see listed on the help page of \code{\link{opticut}}
-(except for \code{dist = "rspf"} which does not have a sount theoretical
-basis due to non-identifiability of piecewise constant RSPF models).
+(except for \code{dist = "rsf"} and \code{dist = "rspf"}
+which does not have a sound theoretical
+basis due to non-identifiability of piece-wise constant RSPF models).
 }
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.
@@ -41,20 +42,20 @@ A list with the following elements:
 \code{coef}: matrix of coefficients (linear predictor scale)
 along the selection path considering best models.
 
-\code{rank}: matrix ranks based on the coefficients 
+\code{rank}: matrix ranks based on the coefficients
 along the selection path considering best models.
-Ranking uses the devault \code{ties.method = "average"} in \code{\link{rank}}.
+Ranking uses the default \code{ties.method = "average"} in \code{\link{rank}}.
 
-\code{deltalist}: delta IC values along the selection path 
+\code{deltalist}: delta IC values along the selection path
 considering all competing models.
 
-\code{iclist}: IC values along the selection path 
+\code{iclist}: IC values along the selection path
 considering all competing models.
 
 \code{coeflist}: matrix of coefficients (linear predictor scale)
 along the selection path considering all competing models.
 
-\code{ranklist}: matrix ranks based on the coefficients 
+\code{ranklist}: matrix ranks based on the coefficients
 along the selection path considering all competing models.
 
 \code{levels}: list of (merged) factor levels along the selection path
