@@ -195,10 +195,13 @@ Currently available distributions:
 * `"binomial"`: presence-absence type data,
 * `"negbin"`: overdispersed Negative Binomial count data,
 * `"beta"`: continuous response in the unit interval, e.g. percent cover,
-* `"zip"`: zero-inflated Poisson counts,
-* `"zinb"`: zero-inflated Negative Binomial counts,
+* `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
+  `"zip"`, or in zero model: `"zip2"`),
+* `"zinb"`, `"zinb"`: zero-inflated Negative Binomial counts 
+  (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`),
 * `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover, 
-* `"rspf"`: presence-only data using resource selection probability functions.
+* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection 
+  probability functions.
 
 
 ## Gaussian
