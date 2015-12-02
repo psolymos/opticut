@@ -98,7 +98,7 @@ function(x, collapse)
     o <- x[order(x, decreasing = FALSE)]
     out <- diag(1L, length(o))
     out[upper.tri(out)] <- 1L
-    out <- out[,-ncol(out)]
+    out <- out[,-ncol(out),drop=FALSE]
     rownames(out) <- names(o)
     colnames(out) <- seq_len(ncol(out))
     for (i in seq_len(ncol(out))) {
