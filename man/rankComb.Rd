@@ -12,8 +12,8 @@ to explore only K-1 binary partitions along the gradient
 defined by the ranks of the expected values.
 }
 \usage{
-oComb(x, collapse = " ")
-rankComb(Y, X, Z, dist = "gaussian", ...)
+oComb(x, collapse)
+rankComb(Y, X, Z, dist = "gaussian", collapse, ...)
 }
 \arguments{
   \item{Y}{
@@ -34,6 +34,7 @@ a vector for \code{allComb} (can be of any type but treated as factor, must have
 }
   \item{collapse}{
 character, what to paste between levels.
+Defaults to \code{getOption("ocoptions")$collapse}.
 }
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.

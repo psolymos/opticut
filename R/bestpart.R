@@ -93,4 +93,3 @@ function (object, which=NULL, ...)
         full_model=TRUE, ...)
 }
 
-

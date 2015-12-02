@@ -11,7 +11,7 @@ Finding all combinations require
 a classification vector with K > 1 partitions.
 }
 \usage{
-allComb(x, collapse = getOption("ocoptions")$collapse)
+allComb(x, collapse)
 kComb(k)
 checkComb(x)
 }
@@ -21,6 +21,7 @@ a vector for \code{allComb} (can be of any type but treated as factor, must have
 }
   \item{collapse}{
 character, what to paste between levels.
+Defaults to \code{getOption("ocoptions")$collapse}.
 }
   \item{k}{
 numeric, number of partitions in a given classification (K > 1).

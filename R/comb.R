@@ -35,10 +35,15 @@ function(k)
 ## with at least 2 levels
 ## and returns a model matrix with binary partitions
 allComb <-
-function(x, collapse = getOption("ocoptions")$collapse)
+function(x, collapse)
 {
+    if (missing(collapse))
+        collapse <-  getOption("ocoptions")$collapse
     f <- droplevels(as.factor(x))
-    LEVELS <- gsub("\\s", "", levels(f))
+    if (any(grepl(collapse, levels(f), fixed=TRUE)))
+        stop("Collapse value found in levels.")
+    #LEVELS <- gsub("\\s", "", levels(f))
+    LEVELS <- levels(f)
     i <- as.integer(f)
     n <- max(i)
     s <- seq_len(n)
@@ -49,6 +54,7 @@ function(x, collapse = getOption("ocoptions")$collapse)
     rownames(out) <- f
     colnames(out) <- LABELS
     attr(out, "collapse") <- collapse
+    #attr(out, "levels") <- LEVELS
     out
 }
 
@@ -81,10 +87,12 @@ checkComb <- function(x) {
 ## x is a named vector of ranks, referring to factor levels
 ## in some classification vector, 1=highest abundance.
 oComb <-
-function(x, collapse = " ")
+function(x, collapse)
 {
     if (length(x) < 2L)
         stop("length of x must be >1")
+    if (missing(collapse))
+        collapse <-  getOption("ocoptions")$collapse
     if (is.null(names(x)))
         names(x) <- seq_len(length(x))
     o <- x[order(x, decreasing = FALSE)]
@@ -103,20 +111,22 @@ function(x, collapse = " ")
 }
 
 rankComb <-
-function(Y, X, Z, dist="gaussian", ...)
+function(Y, X, Z, dist="gaussian", collapse, ...)
 {
     if (!is.factor(Z))
         stop("Z must be a factor")
+    if (missing(collapse))
+        collapse <-  getOption("ocoptions")$collapse
     Z0 <- model.matrix(~Z)
     m <- .opticut1(Y, X, Z1=Z0[,-1L,drop=FALSE],
         linkinv=TRUE, dist=dist, ...)
     lc <- c(m$coef[1], m$coef[1] + m$coef[2:ncol(Z0)])
     names(lc) <- levels(Z)
     x <- rank(-lc)
-    oc <- oComb(x, collapse = getOption("ocoptions")$collapse)
+    oc <- oComb(x, collapse = collapse)
 #    oc <- oComb(x, collapse = " ")
     out <- oc[match(Z, rownames(oc)),]
     attr(out, "est") <- m$linkinv(lc)
-    attr(out, "collapse") <- getOption("ocoptions")$collapse
+    attr(out, "collapse") <- collapse
     out
 }

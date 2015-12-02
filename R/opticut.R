@@ -178,9 +178,12 @@ function(Y, X, Z, dist="gaussian", ...)
         Z <- rankComb(Y, X, Z, dist=dist, ...)
         Est <- attr(Z, "est")
         Comb <- "rank"
+        #LAB <- names(Est)
     } else {
         Est <- NA
-        Comb <- "all"
+        #LAB <- attr(Z, "levels")
+        Comb <- if (is.null(LAB))
+            NA else "all"
     }
     Z <- data.matrix(Z)
     if (is.null(colnames(Z)))
@@ -226,6 +229,7 @@ function(Y, X, Z, dist="gaussian", ...)
         deparse(substitute(dist)) else dist
     attr(out, "comb") <- Comb
     attr(out, "est") <- Est
+    #attr(out, "levels") <- LAB
     class(out) <- c("opticut1", "data.frame")
     out
 }
