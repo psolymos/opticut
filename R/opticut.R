@@ -266,7 +266,7 @@ comb=c("rank", "all"), cl=NULL, ...)
             stop("nchar(getOption('ocoptions')$collapse) must be > 0")
         strata <- droplevels(as.factor(strata)) # factor
         ## make syntactically valid names
-        levels(strata) <- make.names(levels(strata), unique = TRUE)
+        #levels(strata) <- make.names(levels(strata), unique = TRUE)
         ## make sure that collapse is not in levels
         if (any(grepl(getOption('ocoptions')$collapse, levels(strata), fixed=TRUE)))
             stop("Collapse value found in levels.")
@@ -278,7 +278,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         }
     } else {
         Z <- as.matrix(strata) # matrix
-        colnames(Z) <- make.names(colnames(Z), unique = TRUE)
+        #colnames(Z) <- make.names(colnames(Z), unique = TRUE)
         comb <- NA # user supplied matrix, not checked
     }
     Y <- data.matrix(Y)
