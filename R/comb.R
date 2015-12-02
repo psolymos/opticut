@@ -124,7 +124,7 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
     names(lc) <- levels(Z)
     x <- rank(-lc)
     oc <- oComb(x, collapse = collapse)
-    out <- oc[match(Z, rownames(oc)),]
+    out <- oc[match(Z, rownames(oc)),,drop=FALSE]
     attr(out, "est") <- m$linkinv(lc)
     attr(out, "collapse") <- collapse
     attr(out, "comb") <- "rank"
