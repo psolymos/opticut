@@ -178,12 +178,11 @@ function(Y, X, Z, dist="gaussian", ...)
         Z <- rankComb(Y, X, Z, dist=dist, ...)
         Est <- attr(Z, "est")
         Comb <- "rank"
-        #LAB <- names(Est)
     } else {
         Est <- NA
-        #LAB <- attr(Z, "levels")
-        Comb <- if (is.null(LAB))
-            NA else "all"
+        Comb <- attr(Z, "comb")
+        if (is.null(Comb))
+            Comb <- NA
     }
     Z <- data.matrix(Z)
     if (is.null(colnames(Z)))
@@ -196,10 +195,6 @@ function(Y, X, Z, dist="gaussian", ...)
         warning("Row names added to binary split matrix Z (it was NULL). You are welcome.")
         rownames(Z) <- apply(Z, 1, paste, collapse="")
     }
-#    if (!is.function(dist) && dist %in% c("rspf")) {
-#        warning("The use of opticut1 with rspf is discouraged:",
-#            "\nhard to check covariate assumptions, use opticut instead.")
-#    }
     N <- ncol(Z)
     res0 <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf <- matrix(0, N, length(res0$coef)+1)
@@ -229,7 +224,6 @@ function(Y, X, Z, dist="gaussian", ...)
         deparse(substitute(dist)) else dist
     attr(out, "comb") <- Comb
     attr(out, "est") <- Est
-    #attr(out, "levels") <- LAB
     class(out) <- c("opticut1", "data.frame")
     out
 }

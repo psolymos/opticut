@@ -42,7 +42,6 @@ function(x, collapse)
     f <- droplevels(as.factor(x))
     if (any(grepl(collapse, levels(f), fixed=TRUE)))
         stop("Collapse value found in levels.")
-    #LEVELS <- gsub("\\s", "", levels(f))
     LEVELS <- levels(f)
     i <- as.integer(f)
     n <- max(i)
@@ -54,6 +53,7 @@ function(x, collapse)
     rownames(out) <- f
     colnames(out) <- LABELS
     attr(out, "collapse") <- collapse
+    attr(out, "comb") <- "all"
     #attr(out, "levels") <- LEVELS
     out
 }
@@ -124,9 +124,9 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
     names(lc) <- levels(Z)
     x <- rank(-lc)
     oc <- oComb(x, collapse = collapse)
-#    oc <- oComb(x, collapse = " ")
     out <- oc[match(Z, rownames(oc)),]
     attr(out, "est") <- m$linkinv(lc)
     attr(out, "collapse") <- collapse
+    attr(out, "comb") <- "rank"
     out
 }
