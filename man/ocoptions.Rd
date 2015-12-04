@@ -30,6 +30,9 @@ Tags are the following:
   should be meaningfully sorted, the default is \code{TRUE}.}
   \item{theme}{the color theme to be used based on \code{\link{occolors}},
   the default is \code{"br"}.}
+  \item{check_comb}{check the design matrices for complementary partitions
+  using \code{\link{checkComb}},
+  the default is \code{TRUE}.}
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

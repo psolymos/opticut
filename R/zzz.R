@@ -7,7 +7,8 @@
             collapse=" ",
             cut=2,
             sort=TRUE,
-            theme="br"))
+            theme="br",
+            check_comb=TRUE))
     invisible(NULL)
 }
 

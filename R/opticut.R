@@ -189,7 +189,7 @@ function(Y, X, Z, dist="gaussian", ...)
     Z <- data.matrix(Z)
     if (is.null(colnames(Z)))
         colnames(Z) <- paste0("split.", seq_len(ncol(Z)))
-    if (!checkComb(Z))
+    if (getOption("ocoptions")$check_comb && !checkComb(Z))
         stop("Guess what! Complementary design variables found:\nuse 'checkComb'")
     if (length(unique(c(length(Y), nrow(X), nrow(Z)))) > 1)
         stop("Dimension mismatch: check you input.")
@@ -278,6 +278,8 @@ comb=c("rank", "all"), cl=NULL, ...)
         }
     } else {
         Z <- as.matrix(strata) # matrix
+        if (getOption("ocoptions")$check_comb && !checkComb(Z))
+            stop("Guess what! Complementary design variables found:\nuse 'checkComb'")
         #colnames(Z) <- make.names(colnames(Z), unique = TRUE)
         comb <- NA # user supplied matrix, not checked
     }
