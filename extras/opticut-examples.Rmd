@@ -224,6 +224,22 @@ summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
 summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="rank"))
 ```
 
+```{r}
+## DeCaceres & Legendre 2013 Oikos example from Fig 1
+## Oikos 119: 1674-1684, 2010
+## doi: 10.1111/j.1600-0706.2010.18334.x
+Y <- c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4)
+z <- rep(1:3, each=4)
+Z <- allComb(z)
+Z <- cbind(Z, 1-Z)
+colnames(Z) <- c("1", "2", "3", "2 3", "1 3", "1 2")
+Z
+oc <- ocoptions(check_comb=FALSE) # relax the checks
+print(opticut1(Y, Z=Z), cut=-Inf) # identical results for complementary partitions
+ocoptions(oc) # restore defaults
+
+```
+
 ## Binomial
 
 ```{r}
