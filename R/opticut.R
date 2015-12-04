@@ -171,6 +171,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
 opticut1 <-
 function(Y, X, Z, dist="gaussian", ...)
 {
+    if (missing(X))
+        X <- matrix(1, length(Y), 1)
     X <- data.matrix(X)
     if (is.null(rownames(X)))
         rownames(X) <- seq_len(nrow(X))

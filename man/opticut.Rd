@@ -71,7 +71,8 @@ a cluster object, or an integer for multiple cores in parallel computations
 numeric, vector of observations.
 }
   \item{X}{
-numeric, design matrix.
+numeric, design matrix. Can be missing, in which case an intercept-only model
+is assumed.
 }
   \item{Z}{
 factor (must have at least 2 unique levels,
