@@ -21,7 +21,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             "beta","zip","zinb","ordered", "rsf", "rspf",
             "zip2", "zinb2"))
         if (dist %in% c("gaussian", "poisson", "binomial")) {
-            link <- list(...)
+            link <- list(...)$link
             if (is.null(link))
                 link <- switch(dist,
                     "gaussian"="identity",
