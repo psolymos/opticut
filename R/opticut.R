@@ -17,7 +17,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
     }
     if (!is.function(dist)) {
         dist <- as.character(dist)
-        dist <- strsplit("a:b", ":", fixed=TRUE)[[1]]
+        dist <- strsplit(dist, ":", fixed=TRUE)[[1]]
         if (length(dist) > 1L) {
             link <- dist[2L]
             dist <- dist[1L]
