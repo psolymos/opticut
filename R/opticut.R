@@ -21,27 +21,33 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             "beta","zip","zinb","ordered", "rsf", "rspf",
             "zip2", "zinb2"))
         if (dist == "gaussian") {
-            link <- list(...)$link
+            DOTS <- list(...)
+            link <- DOTS$link
             if (is.null(link))
                 link <- "identity"
+            DOTS$link <- NULL
             mod <- stats::glm(Y ~ .-1, data=XX, family=gaussian(link), ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
         if (dist == "poisson") {
-            link <- list(...)$link
+            DOTS <- list(...)
+            link <- DOTS$link
             if (is.null(link))
                 link <- "log"
+            DOTS$link <- NULL
             mod <- stats::glm(Y ~ .-1, data=XX, family=poisson(link), ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
         if (dist == "binomial") {
-            link <- list(...)$link
+            DOTS <- list(...)
+            link <- DOTS$link
             if (is.null(link))
                 link <- "logit"
+            DOTS$link <- NULL
             mod <- stats::glm(Y ~ .-1, data=XX, family=binomial(link), ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
@@ -60,13 +66,25 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             linv <- mod$link$mean$linkinv
         }
         if (dist == "zip") {
-            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist="poisson", ...)
+            DOTS <- list(...)
+            link <- DOTS$link
+            if (is.null(link))
+                link <- "logit"
+            DOTS$link <- NULL
+            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist="poisson",
+                link=link, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
         }
         if (dist == "zinb") {
-            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist="negbin", ...)
+            DOTS <- list(...)
+            link <- DOTS$link
+            if (is.null(link))
+                link <- "logit"
+            DOTS$link <- NULL
+            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist="negbin",
+                link=link, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
@@ -77,9 +95,11 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             } else {
                 data.matrix(cbind(X[,1,drop=FALSE], Z1))
             }
-            link <- list(...)$link
+            DOTS <- list(...)
+            link <- DOTS$link
             if (is.null(link))
                 link <- "logit"
+            DOTS$link <- NULL
             mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist="poisson",
                 link=link, ...)
             cf <- c(coef(mod, "zero"), coef(mod, "count"))
@@ -92,9 +112,11 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             } else {
                 data.matrix(cbind(X[,1,drop=FALSE], Z1))
             }
-            link <- list(...)$link
+            DOTS <- list(...)
+            link <- DOTS$link
             if (is.null(link))
                 link <- "logit"
+            DOTS$link <- NULL
             mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist="negbin",
                 link=link, ...)
             cf <- c(coef(mod, "zero"), coef(mod, "count"))
