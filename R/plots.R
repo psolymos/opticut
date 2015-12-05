@@ -136,8 +136,8 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
     bp <- ss$bestpart
     if (sort) {
         bp <- bp[attr(ss$bestpart, "row.order"),
-            attr(ss$bestpart, "col.order")]
-        xx <- xx[attr(ss$bestpart, "row.order"),]
+            attr(ss$bestpart, "col.order"),drop=FALSE]
+        xx <- xx[attr(ss$bestpart, "row.order"),,drop=FALSE]
     }
     if (!any(xx$logLR >= cut)) {
         warning("All logLR < cut: cut ignored")
