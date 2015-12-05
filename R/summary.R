@@ -127,7 +127,7 @@ summary.opticut <- function(object, ...)
     bp <- t(bp[order(rownames(bp)),,drop=FALSE])
     attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
     attr(bp, "row.order") <- order(ncol(bp) - rowSums(bp),
-        lab1, 1 - res$I, decreasing=FALSE)
+        lab1, 1 - ifelse(is.na(res$I), 0, res$I), decreasing=FALSE)
     res$lablo <- lab0
     res$labhi <- lab1
     object$summary <- res

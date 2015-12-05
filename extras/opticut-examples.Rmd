@@ -234,11 +234,27 @@ Z <- allComb(z)
 Z <- cbind(Z, 1-Z)
 colnames(Z) <- c("1", "2", "3", "2 3", "1 3", "1 2")
 Z
-oc <- ocoptions(check_comb=FALSE) # relax the checks
-print(opticut1(Y, Z=Z), cut=-Inf) # identical results for complementary partitions
+try(opticut1(Y, Z=Z))
+oc <- ocoptions(check_comb=FALSE, cut=-Inf) # relax the checks
+opticut1(Y, Z=Z) # identical results for complementary partitions
 ocoptions(oc) # restore defaults
+```
+
+BCI data
+
+```{r}
+library (vegan)
+data (BCI)
+library (BiodiversityR)  # available from R version 2.15.1, not older!
+data (BCI.env)
+BCI.soil <- read.delim ('http://www.davidzeleny.net/anadat-r/lib/exe/fetch.php?media=data:bci.soil.txt')
+###
+BCI.hab <- read.table("http://www.kharms.biology.lsu.edu/TORUS_Habitats.txt",
+    sep="\t", header=TRUE)
+
 
 ```
+
 
 ## Binomial
 
@@ -553,5 +569,59 @@ system.time(uncertainty(o, type="boot", B=100, cl=cl))
 system.time(uncertainty(o, type="multi", B=100))
 system.time(uncertainty(o, type="multi", B=100, cl=cl))
 stopCluster(cl)
+```
+
+
+# Simulations
+
+```{r}
+oc_sim_K2 <- 
+function(b1=0.5, b2=0, b3=0, b4=0, mu0=10, n=100, pos=TRUE)
+{
+    K <- 2
+    n <- 2*(n %/% 2)
+    x <- 1:n
+    h0 <- rep(LETTERS[1:2], each=n/2)
+    j <- sample.int(n/2, round(n*b4/2))
+    h1 <- h0
+    h1[j] <- h0[j+n/2]
+    h1[j+n/2] <- h0[j]
+    mu <- c(mu0*(1-b1), mu0)
+    Mean <- rep(mu, each=n/2)
+    Conf <- rep(seq(-0.5*diff(mu), 0.5*diff(mu), length=n/2), 2)
+    Noise <- rnorm(n, 0, 0.1*mu0)
+    Y <- Mean + b2*Conf + b3*Noise    
+    if (pos)
+        Y[Y < 0] <- 0
+    out <- data.frame(Y=Y, h0=h0, h1=h1, x=x,
+        Mean=Mean, Conf=Conf, Noise=Noise)
+    attr(out, "settings") <- list(b1=b1, b2=b2, b3=b3, b4=b4, 
+                                  K=K, n=n, mu0=mu0, pos=pos)
+    out
+}
+
+dat <- oc_sim_K2(b1=0.5, b2=0, b3=0, b4=0, mu0=5, n=100)
+plot(Y ~ x, dat)
+m0 <- opticut(Y ~ 1, dat, strata=h1)
+m1 <- opticut(Y ~ x, dat, strata=h1)
+m0$species[[1]]
+m1$species[[1]]
+
+## Noise
+dat <- oc_sim_K2(b1=0.9, b2=0, b3=1, b4=0, mu0=5, n=100)
+plot(Y ~ x, dat)
+m0 <- opticut(Y ~ 1, dat, strata=h1)
+m1 <- opticut(Y ~ x, dat, strata=h1)
+m0$species[[1]]
+m1$species[[1]]
+
+## Noise + Confounding
+dat <- oc_sim_K2(b1=0.9, b2=0.5, b3=1, b4=0, mu0=5, n=100)
+plot(Y ~ x, dat)
+m0 <- opticut(Y ~ 1, dat, strata=h1)
+m1 <- opticut(Y ~ x, dat, strata=h1)
+m0$species[[1]]
+m1$species[[1]]
+
 ```
 
