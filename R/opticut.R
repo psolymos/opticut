@@ -215,6 +215,10 @@ function(Y, X, Z, dist="gaussian", ...)
     cf1 <- res0$linkinv(cf[,1L] + cf[,2L])
     h <- sign(cf[,2L])
     I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+    if (any(cf0 < 0) || any(cf1 < 0)) {
+        warning("Negative prediction: I-value set to NA")
+        I[I < 0 | I > 1] <- NA
+    }
     out <- data.frame(assoc=h, I=I,
         null=cfnull,
         mu0=cf0, mu1=cf1,
