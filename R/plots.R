@@ -145,9 +145,12 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
         bp <- bp[xx$logLR >= cut, , drop=FALSE]
         xx <- xx[xx$logLR >= cut, , drop=FALSE]
     }
+    MinVal <- 0.01
     xx$h0 <- pmin(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
-    xx$h0[xx$h0 < 0.01] <- 0.01
+    xx$h0[xx$h0 < MinVal] <- MinVal
     xx$h1 <- pmax(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
+    xx$h0[is.na(xx$I)] <- MinVal
+    xx$h1[is.na(xx$I)] <- MinVal
     n <- nrow(bp)
     p <- ncol(bp)
     op <- par(las=las, mar=mar)
