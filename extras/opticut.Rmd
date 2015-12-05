@@ -1,15 +1,42 @@
 ---
-title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
+title: "Likelihood based optimal partitioning for indicator species analysis"
 author: "Peter Solymos, Ermias T. Azeria"
-date: "November 17, 2015"
+date: "December 2, 2015"
 output:
   pdf_document:
     keep_tex: no
     number_sections: yes
-    toc: yes
+    toc: no
 ---
 
 # Introduction
+
+Distribution of biodiversity is non-random.
+
+Why is it important to know what lives where?
+
+TEK & archeological context: it has always been life or death (food, medicine, tools, building material). (Recently considered as Ecosystem services.)
+
+Empirical descriptions: Braun-Blanquet and coenological tabelles, ecological gradients of Whittaker.
+
+Contingency tables and correlation metrics: association and classification.
+
+ANOVA, F-statistic, Wildi's papers.
+
+Heuristic algorithms (IndVal and friends).
+
+Limitations of these approaches:
+
+* implicit assumptions about data types (through randomization, that requires counts) in IndVal, less flexibility regarding the model for ANOVA (Gaussian) and association metrics (discrete).
+* counfounding/modifying effects can affect powr to detect associations when not controlled for, this applies to all of the approaches.
+
+What we describe is:
+
+
+
+
+
+
 
 General problem: find where species abundances are high vs. low in
 a way which leads to optimal classification by maximizing the
@@ -246,296 +273,4 @@ Z <- allComb(x0)
 summary(opticut(Y ~ x2, strata=x0, dist="binomial"))
 ```
 
-
-## Poisson: Mite data set -- high performance computing
-
-See computing time diffs and plotting options.
-
-```{r}
-library(vegan)
-data(mite)
-data(mite.env)
-mite.env$hab <- with(mite.env, interaction(Shrub, Topo, drop=TRUE))
-summary(mod0 <- opticut(as.matrix(mite) ~ SubsDens, mite.env,
-    strata=mite.env$hab, dist="poisson", comb="all"))
-plot(mod0)
-
-system.time(aa <- opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", comb="rank"))
-system.time(bb <- opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", comb="all"))
-
-## sequential
-system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson"))
-## parallel -- compare system times
-library(parallel)
-cl <- makeCluster(3)
-system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl=cl))
-stopCluster(cl)
-## forking -- will not work on Windows
-if (!.Platform$OS.type == "windows")
-system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl=3))
-```
-
-## Percentages
-
-### Dune data, cover type data
-
-See http://www.davidzeleny.net/anadat-r/doku.php/en:data:dune
-
-```{r}
-library(vegan)
-data(dune)
-data(dune.env)
-
-## ordinal regr
-## (when nlevels() < 3 use logistic regression instead !!!
-Dune <- as.matrix(dune)
-#Dune <- Dune[,apply(Dune, 2, function(z) length(unique(z)))>2]
-x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="ordered")
-summary(x)
-
-## Binarizing data
-Dune <- ifelse(as.matrix(dune)>0,1,0)
-x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="binomial")
-summary(x)
-plot(x)
-
-## Beta regression
-Dune <- as.matrix(dune+0.5) / 10
-x <- opticut(Dune ~ 1, strata=dune.env$Management, dist="beta")
-summary(x)
-```
-
-### Stratigraphy example
-
-```{r}
-library(rioja)
-data(aber)
-strat.plot(aber$spec, aber$ages$Depth, scale.percent=TRUE, y.rev=TRUE)
-
-z <- as.factor(cut(aber$ages$Depth, 5))
-ab <- as.matrix(aber$spec) / 100
-ab[ab == 0] <- 0.0001
-ab <- ab[,apply(ab, 2, max) > 0.05]
-
-a <- opticut(ab ~ 1, strata=z, comb="rank", dist="beta")
-summary(a)
-plot(a, sort=FALSE)
-bp <- bestpart(a)
-
-op <- par(mfrow=c(3,4), mar=c(2,2,1,1))
-for (i in 1:12) {
-    plot(ab[,i], aber$ages$Depth, type="l", ann=FALSE)
-    segments(x0=rep(0, nrow(ab)), y0=aber$ages$Depth, x1=ab[,i], 
-        col=ifelse(bp[,i] > 0, 2, 1))
-    title(main=colnames(ab)[i])
-}
-par(op)
-```
-
-
-## Presence-only data
-
-Describe RSF/RSPF differences especially related to covariates.
-
-```{r}
-## presence-only data
-## single species model only:
-## because the used distr is different for
-## each species by definition.
-
-library(ResourceSelection)
-## settings
-n.used <- 1000
-m <- 10
-n <- n.used * m
-set.seed(1234)
-x <- data.frame(x0=as.factor(sample(1:3, n, replace=TRUE)),
-    x1=rnorm(n), x2=runif(n))
-cfs <- c(1, -0.5, 0.1, -1, 0.5)
-## Logistic RSPF model
-dd <- simulateUsedAvail(x, cfs, n.used, m, link="logit")
-
-Y <- dd$status
-X <- model.matrix(~ x1 + x2, dd)
-Z <- allComb(as.integer(dd$x0))
-
-mod1 <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rsf", m=0, B=0)
-mod1$species
-mod2 <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rspf", m=0, B=0)
-mod2$species
-```
-
-# Custom distributions
-
-The `distr` argument accepts a function, so other parametric models
-can be supplied which are avoided due to package dependencies. 
-
-## Mixed models
-
-Here is an example using mixed models and the package `lme4`:
-
-```{r}
-library(lme4)
-set.seed(1234)
-n <- 200
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-ee <- rnorm(n/5)
-g <- rep(1:5, each=n/5)
-lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2 + ee[g])
-Y1 <- rpois(n, lam1)
-
-X <- model.matrix(~x2)
-Z <- allComb(x0)
-
-lmefun <- function(Y, X, linkinv, gr, ...) {
-    X <- as.matrix(X)
-    m <- glmer(Y ~ X-1 + (1|gr), family=poisson("log"), ...)
-    list(coef=fixef(m),
-        logLik=logLik(m),
-        linkinv=family(m)$linkinv)
-}
-lmefun(Y1, X, gr=g)
-
-opticut1(Y1, X, Z, dist=lmefun, gr=g)
-```
-
-## Imperfect detectability: N-mixture case
-
-A single-visit based N-mixture is an example where
-detection error is estimated. Let us compare results
-based on naive GLM and N-mixture:
-
-```{r}
-library(detect)
-set.seed(2345)
-n <- 500
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-x3 <- runif(n, 0, 1)
-lam <- exp(0.5 + 1*x1 + -0.2*x2)
-p <- plogis(2 + -2*x3)
-Y <- rpois(n, lam*p)
-
-X <- model.matrix(~x2)
-
-op <- par(mfrow=c(1,2))
-boxplot((lam*p) ~ x0, ylab="lam*p", xlab="x0")
-boxplot(lam ~ x0, ylab="lam", xlab="x0")
-par(op)
-
-svfun <- function(Y, X, linkinv, ...) {
-    X <- as.matrix(X)
-    m <- svabu(Y ~ X-1 | x3, ...)
-    list(coef=coef(m, "sta"),
-        logLik=logLik(m),
-        linkinv=poisson()$linkinv)
-}
-svfun(Y, X)
-
-## naive GLM
-print(opticut1(Y, X, as.factor(x0), dist="poisson"), cut=-Inf)
-## N-mixture
-print(opticut1(Y, X, as.factor(x0), dist=svfun), cut=-Inf)
-```
-
-## Sampling differences: using offsets
-
-Not accounting for unequal sampling effort can be quite misleading, especially
-if that is related to habitat classes. This example shows how to take
-advantage of the other arguments passed to the `...` in the `opticut`
-function.
-
-```{r}
-set.seed(1234)
-n <- 50
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-lam <- exp(0.5 + 1*x1 + -0.2*x2)
-A <- ifelse(x0 %in% c(1,3), 1, 2)
-Y <- rpois(n, lam*A)
-
-op <- par(mfrow=c(1,2))
-boxplot((lam*A) ~ x0, ylab="lam*A", xlab="x0")
-boxplot(lam ~ x0, ylab="lam", xlab="x0")
-par(op)
-
-## no offset: incorrect
-opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")$species
-## with offsets: log Area
-opticut(Y ~ x2, strata=x0, dist="poisson", offset=log(A), comb="rank")$species
-```
-
-# Finding best partitions
-
-It is useful to access the best binary partition
-
-```{r}
-set.seed(2345)
-n <- 50
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-lam <- exp(0.5 + 1*x1 + -0.2*x2)
-Y <- rpois(n, lam)
-o <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
-summary(o)
-
-bp <- bestpart(o)
-head(bp)
-```
-
-The model based on the best partition can be returned as:
-
-```{r}
-bestmodel(o, which=1)
-```
-
-the `which` argument can be used to subset the species.
-
-# Uncertainty
-
-Uncertainty in $I$ values might be of interest.
-The `type` argument for the `uncertainty` method can take the following values:
-
-* `"asymp"`: asymptotic distribution of $I$, $\mu_{0}$ and $\mu_{1}$
-  based on best partition found for the input object.
-* `"boot"`: non-parametric bootstrap distribution of $I$, $\mu_{0}$ and $\mu_{1}$
-  based on best partition found for the input object.
-* `"multi"`: non-parametric bootstrap distribution of $I$, $\mu_{0}$ and $\mu_{1}$
-  based on best partition found for the bootstrap data (i.e.
-  the model ranking is re-evaluated each time).
-
-```{r}
-uc1 <- uncertainty(o, type="asymp", B=5000)
-uc2 <- uncertainty(o, type="boot", B=200)
-uc3 <- uncertainty(o, type="multi", B=200)
-
-uc1$uncertainty[[1]]
-uc2$uncertainty[[1]]
-uc3$uncertainty[[1]]
-
-plot(uc3$uncertainty[[1]])
-wplot(uc3$uncertainty[[1]])
-
-## performance comparisons for 10 species
-YYY <- cbind(Y, Y, Y, Y, Y, Y, Y, Y, Y, Y)
-colnames(YYY) <- LETTERS[1:10]
-o <- opticut(YYY ~ x2, strata=x0, dist="poisson", comb="rank")
-
-library(parallel)
-cl <- makeCluster(2)
-system.time(uncertainty(o, type="asymp", B=5000))
-system.time(uncertainty(o, type="asymp", B=5000, cl=cl))
-
-system.time(uncertainty(o, type="boot", B=100))
-system.time(uncertainty(o, type="boot", B=100, cl=cl))
-
-system.time(uncertainty(o, type="multi", B=100))
-system.time(uncertainty(o, type="multi", B=100, cl=cl))
-stopCluster(cl)
-```
 
