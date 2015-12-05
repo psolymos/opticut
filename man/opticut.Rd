@@ -280,9 +280,9 @@ data(dolina)
 dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 ## filter species to speed up things a bit
 Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
-## opticut results
+## opticut results, note the cloglog link function
 dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="zinb")
+    strata=dolina$samp$mhab, dist="zinb:cloglog")
 summary(dol)
 plot(dol)
 
