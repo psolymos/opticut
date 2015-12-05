@@ -16,12 +16,19 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
         XX <- as.data.frame(cbind(X[,1,drop=FALSE], Z1, X[,-1,drop=FALSE]))
     }
     if (!is.function(dist)) {
+        dist <- as.character(dist)
+        dist <- strsplit("a:b", ":", fixed=TRUE)[[1]]
+        if (length(dist) > 1L) {
+            link <- dist[2L]
+            dist <- dist[1L]
+        } else {
+            link <- NULL
+        }
         dist <- match.arg(dist,
             c("gaussian","poisson","binomial","negbin",
             "beta","zip","zinb","ordered", "rsf", "rspf",
             "zip2", "zinb2"))
         if (dist %in% c("gaussian", "poisson", "binomial")) {
-            link <- list(...)$link
             if (is.null(link))
                 link <- switch(dist,
                     "gaussian"="identity",
@@ -49,10 +56,13 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             linv <- mod$link$mean$linkinv
         }
         if (dist %in% c("zip", "zinb")) {
+            if (is.null(link))
+                link <- "logit"
             Dist <- switch(dist,
                 "zip"="poisson",
                 "zinb"="negbin")
-            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist=Dist, ...)
+            mod <- pscl::zeroinfl(Y ~ .-1 | 1, data=XX, dist=Dist,
+                link=link, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
@@ -63,17 +73,23 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             } else {
                 data.matrix(cbind(X[,1,drop=FALSE], Z1))
             }
+            if (is.null(link))
+                link <- "logit"
             Dist <- switch(dist,
                 "zip2"="poisson",
                 "zinb2"="negbin")
-            mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist=Dist, ...)
+            mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist=Dist,
+                link=link, ...)
             cf <- c(coef(mod, "zero"), coef(mod, "count"))
             ll <- as.numeric(logLik(mod))
-            linv <- function(eta) 1 - binomial(mod$link)$linkinv(eta)
+            linv <- function(eta) 1 - binomial(link)$linkinv(eta)
         }
         if (dist == "ordered") {
             if (!is.null(list(...)$method))
                 if (list(...)$method != "logistic")
+                    stop("Sorry but only logisic model allowed for ordered.")
+            if (!is.null(link))
+                if (link != "logistic")
                     stop("Sorry but only logisic model allowed for ordered.")
             Y <- as.ordered(Y)
             if (nlevels(Y) > 2) { # ordinal
