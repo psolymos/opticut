@@ -56,7 +56,12 @@ from which \code{opticut} is called.
 vector, unique values define partitions.
 }
   \item{dist}{
-character or function, a distribution to fit, see Details and Examples.
+character or function, a distribution to fit.
+If character, it can follow one of these patterns: \code{"family"},
+or \code{"family:link"} when appropriate (there is a \code{link}
+argument in the underlying function, or the link
+can be specified via the \code{family} argument).
+See Details and Examples.
 }
   \item{comb}{
 character, how to define the binary partitions.
