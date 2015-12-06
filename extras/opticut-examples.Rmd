@@ -586,7 +586,7 @@ and also that the habitat identified is the right one
 
 ```{r}
 oc_sim_K2 <- 
-function(b1=0.5, b2=0, b3=0, b4=0, mu0=10, n=100, pos=TRUE)
+function(b1=0.5, b2=0, b3=0.05, b4=0, mu0=10, n=100, pos=TRUE)
 {
     K <- 2
     n <- 2*(n %/% 2)
@@ -614,30 +614,8 @@ function(b1=0.5, b2=0, b3=0, b4=0, mu0=10, n=100, pos=TRUE)
     out
 }
 
-vals <- expand.grid(
-    b1=c(0.1, 0.5, 0.9),
-    b2=c(0, 0.5, 1),
-    b3=c(0.05, 0.5, 1),
-    b4=c(0, 0.5, 1))
-
-vals <- expand.grid(
-    b1=0.5,
-    b2=c(0, 0.5, 1),
-    b3=0.1,
-    b4=c(0, 0.5, 1))
-
-library(indicspecies)
-ii <- 40 # row from vals
-R <- 999 # no. iter for p-values (each run)
-B <- 100 # replicates
-
-est_fun <- function(ii, R=999, level=0.95) {
-    dat <- oc_sim_K2(
-        b1=vals$b1[ii], 
-        b2=vals$b2[ii], 
-        b3=vals$b3[ii], 
-        b4=vals$b4[ii], 
-        mu0=10, n=100)
+est_fun1 <- function(..., R=999, level=0.95) {
+    dat <- oc_sim_K2(...)
     m0 <- opticut(Y ~ 1, dat, strata=h1)$species[[1]]
     m1 <- opticut(Y ~ Conf, dat, strata=h1)$species[[1]]
     ## IndVal
@@ -673,6 +651,53 @@ est_fun <- function(ii, R=999, level=0.95) {
     ## F-ratio cannot tell which is low/high
     t(out)    
 }
+
+est_fun <- function(B, ...)
+    replicate(B, est_fun1(...))
+library(opticut)
+library(indicspecies)
+
+B <- 100
+
+library(parallel)
+cl <- makeCluster(4)
+clusterExport(cl, c("est_fun", "est_fun1", "oc_sim_K2", "B"))
+clusterEvalQ(cl, library(opticut))
+clusterEvalQ(cl, library(indicspecies))
+
+## contrast (I)
+res1 <- parLapply(cl, seq(0.1, 0.9, by=0.1), function(z) est_fun(B=B, b1=z))
+
+## confounding
+res2 <- lapply(seq(0, 1, by=0.1), function(z) est_fun(B=B, b2=z))
+
+## noise
+res3 <- lapply(seq(0.1, 1, by=0.1), function(z) est_fun(B=B, b3=z))
+
+## mixing
+res4 <- lapply(seq(0, 1, by=0.1), function(z) est_fun(B=B, b4=z))
+
+stopCluster(cl)
+
+vals <- expand.grid(
+    b1=c(0.1, 0.5, 0.9),
+    b2=c(0, 0.5, 1),
+    b3=c(0.05, 0.5, 1),
+    b4=c(0, 0.5, 1))
+
+vals <- expand.grid(
+    b1=0.5,
+    b2=c(0, 0.5, 1),
+    b3=0.1,
+    b4=c(0, 0.5, 1))
+
+library(indicspecies)
+ii <- 40 # row from vals
+R <- 999 # no. iter for p-values (each run)
+B <- 100 # replicates
+
+
+
 
 dat <- oc_sim_K2(b1=0.5, b2=0, b3=0, b4=0, mu0=10, n=100)
 plot(Y ~ x, dat)
