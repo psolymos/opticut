@@ -1,7 +1,7 @@
 ---
 title: "Likelihood based optimal partitioning for indicator species analysis"
 author: "Peter Solymos, Ermias T. Azeria"
-date: "December 2, 2015"
+date: "December 7, 2015"
 output:
   pdf_document:
     keep_tex: no
@@ -11,209 +11,139 @@ output:
 
 # Introduction
 
-Distribution of biodiversity is non-random.
+The distributions of organisms on Earth show different levels of aggregation
+determined by climate, vegetation,
+species interactions, and anthropogenic disturbances
+(cit. Humboldt, Whittaker, Rosenzweig).
+Species' responses to environmental factors thus allow predictions,
+i.e. identify regions or locations where a species can be found
+with higher probability, or in higher numbers.
+This knowledge of species-environment relationships has been
+at the core of human endeavor, e.g. knowing where to find
+food, medicinal plants, species used to make tools from or used as
+construction material, according to the archaeological record and
+studies in traditional ecological knowledge.
 
-Why is it important to know what lives where?
+Some species show strong associations with easy to measure
+environmental variables,
+while the patterns for others species are weaker and often much
+harder to quantify.
+Species with strong environmental associations are often referred to as
+differential, character, or indicator species. These species
+are used to characterize certain habitats or vegetation types (Butta-Dukat),
+indicate naturalness or degradation of ecosystems (McGeoch & Chown),
+measure success of habitat restoration,
+alerting about critical community thresholds (TITAN),
+or indicate the presence of cryptic or rare species (Beals, Indpower, TWINSPAN).
 
-TEK & archeological context: it has always been life or death (food, medicine, tools, building material). (Recently considered as Ecosystem services.)
+There are three main types of algorithms that are used to quantify the degree of association for species. The contingency table based measures (e.g. the
+phi-coefficient, or Chi-square metric) that compare
+agreement in binary classifications based on some function of
+species' abundances and a-priori classification of the environment (Chytry etc);
+Contingency table based methods quantify association as a correlation
+measure indicating the magnitude and sign
+(-1: maximum avoidance, 0: no association, +1: maximum preference).
+The major limitation of these correlation
+measures is that the use of binary classification for species observations
+is either based on presence/absence (detection/non-detection) data thus
+ignoring possibly available abundance information (e.g. >1 counts), or
+is based on arbitrary thresholds when binarizing the abundance data
+(Tsiripidis, Tichy). Uncertainty in the strength of associations
+can be expressed based on
+large sample asymptotics or randomization tests, comparing against the
+null hypothesis of no association (Agresti, Count data book).
 
-Empirical descriptions: Braun-Blanquet and coenological tabelles, ecological gradients of Whittaker.
+The analysis of variance (ANOVA) based measures that compare
+between and within group variance (F-ratio) in species abundance given
+an a-priori classification (Jancey, Wildi). The F-ratio
+is used to rank species based on the degree of associations, but
+it is not explicitly testing the sign of the associations.
+Uncertainty in the strength of associations is commonly expressed
+using an F-test and corresponding p-value testing the null
+hypothesis of equal abundance.
+The parametric assumptions of the ANOVA imply normality and
+homoskedastic errors, which might not always be satisfied
+in most field situations (e.g. using 0/1, biomass, or % cover data).
 
-Contingency tables and correlation metrics: association and classification.
+The third and most widely adopted approach is the IndVal method
+that quantifies the concentration of species occurrence and
+abundances given an a-priory classification (Dufrene & Legendre).
+The IndVal index combines the species' abundance and occurrence information
+into a single index which reflects the magnitude of positive
+environment-associations (0-1). Uncertainty
+in the strength of associations can be quantified based on
+bootstrap (DeCaceres), but this approach is not testing against
+the null hypothesis of equal expected abundance within the
+partitions, because the method is non-parametric.
+The p-value for the null hypothesis is based on permutation tests.
+Randomization is used to derive the p-value is based on
+randomly placing samples or individuals, and this randomization
+might not always be meaningful for continuous input data
+(e.g. biomass, or % cover).
 
-ANOVA, F-statistic, Wildi's papers.
+As we see, a common limitation of available methods is that
+assumptions about the distribution (Binomial, Normal)
+or type (0/1, counts) of the species data are too restrictive.
+As a result, ecologists need to adjust the input data
+(binarization, rounding to integers) to meet the needs of the
+available analysis options. However, non-count or non-normal
+data are commonplace, e.g. vegetation studies measuring the
+response on ordinal scale, % cover, or biomass.
+Besides, none of these approaches are designed to deal with some other
+aspects of field data, for example confounding variables,
+sample selection bias (presence-only data),
+sampling effort differences, or imperfect detection.
 
-Heuristic algorithms (IndVal and friends).
+In this paper we introduce a general and extensible likelihood-based
+framework for indicator species analysis, that we call the opticut approach.
+The opticut approach provides a solution to the limitations
+of currently available and used options as listed above.
+We compare the power of traditional approaches and opticut
+to identify an indicator species when there
+is true indication in terms of abundance differences among partitions using
+simulations. We also show how to assess uncertainty in the strength
+of association, and also uncertainty in classification based on
+resampling, thus introducing a wider set of tools for statistical inference.
+Finally, we illustrate the breadth of situations where the use of opticut
+might be advantageous using case studies.
+We also provide the opticut R extension package that implements
+computationally efficient algorithm for finding indicator species,
+and tools for exploring and visualizing the results.
 
-Limitations of these approaches:
 
-* implicit assumptions about data types (through randomization, that requires counts) in IndVal, less flexibility regarding the model for ANOVA (Gaussian) and association metrics (discrete).
-* counfounding/modifying effects can affect powr to detect associations when not controlled for, this applies to all of the approaches.
+## Methods
 
-What we describe is:
+### Parametric model
 
+In indicator species analysis we are faced with the
+general problem of finding an optimal
+partitioning of low vs. high species abundance with respect to
+an a-priory stratification.
 
-
-
-
-
-
-General problem: find where species abundances are high vs. low in
-a way which leads to optimal classification by maximizing the
-contrast between the partitions.
-
-Previous attempts: historical review, highlighting IndVal.
-
-Issues with previous attempts:
-
-* summary statistics & Monte Carlo randomization with p-values, no model,
-* data types not always compatible with randomization (i.e. decimals),
-* confounding effects to classification can impact power,
-* assessing the ranking of partitions without inferential statements.
-
-Goals: 
-
-* describe a general and extensible approach that addresses the above limitations,
-* implement a computationally efficient algorithm,
-* tools for exploring the results (i.e. summaries, plots) in a object oriented framework.
-
-# Theory
-
-## The quest for optimal binary partitioning
-
-$Y_{i}$'s are observations for a single species
-from $n$ locations ($i = 1, ..., n$).
-$g_{i}$'s are known discrete descriptors of the locations with
-$K$ levels ($K > 2$). $z^{(m)}$ is a binary reclassification of $g$ taking
-values (0, 1). The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification out of the total $M = 2^{K-1} - 1$ total combinations (excluding complements). See below for options for defining binary partitions.
+The observations usually come as a community data matrix with
+sites or samples as rows ($i = 1, ..., n$) and species as columns.
+We describe the theory for a single species only.
+The community-wide inference replicates the analyses for each species
+independently of one another. $Y_{i}$'s are observations for a single species
+from $n$ locations.
+$g_{i}$ is a known descriptor of stratification for the location $i$
+that can take any of $K$ discrete values ($K > 2$).
+Let us denote $z^{(m)}$ as a binary reclassification of $g$ taking values (0, 1).
+The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification out of the total $M = 2^{K-1} - 1$ total combinations (excluding complements, e.g. 01 is identical to 10, i.e. the $K$ labels are arbitrary).
 There can also be other site descriptors denoted as $x_{ij}$
-taking discrete or continuous values ($j = 1, ..., p$; number of predictors).
+taking discrete or continuous values ($j = 1, ..., p$; the number of predictors).
 
-A suitable parametric model describe the
-relationship between the observations and the site descriptors
-through the probability density function 
-$P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$ 
-where $\theta$ is the vector of model parameters: 
+A suitable parametric model describes the
+relationship between the observations and the site descriptors, including
+the binary partitioning, through the probability density function
+$P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$
+where $\theta$ is the vector of model parameters:
 $\theta = (\beta_{0}, \beta_{1}, \alpha_{1}, ..., \alpha_{p})$.
-The choice of the parametric model depends on the nature of the 
+The choice of the parametric model depends on the nature of the
 observations. It can be Gaussian, Binomial, Poisson,
-ordinal, Beta regression, or zero-inflated models, with a 
+ordinal, Beta regression, or zero-inflated models, with a
 suitable link function ($f$) for the mean:
 $f(\eta_{i}) = \beta_{0}^{(m)} + \beta_{1}^{(m)} z_{i}^{(m)} + \sum_{j=1}^{p} \alpha_{j}^{(m)} x_{ij}$.
-
-$\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the 
-model parameters given the data and classification $m$, 
-with corresponding log-likelihood value $l(\widehat{\theta^{(m)}}; y)$.
-Finding MLEs for all $M$ candidate binary partitions
-leads to a set of log-likelihood values. One can compare
-the log-likelihood values to a null model (no binary partition is necessary)
-where $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
-and corresponding log-likelihood value for the null model: 
-$l(\widehat{\theta^{(0)}}; y)$.
-
-The log-likelihood ratio for each candidate partition can be
-calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
-The best supported binary partition is
-the model with the highest log-likelihood ratio value.
-
-The indicator value ($I$) for each candidate partition can be calculated
-based on expected values using the inverse link function as 
-$\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and 
-$\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
-$I = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
-Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and 
-$\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
-for the observations given the binary partition $z_{i}^{(m)}$
-and at 0 value for all $x_{ij}$. 
-
-## Finding all possible binary partitions
-
-Finding all combinations does not require a model or observed responses.
-It only takes a classification vector with $K > 1$ partitions.
-
-`kComb` returns a 'contrast' matrix corresponding to
-all possible binary partitions of the factor with `K` levels.
-Complements are not counted twice, i.e.
-(0,0,1,1) is equivalent to (1,1,0,0).
-The number of such possible combinations is $M = 2^{K-1} - 1$.
-
-Get the package and load it:
-```{r}
-#devtools::install_github("psolymos/opticut")
-#devtools::install("~/repos/opticut")
-#devtools::build("~/repos/opticut", binary=TRUE)
-library(opticut)
-```
-
-```{r}
-kComb(k = 2)
-kComb(k = 3)
-kComb(k = 4)
-```
-
-`allComb` this takes a classification vector with at least 2 levels
-and returns a model matrix with binary partitions. `checkComb`
-checks if combinations are unique and non-complementary
-(misfits are returned as attributes).
-
-```{r}
-(f <- rep(LETTERS[1:4], each=2))
-(mc <- allComb(f, collapse = "_"))
-checkComb(mc)
-mc2 <- cbind(z = 1 - mc[,1], mc[,c(1:ncol(mc), 1)])
-colnames(mc2) <- 1:ncol(mc2)
-mc2
-checkComb(mc2)
-```
-
-## Poisson count model example
-
-```{r}
-set.seed(1234)
-n <- 200
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-table(x0,x1)
-lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2)
-boxplot(lam1~x0)
-Y1 <- rpois(n, lam1)
-lam2 <- exp(0.1 + 0.5*ifelse(x0==4,1,0) + 0.2*x2)
-boxplot(lam2~x0)
-Y2 <- rpois(n, lam2)
-lam3 <- exp(0.1 + -0.2*x2)
-boxplot(lam3~x0)
-Y3 <- rpois(n, lam3)
-Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
-X <- model.matrix(~x2)
-Z <- allComb(x0)
-opticut1(Y1, X, Z, dist="poisson")
-opticut1(Y2, X, Z, dist="poisson")
-opticut1(Y3, X, Z, dist="poisson")
-summary(m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
-plot(m, cut=-Inf)
-```
-
-Describe here what is what in the output.
-
-## Not using all possible partitions
-
-Blindly fitting a model to all possible partitions is wasteful
-use of resources. Instead, one can rank the $K$ partitions
-based on expected response values 
-($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$, 
-where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
-This way we have to explore only $K-1$ partitions:
-
-```{r}
-oComb(1:4)
-```
-
-`oComb` return the 'contrast' matrix based on the rank vector as input.
-Rank 1 means lowest expected value among the partitions.
-
-The function `rankComb` fits the model with multiple ($K > 2$) factor levels
-to find out the ranking, and returns a binary classification matrix
-similarly to `allComb`:
-
-```{r}
-head(rc <- rankComb(Y1, model.matrix(~x2), as.factor(x0), dist="poisson"))
-attr(rc, "est")
-```
-
-Note that the ranking varies from species to species, thus
-it is not possible to supply the resulting matrix as
-`strata` definition:
-
-```{r}
-summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
-```
-
-There is an overhead of fitting the model to calculate the ranking.
-But computing efficiencies can be still high compared to all partitions
-when the number of levels ($k$) is high.
-
-# Distributions
 
 Currently available distributions:
 
@@ -224,53 +154,90 @@ Currently available distributions:
 * `"beta"`: continuous response in the unit interval, e.g. percent cover,
 * `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
   `"zip"`, or in zero model: `"zip2"`),
-* `"zinb"`, `"zinb"`: zero-inflated Negative Binomial counts 
+* `"zinb"`, `"zinb"`: zero-inflated Negative Binomial counts
   (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`),
-* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover, 
-* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection 
+* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover,
+* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection
   probability functions.
 
+### Defining the set of candidate partitions
 
-## Gaussian
+$\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the
+model parameters given the data and classification $m$,
+with corresponding log-likelihood value $l(\widehat{\theta^{(m)}}; y)$.
+Finding MLEs for all $M$ candidate binary partitions
+leads to a set of log-likelihood values. One can compare
+the log-likelihood values to a null model (no binary partitioning is necessary)
+where we fix $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
+and corresponding log-likelihood value for the null model:
+$l(\widehat{\theta^{(0)}}; y)$.
 
-```{r}
-Y <- rnorm(n, log(lam1) + 10, 0.5)
-(mod <- opticut(Y ~ x2, strata=x0, dist="gaussian"))
-```
+The log-likelihood ratio for each candidate partition can be
+calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
+The best supported binary partition is
+the model with the highest log-likelihood ratio value (CITATION).
 
-Legendre example
-
-```{r}
-gr <- rep(1:5, each=5)
-spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
-    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
-    Species3=rep(c(18,2,0,0,0), each=5))
-rownames(spp) <- gr
-spp
-summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
-summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="rank"))
-```
-
-## Binomial
-
-```{r}
-set.seed(1234)
-n <- 1000
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-table(x0,x1)
-p1 <- plogis(0.5 + 0.5*x1 + -0.2*x2)
-boxplot(p1~x0)
-Y1 <- rbinom(n, 1, p1)
-p2 <- plogis(0.1 + 0.5*ifelse(x0==4,1,0) + 0.2*x2)
-boxplot(p2~x0)
-Y2 <- rbinom(n, 1, p2)
-Y <- cbind(SPP1=Y1, SPP2=Y2)
-X <- model.matrix(~x2)
-Z <- allComb(x0)
-
-summary(opticut(Y ~ x2, strata=x0, dist="binomial"))
-```
+#### All partitions, complements
 
 
+Finding all combinations does not require a model or observed responses.
+It only takes a classification vector with $K > 1$ partitions.
+
+`kComb` returns a 'contrast' matrix corresponding to
+all possible binary partitions of the factor with `K` levels.
+Complements are not counted twice, i.e.
+(0,0,1,1) is equivalent to (1,1,0,0).
+The number of such possible combinations is $M = 2^{K-1} - 1$.
+
+`allComb` this takes a classification vector with at least 2 levels
+and returns a model matrix with binary partitions. `checkComb`
+checks if combinations are unique and non-complementary
+(misfits are returned as attributes).
+
+#### model weights
+
+#### rank based partitions
+
+Blindly fitting a model to all possible partitions is wasteful
+use of resources. Instead, one can rank the $K$ partitions
+based on expected response values
+($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$,
+where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
+This way we have to explore only $K-1$ partitions:
+
+`oComb` return the 'contrast' matrix based on the rank vector as input.
+Rank 1 means lowest expected value among the partitions.
+
+The function `rankComb` fits the model with multiple ($K > 2$) factor levels
+to find out the ranking, and returns a binary classification matrix
+similarly to `allComb`:
+
+Note that the ranking varies from species to species, thus
+it is not possible to supply the resulting matrix as
+`strata` definition:
+
+There is an overhead of fitting the model to calculate the ranking.
+But computing efficiencies can be still high compared to all partitions
+when the number of levels ($k$) is high.
+
+## Indicator value
+
+The indicator value ($I$) for each candidate partition can be calculated
+based on expected values using the inverse link function as
+$\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and
+$\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
+$I = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
+Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and
+$\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
+for the observations given the binary partition $z_{i}^{(m)}$
+and at 0 value for all $x_{ij}$.
+
+## simulations
+
+## Case studies
+
+# Results
+
+# Discussion
+
+# References
