@@ -657,34 +657,86 @@ est_fun <- function(B, ...)
 library(opticut)
 library(indicspecies)
 
-B <- 100
+B <- 200
+
+vals <- expand.grid(
+    b2=seq(0, 1, by=0.1),
+    b4=seq(0, 1, by=0.1))
+
+vals2 <- expand.grid(
+    b2=seq(0, 1, by=0.1),
+    b4=seq(0, 1, by=0.1),
+    b1=c(0.1, 0.5, 0.9),
+    b3=c(0.1, 0.5, 1))
 
 library(parallel)
-cl <- makeCluster(4)
-clusterExport(cl, c("est_fun", "est_fun1", "oc_sim_K2", "B"))
+cl <- makeCluster(6)
+clusterExport(cl, c("est_fun", "est_fun1", "oc_sim_K2", "B","vals","vals2"))
 clusterEvalQ(cl, library(opticut))
 clusterEvalQ(cl, library(indicspecies))
 
 ## contrast (I)
-res1 <- parLapply(cl, seq(0.1, 0.9, by=0.1), function(z) est_fun(B=B, b1=z))
+res1 <- parLapply(cl, seq(0.1, 0.9, by=0.1), function(z) 
+    replicate(B, est_fun1(b1=z)))
 
 ## confounding
-res2 <- lapply(seq(0, 1, by=0.1), function(z) est_fun(B=B, b2=z))
+res2 <- parLapply(cl, seq(0, 1, by=0.1), function(z) 
+    replicate(B, est_fun1(b2=z)))
 
 ## noise
-res3 <- lapply(seq(0.1, 1, by=0.1), function(z) est_fun(B=B, b3=z))
+res3 <- parLapply(cl, seq(0.1, 1, by=0.1), function(z) 
+    replicate(B, est_fun1(b3=z)))
 
 ## mixing
-res4 <- lapply(seq(0, 1, by=0.1), function(z) est_fun(B=B, b4=z))
+res4 <- parLapply(cl, seq(0, 1, by=0.1), function(z) 
+    replicate(B, est_fun1(b4=z)))
+
+## conf & mixing
+res5 <- parLapply(cl, 1:nrow(vals), function(z) 
+    replicate(B, est_fun1(b2=vals[z,1], b4=vals[z,2])))
+
+## all
+res6 <- parLapply(cl, 1:nrow(vals2), function(z) 
+    replicate(B, est_fun1(b2=vals2[z,1], b4=vals2[z,2],
+        b1=vals2[z,3], b3=vals2[z,4])))
 
 stopCluster(cl)
 
-vals <- expand.grid(
-    b1=c(0.1, 0.5, 0.9),
-    b2=c(0, 0.5, 1),
-    b3=c(0.05, 0.5, 1),
-    b4=c(0, 0.5, 1))
+save(vals, vals2, res1, res2, res3, res4, res5, res6,
+    file="~/Dropbox/collaborations/opticut/R/opticut-simuls.Rdata")
 
+r1 <- sapply(res1, function(z) rowMeans(abs(z[2,,])))
+r2 <- sapply(res2, function(z) rowMeans(abs(z[2,,])))
+r3 <- sapply(res3, function(z) rowMeans(abs(z[2,,])))
+r4 <- sapply(res4, function(z) rowMeans(abs(z[2,,])))
+r5 <- sapply(res5, function(z) rowMeans(abs(z[2,,])))
+r6 <- sapply(res6, function(z) rowMeans(abs(z[2,,])))
+
+r1v <- sapply(res1, function(z) rowMeans(z[2,,]>0))
+r2v <- sapply(res2, function(z) rowMeans(z[2,,]>0))
+r3v <- sapply(res3, function(z) rowMeans(z[2,,]>0))
+r4v <- sapply(res4, function(z) rowMeans(z[2,,]>0))
+r5v <- sapply(res5, function(z) rowMeans(z[2,,]>0))
+r6v <- sapply(res6, function(z) rowMeans(z[2,,]>0))
+summary(t(r1-r1v))
+
+rr <- r6v[vals2$b1==0.1 & vals2$b3==0.1]
+par(mfrow=c(3,2))
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-r5[1,], length(unique(vals$b2)), length(unique(vals$b4))))
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-r5[2,], length(unique(vals$b2)), length(unique(vals$b4))))
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-r5[3,], length(unique(vals$b2)), length(unique(vals$b4))))
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-r5[4,], length(unique(vals$b2)), length(unique(vals$b4))))
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-r5[5,], length(unique(vals$b2)), length(unique(vals$b4))))
+
+## todo:
+## - use all combs with few other levels of noise and I
+
+## --
 vals <- expand.grid(
     b1=0.5,
     b2=c(0, 0.5, 1),
