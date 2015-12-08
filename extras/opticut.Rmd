@@ -235,9 +235,9 @@ because $I$ only considers the contrast between predicted
 abundances in the two strata, whereas $log(LR)$ represents
 goodness of fit and is a function of not only the model
 parameters but the data as well. $I$ and $log(LR)$ convey
-complementary information that needs to be presented together
+different information that needs to be presented together
 for meaningful statistical inference. Ranking of models
-should follow $log(LR)$ and not $I$.
+should follow $log(LR)$ (best fit) and not $I$ (largest contrast).
 
 
 ## Quantifying uncertainty
@@ -255,3 +255,70 @@ should follow $log(LR)$ and not $I$.
 # Discussion
 
 # References
+
+McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. 
+Trends in Ecology and Evolution 13: 46--47.
+
+Podani J and Csanyi B (2010) Detecting indicator species: some extensions of the
+INDVAL measure. Ecological Indicators 10: 1119-1124.
+
+Hill MO (1979) TWINSPAN - A FORTRAN Program for Arranging Multivariate Data
+in an Ordered Two-way Table by Classification of the Individuals and Attributes.
+Ithaca, New York: Section of Ecology and Systematics, CornellUniversity.
+
+Dufrene M and Legendre P (1997) Species assemblages and indicator species: The
+need for a flexible asymmetrical approach. Ecological Monographs 67: 345--366.
+
+De Caceres M and Legendre P (2009) Associations between species and groups of
+sites: Indices and statistical inference. Ecology 90: 3566--3574.
+
+De Caceres M, Legendre P, and Moretti M (2010) Improving indicator species
+analysis by combining groups of sites. Oikos 119: 1674--1684.
+
+SANDER GREENLAND AND HAL MORGENSTERN 1989. 
+Ecological Bias, Confounding, and Effect Modification.
+International Journal of Epidemiology, 18: 269--274.
+
+Tsiripidis, Ioannis; Bergmeier, Erwin; Fotiadis, Georgios & Dimopoulos, Panayotis
+2009. A new algorithm for the determination of differential taxa.
+Journal of Vegetation Science 20: 233--240.
+
+Tichy, Lubomir & Chytry, Milan 2006.
+Statistical determination of diagnostic species for site groups of unequal size.
+Journal of Vegetation Science 17: 809--818.
+
+Z. Botta-Dukat and A. Borhidi 1999.
+New objective method for calculating fidelity. Example: the Illyrian beechwoods.
+ANNALI DI BOTANICA LVII: 73--90.
+
+Matthew E. Baker and Ryan S. King 2010
+A new method for detecting and interpreting biodiversity and ecological community thresholds.
+Methods in Ecology and Evolution, 1, 25--37.
+
+O. Wildi and E. Feldmeyer-Christe 2013.
+Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data.
+COMMUNITY ECOLOGY 14(2): 139--143.
+
+E. van der Maarel 1979.
+Transformation of Cover-Abundance Values in Phytosociology and Its Effects on Community
+Similarity. Vegetatio, Vol. 39: 97--114.
+
+Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002.
+Determination of diagnostic species with statistical fidelity measures.
+Journal of Vegetation Science 13: 79--90.
+
+KENNETH P. BURNHAM & DAVID R. ANDERSON 2004.
+Multimodel Inference - Understanding AIC and BIC in Model Selection.
+SOCIOLOGICAL METHODS & RESEARCH, 33: 261--304
+
+Wildi, O. 1989. A new numerical solution to traditional phytosociological
+tabular classification. Vegetatio 81: 95-106.
+
+McGeoch, M.A. and Chown, S.L.1998. 
+Scaling up the value of bioindicators. 
+Trends Ecol. Evol. 13: 46-47.
+
+Jancey, R.C. 1979. Species ordering on a variance criterion. 
+Vegetatio 39: 59--63.
+
+
