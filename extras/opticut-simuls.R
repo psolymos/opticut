@@ -1,5 +1,4 @@
-
-## Simulations
+## Simulations: K=2 case
 
 ## The power of a statistical test is 
 ## the probability that it correctly rejects the null hypothesis 
@@ -10,6 +9,12 @@
 ## in our setup the H0 is false
 ## so we examine how often we found that H0 is rejected (p < alpha)
 ## and also that the habitat identified is the right one
+
+library(mefa4)
+library(opticut)
+library(indicspecies)
+
+B <- 200
 
 oc_sim_K2 <- 
 function(b1=0.5, b2=0, b3=0.05, b4=0, mu0=10, n=100, pos=TRUE)
@@ -78,13 +83,6 @@ est_fun1 <- function(..., R=999, level=0.95) {
     t(out)    
 }
 
-est_fun <- function(B, ...)
-    replicate(B, est_fun1(...))
-library(opticut)
-library(indicspecies)
-
-B <- 200
-
 vals <- expand.grid(
     b2=seq(0, 1, by=0.1),
     b4=seq(0, 1, by=0.1))
@@ -128,8 +126,10 @@ res6 <- parLapply(cl, 1:nrow(vals2), function(z)
 
 stopCluster(cl)
 
-save(vals, vals2, res1, res2, res3, res4, res5, res6, B
-    file="~/Dropbox/collaborations/opticut/R/opticut-simuls.Rdata")
+#save(vals, vals2, res1, res2, res3, res4, res5, res6, B
+#    file="~/Dropbox/collaborations/opticut/R/opticut-simuls.Rdata")
+
+load("~/Dropbox/collaborations/opticut/opticut-simuls.Rdata")
 
 r1 <- sapply(res1, function(z) rowMeans(abs(z[2,,])))
 r2 <- sapply(res2, function(z) rowMeans(abs(z[2,,])))
@@ -146,16 +146,43 @@ r5v <- sapply(res5, function(z) rowMeans(z[2,,]>0))
 r6v <- sapply(res6, function(z) rowMeans(z[2,,]>0))
 summary(t(r1-r1v))
 
-rr <- r6v[vals2$b1==0.1 & vals2$b3==0.1]
-par(mfrow=c(3,2))
+op <- par(mfrow=c(2,5))
+rr <- r6v[,vals2$b1==0.1 & vals2$b3==0.1]
+for (i in 1:5)
 image(unique(vals$b2), unique(vals$b4), 
-    matrix(-r5[1,], length(unique(vals$b2)), length(unique(vals$b4))))
-image(unique(vals$b2), unique(vals$b4), 
-    matrix(-r5[2,], length(unique(vals$b2)), length(unique(vals$b4))))
-image(unique(vals$b2), unique(vals$b4), 
-    matrix(-r5[3,], length(unique(vals$b2)), length(unique(vals$b4))))
-image(unique(vals$b2), unique(vals$b4), 
-    matrix(-r5[4,], length(unique(vals$b2)), length(unique(vals$b4))))
-image(unique(vals$b2), unique(vals$b4), 
-    matrix(-r5[5,], length(unique(vals$b2)), length(unique(vals$b4))))
+    matrix(-rr[i,], length(unique(vals$b2)), length(unique(vals$b4))),
+    main=rownames(rr)[i],
+    xlab="Confounding", ylab="Misclassification")
 
+rr <- r6v[,vals2$b1==0.9 & vals2$b3==1]
+for (i in 1:5)
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-rr[i,], length(unique(vals$b2)), length(unique(vals$b4))),
+    main=rownames(rr)[i],
+    xlab="Confounding", ylab="Misclassification")
+par(op)
+
+r6c <- sapply(res6, function(z) rowSums(z[2,,]>0))
+xx <- data.frame(success=as.numeric(t(r6c)), 
+    failure=B-as.numeric(t(r6c)),
+    method=rep(rownames(r6c), nrow(vals2)), vals2)
+xx$method <- relevel(xx$method, "IX")
+mm <- glm(cbind(success, failure) ~ method + (b1 + b2 + b3 + b4), xx, family=binomial)
+summary(mm)
+av <- anova(mm)
+av$Perc <- round(100 * anova(mm)$Deviance / 1041142, 2)
+sum(av$Perc, na.rm=TRUE)
+av
+
+
+## Gaussian example
+
+library(opticut)
+Y <- c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4)
+z <- as.factor(rep(LETTERS[1:3], each=4))
+
+opticut1(Y, Z=z)
+opticut1(ifelse(Y>0,1,0), Z=z, dist="binomial")
+
+print(opticut1(Y, Z=allComb(z)), cut=-Inf)
+print(opticut1(ifelse(Y>0,1,0), Z=allComb(z), dist="binomial"), cut=-Inf)
