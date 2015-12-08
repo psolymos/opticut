@@ -5,7 +5,7 @@ date: "December 7, 2015"
 output:
   pdf_document:
     keep_tex: no
-    number_sections: yes
+    number_sections: no
     toc: no
 ---
 
@@ -23,11 +23,6 @@ at the core of human endeavor, e.g. knowing where to find
 food, medicinal plants, species used to make tools from or used as
 construction material, according to the archaeological record and
 studies in traditional ecological knowledge.
-
-Some species show strong associations with easy to measure
-environmental variables,
-while the patterns for others species are weaker and often much
-harder to quantify.
 Species with strong environmental associations are often referred to as
 differential, character, or indicator species. These species
 are used to characterize certain habitats or vegetation types (Butta-Dukat),
@@ -81,12 +76,12 @@ randomly placing samples or individuals, and this randomization
 might not always be meaningful for continuous input data
 (e.g. biomass, or % cover).
 
-As we see, a common limitation of available methods is that
+A common limitation of the available methods is that
 assumptions about the distribution (Binomial, Normal)
 or type (0/1, counts) of the species data are too restrictive.
 As a result, ecologists need to adjust the input data
 (binarization, rounding to integers) to meet the needs of the
-available analysis options. However, non-count or non-normal
+analysis options. However, non-count or non-normal
 data are commonplace, e.g. vegetation studies measuring the
 response on ordinal scale, % cover, or biomass.
 Besides, none of these approaches are designed to deal with some other
@@ -119,18 +114,16 @@ In indicator species analysis we are faced with the
 general problem of finding an optimal
 partitioning of low vs. high species abundance with respect to
 an a-priory stratification.
-
-The observations usually come as a community data matrix with
+The observations are usually organized as a community data matrix with
 sites or samples as rows ($i = 1, ..., n$) and species as columns.
 We describe the theory for a single species only.
 The community-wide inference replicates the analyses for each species
 independently of one another. $Y_{i}$'s are observations for a single species
 from $n$ locations.
 $g_{i}$ is a known descriptor of stratification for the location $i$
-that can take any of $K$ discrete values ($K > 2$).
+that can take any of $K$ discrete values ($K > 1$).
 Let us denote $z^{(m)}$ as a binary reclassification of $g$ taking values (0, 1).
-The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification out of the total $M = 2^{K-1} - 1$ total combinations (excluding complements, e.g. 01 is identical to 10, i.e. the $K$ labels are arbitrary).
-There can also be other site descriptors denoted as $x_{ij}$
+The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification. There can also be other site descriptors denoted as $x_{ij}$
 taking discrete or continuous values ($j = 1, ..., p$; the number of predictors).
 
 A suitable parametric model describes the
@@ -145,80 +138,77 @@ ordinal, Beta regression, or zero-inflated models, with a
 suitable link function ($f$) for the mean:
 $f(\eta_{i}) = \beta_{0}^{(m)} + \beta_{1}^{(m)} z_{i}^{(m)} + \sum_{j=1}^{p} \alpha_{j}^{(m)} x_{ij}$.
 
-Currently available distributions:
+The opticut R extension package implements different parametric models.
+The default is a Gaussian linear model with an identity link.
+Other models include logistic regression (Binomial distribution with
+logistic link function), log-linear count models (Poisson, Negative
+Binomial, Zero-inflated Poisson and Negative Binomial with logarithmic link).
+Ordinal species observations can be analyzed using
+the proportional ordered logistic regression (cit MASS). Percent cover data
+may be analyzed based on a Beta regression (cit package).
+Presence-only data (e.g. museum records, incidental sightings,
+most citizen science observations), or animal movement data can be analyzed
+based on resource selection (probability) functions (Lele & Keim).
+Other custom distributions can also be defined in the R package,
+such as linear mixed models, generalized linear mixed models (cit),
+occupancy (cit MacKenzie, Lele et al) or N-mixture models (Royle, Solymos).
 
-* `"gaussian"`: real valued continuous observations, e.g. biomass,
-* `"poisson"`: Poisson count data,
-* `"binomial"`: presence-absence type data,
-* `"negbin"`: overdispersed Negative Binomial count data,
-* `"beta"`: continuous response in the unit interval, e.g. percent cover,
-* `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
-  `"zip"`, or in zero model: `"zip2"`),
-* `"zinb"`, `"zinb"`: zero-inflated Negative Binomial counts
-  (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`),
-* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover,
-* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection
-  probability functions.
+### Defining the set of partitions
 
-### Defining the set of candidate partitions
+The maximum number of binary partitions based on $K$ levels is
+$2^K - 1$ (see DeCaceres), including complements like
+(0, 0, 1) and (1, 1, 0) counted as separate
+partitions. Such complementary partitions represent identical stratification,
+thus should not affect the result of indicator species analysis.
+(It does affect the IndVal value for $K>2$ cases.)
+When complements are not counted twice, the number of
+possible binary partitions of the stratification with $K$ strata (or levels)
+is $M = 2^{K-1} - 1$.
+Finding all combinations does not require a model or observed responses.
+It only takes a classification vector with $K > 1$ partitions.
+As a consequence, the partitions can be set up for all species in the
+community matrix at once, and used for finding the best partition for each
+species.
+
+Blindly fitting a model to all possible partitions is wasteful
+use of resources because the number of candidate partitions
+grows steeply with increasing $K$. Instead, one can rank the
+$K$ partitions based on expected response values
+($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$,
+where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
+This way we have to explore only $M=K-1$ partitions. For $K=3$
+we have the following partitions: (1), (1, 2), (1, 2, 3),
+where rank 1 is for lowest and 3 is for highest expected abundance.
+The ranking varies from species to species, thus
+it is not possible to supply the resulting stratification a-priory
+for for all species in the community matrix.
+There is an overhead of fitting the model to calculate the ranking first.
+But computing efficiencies are significant for $K>3$ cases.
+For example for $K=10$ the difference is
+56-fold (511 all partitions vs. 9 rank based partitions).
 
 $\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the
-model parameters given the data and classification $m$,
-with corresponding log-likelihood value $l(\widehat{\theta^{(m)}}; y)$.
+model parameters given the data and partition $m$,
+with corresponding log-likelihood value 
+$l(\widehat{\theta^{(m)}}; y) = l^{(m)}$.
 Finding MLEs for all $M$ candidate binary partitions
 leads to a set of log-likelihood values. One can compare
 the log-likelihood values to a null model (no binary partitioning is necessary)
 where we fix $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
 and corresponding log-likelihood value for the null model:
-$l(\widehat{\theta^{(0)}}; y)$.
-
+$l(\widehat{\theta^{(0)}}; y) = l^{(0)}$.
 The log-likelihood ratio for each candidate partition can be
-calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
+calculated as $log(LR)^{(m)} = l^{(m)} - l^{(0)}$.
 The best supported binary partition is
 the model with the highest log-likelihood ratio value (CITATION).
 
-#### All partitions, complements
+The relative support for the candidate partitions can be measured
+by the log-likelihood ratio. A value of >2 means support for
+a partition over the null model, a value of >8 indicates strong support
+over the null model. Model weights can be calculated as 
+$w^{(m)} = \Delta^{(m)} / \sum_{m=1}^{M} \Delta^{(m)}$,
+where $\Delta^{(m)} = exp(l^{(m)} - max(l^{(1)}, ..., l^{(M)}))$ (Burnham & Anderson).
 
-
-Finding all combinations does not require a model or observed responses.
-It only takes a classification vector with $K > 1$ partitions.
-
-`kComb` returns a 'contrast' matrix corresponding to
-all possible binary partitions of the factor with `K` levels.
-Complements are not counted twice, i.e.
-(0,0,1,1) is equivalent to (1,1,0,0).
-The number of such possible combinations is $M = 2^{K-1} - 1$.
-
-`allComb` this takes a classification vector with at least 2 levels
-and returns a model matrix with binary partitions. `checkComb`
-checks if combinations are unique and non-complementary
-(misfits are returned as attributes).
-
-#### model weights
-
-#### rank based partitions
-
-Blindly fitting a model to all possible partitions is wasteful
-use of resources. Instead, one can rank the $K$ partitions
-based on expected response values
-($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$,
-where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
-This way we have to explore only $K-1$ partitions:
-
-`oComb` return the 'contrast' matrix based on the rank vector as input.
-Rank 1 means lowest expected value among the partitions.
-
-The function `rankComb` fits the model with multiple ($K > 2$) factor levels
-to find out the ranking, and returns a binary classification matrix
-similarly to `allComb`:
-
-Note that the ranking varies from species to species, thus
-it is not possible to supply the resulting matrix as
-`strata` definition:
-
-There is an overhead of fitting the model to calculate the ranking.
-But computing efficiencies can be still high compared to all partitions
-when the number of levels ($k$) is high.
 
 ## Indicator value
 
@@ -226,11 +216,35 @@ The indicator value ($I$) for each candidate partition can be calculated
 based on expected values using the inverse link function as
 $\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and
 $\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
-$I = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
+$I^{(m)} = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
 Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and
 $\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
 for the observations given the binary partition $z_{i}^{(m)}$
 and at 0 value for all $x_{ij}$.
+The strength of association of the species with a given partition is 
+determined by $I^{(m)}$.
+The value of $I^{(m)}$ is minimal (0) when $\mu_{0}^{(m)} = \mu_{1}^{(m)}$,
+whereas $I^{(m)}$ is maximal (1) when one of the expected values
+is close to 0 (i.e. the species is absent). This is also referred to as
+high fidelity in plant ecology (citation).
+The sign of the association equals $sign(\beta_{1}^{(m)})$. 
+
+The ranking of the $M$ candidate models based on 
+$I$ and $log(LR)$ is usually not identical
+because $I$ only considers the contrast between predicted
+abundances in the two strata, whereas $log(LR)$ represents
+goodness of fit and is a function of not only the model
+parameters but the data as well. $I$ and $log(LR)$ convey
+complementary information that needs to be presented together
+for meaningful statistical inference. Ranking of models
+should follow $log(LR)$ and not $I$.
+
+
+## Quantifying uncertainty
+
+#### model weights
+
+#### etc
 
 ## simulations
 
