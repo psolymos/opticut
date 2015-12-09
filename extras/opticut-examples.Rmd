@@ -215,9 +215,9 @@ Legendre example
 
 ```{r}
 gr <- rep(1:5, each=5)
-spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
-    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
-    Species3=rep(c(18,2,0,0,0), each=5))
+spp <- cbind(Sp1=rep(c(4,6,5,3,2), each=5),
+    Sp2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
+    Sp3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
 spp
 summary(mod <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))

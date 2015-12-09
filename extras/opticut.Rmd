@@ -1,8 +1,9 @@
 ---
 title: "Likelihood based optimal partitioning for indicator species analysis"
-author: "Peter Solymos, Ermias T. Azeria"
+author: "Peter Solymos, Ermias T. Azeria. et al."
 date: "December 7, 2015"
 output:
+  word_document: default
   pdf_document:
     keep_tex: no
     number_sections: no
@@ -13,7 +14,7 @@ output:
 
 The distributions of organisms on Earth show different levels of aggregation
 determined by climate, vegetation,
-species interactions, and anthropogenic disturbances
+species interactions, barriers to dispersal, and anthropogenic disturbances
 (cit. Humboldt, Whittaker, Rosenzweig).
 Species' responses to environmental factors thus allow predictions,
 i.e. identify regions or locations where a species can be found
@@ -21,20 +22,21 @@ with higher probability, or in higher numbers.
 This knowledge of species-environment relationships has been
 at the core of human endeavor, e.g. knowing where to find
 food, medicinal plants, species used to make tools from or used as
-construction material, according to the archaeological record and
-studies in traditional ecological knowledge.
+construction material, according to the archaeological (cit) record and
+studies in traditional ecological knowledge (cit).
 Species with strong environmental associations are often referred to as
 differential, character, or indicator species. These species
-are used to characterize certain habitats or vegetation types (Butta-Dukat),
+are used to characterize certain habitats or vegetation types (Botta-Dukat),
 indicate naturalness or degradation of ecosystems (McGeoch & Chown),
 measure success of habitat restoration,
 alerting about critical community thresholds (TITAN),
 or indicate the presence of cryptic or rare species (Beals, Indpower, TWINSPAN).
 
-There are three main types of algorithms that are used to quantify the degree of association for species. The contingency table based measures (e.g. the
+There are three main types of algorithms that are used to quantify the 
+degree of association for species. The contingency table based measures (e.g. the
 phi-coefficient, or Chi-square metric) that compare
 agreement in binary classifications based on some function of
-species' abundances and a-priori classification of the environment (Chytry etc);
+species' abundances and *a priori* classification of the environment (Chytry etc);
 Contingency table based methods quantify association as a correlation
 measure indicating the magnitude and sign
 (-1: maximum avoidance, 0: no association, +1: maximum preference).
@@ -48,9 +50,9 @@ can be expressed based on
 large sample asymptotics or randomization tests, comparing against the
 null hypothesis of no association (Agresti, Count data book).
 
-The analysis of variance (ANOVA) based measures that compare
+The analysis of variance (ANOVA) based measures compare
 between and within group variance (F-ratio) in species abundance given
-an a-priori classification (Jancey, Wildi). The F-ratio
+an *a priori* classification (Jancey, Wildi). The F-ratio
 is used to rank species based on the degree of associations, but
 it is not explicitly testing the sign of the associations.
 Uncertainty in the strength of associations is commonly expressed
@@ -245,6 +247,25 @@ opticut1(ifelse(Y>0,1,0), Z=z, dist="binomial")
 
 print(opticut1(Y, Z=allComb(z)), cut=-Inf)
 print(opticut1(ifelse(Y>0,1,0), Z=allComb(z), dist="binomial"), cut=-Inf)
+
+allComb(z)
+rankComb(Y, matrix(1, length(Y), 1), z)
+
+set.seed(123)
+oc <- opticut(Y ~ 1, strata=z)
+uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
+#uc2 <- uncertainty(oc, 1, type="boot", B=999)
+#uc3 <- uncertainty(oc, 1, type="multi", B=999)
+
+Y <- cbind(Sp1=c(4, 6, 3, 5, 5, 6, 3, 4, 4, 1, 3, 2),
+           Sp2=c(0, 0, 0, 0, 1, 0, 0, 1, 5, 2, 3, 4),
+           Sp3=c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4))
+oc <- opticut(Y ~ 1, strata=z)
+plot(oc)
+uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
+#uc2 <- uncertainty(oc, 1, type="boot", B=999)
+#uc3 <- uncertainty(oc, 2, type="multi", B=999)
+
 ```
 
 ## Quantifying uncertainty
@@ -262,7 +283,7 @@ where $\Delta^{(m)} = exp(l^{(m)} - max(l^{(1)}, ..., l^{(M)}))$ (Burnham & Ande
 
 Describe how to get asymptotic CIs for mu0, mu1, I (but best partition is fixed). This is of little value, because we rarely test if I for one species is
 different from I for another species. Also, significance of differences between
-mu0 and mu1 (contrasts) are of little valie on their own. But one might want to 
+mu0 and mu1 (contrasts) are of little value on their own. But one might want to 
 explore the distributions and interpret the results visually.
 
 ### Bootstrap based inference
@@ -288,7 +309,7 @@ K=3 case: recovering mixing proportions using bootstrap
 # Results
 
 Confounding effect is fixed by opticut (IX),
-others are similar (I0: interept only opticut, IV: IndVal,
+others are similar (I0: interpret only opticut, IV: IndVal,
 PH: phi coefficient, FR: F-ratio). Red = 1, yellow=0 (proportion passed).
 
 ```{r,echo=FALSE}
