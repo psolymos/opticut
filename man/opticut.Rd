@@ -46,8 +46,9 @@ or possible a vector for single species case) in the left-hand side,
 model terms for modifying effects in the right-hand side
 (its structure depending on the underlying functions).
 Centering the modifying terms (or choosing the origin wisely)
-is generally recommended because
-the relative abundance contrast is estimated at the origin (0).
+is generally recommended (especially for Gaussian distribution
+where linear predictors are additive on the response scale) 
+because the relative abundance contrast is estimated at the origin (0).
 }
   \item{data}{
 an optional data frame, list or environment containing the variables
