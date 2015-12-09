@@ -202,14 +202,6 @@ calculated as $log(LR)^{(m)} = l^{(m)} - l^{(0)}$.
 The best supported binary partition is
 the model with the highest log-likelihood ratio value (CITATION).
 
-The relative support for the candidate partitions can be measured
-by the log-likelihood ratio. A value of >2 means support for
-a partition over the null model, a value of >8 indicates strong support
-over the null model. Model weights can be calculated as 
-$w^{(m)} = \Delta^{(m)} / \sum_{m=1}^{M} \Delta^{(m)}$,
-where $\Delta^{(m)} = exp(l^{(m)} - max(l^{(1)}, ..., l^{(M)}))$ (Burnham & Anderson).
-
-
 ## Indicator value
 
 The indicator value ($I$) for each candidate partition can be calculated
@@ -239,18 +231,97 @@ different information that needs to be presented together
 for meaningful statistical inference. Ranking of models
 should follow $log(LR)$ (best fit) and not $I$ (largest contrast).
 
+!!! TODO: use DeCaceres 1-species example from Oikos paper to
+explain the Gaussian opticut approach.
+
+```{r}
+## Gaussian example
+library(opticut)
+(Y <- c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4))
+(z <- as.factor(rep(LETTERS[1:3], each=4)))
+
+opticut1(Y, Z=z)
+opticut1(ifelse(Y>0,1,0), Z=z, dist="binomial")
+
+print(opticut1(Y, Z=allComb(z)), cut=-Inf)
+print(opticut1(ifelse(Y>0,1,0), Z=allComb(z), dist="binomial"), cut=-Inf)
+```
 
 ## Quantifying uncertainty
 
-#### model weights
+### Model weights
 
-#### etc
+The relative support for the candidate partitions can be measured
+by the log-likelihood ratio. A value of >2 means support for
+a partition over the null model, a value of >8 indicates strong support
+over the null model. Model weights can be calculated as 
+$w^{(m)} = \Delta^{(m)} / \sum_{m=1}^{M} \Delta^{(m)}$,
+where $\Delta^{(m)} = exp(l^{(m)} - max(l^{(1)}, ..., l^{(M)}))$ (Burnham & Anderson).
 
-## simulations
+### Asymptotic (large sample) inference
+
+Describe how to get asymptotic CIs for mu0, mu1, I (but best partition is fixed). This is of little value, because we rarely test if I for one species is
+different from I for another species. Also, significance of differences between
+mu0 and mu1 (contrasts) are of little valie on their own. But one might want to 
+explore the distributions and interpret the results visually.
+
+### Bootstrap based inference
+
+Small sample based inference (CIs can be asymmetric and wider than
+asymptotics). Best partition can be fixed (same applies as for asymptotics).
+Best partition can be selected for each bootstrap iteration, thus
+giving a probabilistic measure of 'mixing'. DeCaceres also mentioned this.
+
+## Simulations
+
+K=2 case: study effect of:
+
+* contrast
+* confounding
+* noise
+* misclassification
+
+K=3 case: recovering mixing proportions using bootstrap
 
 ## Case studies
 
 # Results
+
+Confounding effect is fixed by opticut (IX),
+others are similar (I0: interept only opticut, IV: IndVal,
+PH: phi coefficient, FR: F-ratio). Red = 1, yellow=0 (proportion passed).
+
+```{r,echo=FALSE}
+load("~/Dropbox/collaborations/opticut/opticut-simuls.Rdata")
+r6v <- sapply(res6, function(z) rowMeans(z[2,,]>0))
+op <- par(mfrow=c(2,3))
+rr <- r6v[,vals2$b1==0.9 & vals2$b3==1]
+for (i in 1:5)
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-rr[i,], length(unique(vals$b2)), length(unique(vals$b4))),
+    main=rownames(rr)[i],
+    xlab="Confounding", ylab="Misclassification")
+par(op)
+```
+
+Power (pass/fail) analyzed with Binomial GLM,
+see sign & magnitude of effects and deviance table.
+b1: contrast, b2: confounding, b3: noise, b4: misclassification
+(small value: small effect etc).
+
+```{r,echo=FALSE}
+r6c <- sapply(res6, function(z) rowSums(z[2,,]>0))
+xx <- data.frame(success=as.numeric(t(r6c)), 
+    failure=B-as.numeric(t(r6c)),
+    method=rep(rownames(r6c), nrow(vals2)), vals2)
+xx$method <- relevel(xx$method, "IX")
+mm <- glm(cbind(success, failure) ~ method + (b1 + b2 + b3 + b4), xx, family=binomial)
+summary(mm)
+av <- anova(mm)
+av$Perc <- round(100 * anova(mm)$Deviance / 1041142, 2)
+sum(av$Perc, na.rm=TRUE)
+av
+```
 
 # Discussion
 
