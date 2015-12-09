@@ -1,7 +1,7 @@
 ## Simulations: K=2 case
 
-## The power of a statistical test is 
-## the probability that it correctly rejects the null hypothesis 
+## The power of a statistical test is
+## the probability that it correctly rejects the null hypothesis
 ## when the null hypothesis is false.
 
 ## Here H0 is: no significant diff among hab A and B (pval >= alpha).
@@ -16,7 +16,7 @@ library(indicspecies)
 
 B <- 200
 
-oc_sim_K2 <- 
+oc_sim_K2 <-
 function(b1=0.5, b2=0, b3=0.05, b4=0, mu0=10, n=100, pos=TRUE)
 {
     K <- 2
@@ -35,12 +35,12 @@ function(b1=0.5, b2=0, b3=0.05, b4=0, mu0=10, n=100, pos=TRUE)
     ## counteracts the habitat effect
     Conf <- runif(n,0,1) * rep(c(diff(mu), -diff(mu)), each=n/2)
     Noise <- rnorm(n, 0, 0.1*mu0)
-    Y <- Mean + b2*Conf + b3*Noise    
+    Y <- Mean + b2*Conf + b3*Noise
     if (pos)
         Y[Y < 0] <- 0
     out <- data.frame(Y=Y, h0=h0, h1=h1, i=i, x=i-mean(i),
         Mean=Mean, Conf=Conf, Noise=Noise)
-    attr(out, "settings") <- list(b1=b1, b2=b2, b3=b3, b4=b4, 
+    attr(out, "settings") <- list(b1=b1, b2=b2, b3=b3, b4=b4,
                                   K=K, n=n, mu0=mu0, pos=pos)
     out
 }
@@ -50,14 +50,14 @@ est_fun1 <- function(..., R=999, level=0.95) {
     m0 <- opticut(Y ~ 1, dat, strata=h1)$species[[1]]
     m1 <- opticut(Y ~ Conf, dat, strata=h1)$species[[1]]
     ## IndVal
-    iv <- multipatt(data.frame(spp1=dat$Y), dat$h1, func = "IndVal.g", 
+    iv <- multipatt(data.frame(spp1=dat$Y), dat$h1, func = "IndVal.g",
         duleg=TRUE, control = how(nperm=R))
     ## Phi coef
-    rg <- multipatt(data.frame(spp1=dat$Y), dat$h1, func = "r.g", 
+    rg <- multipatt(data.frame(spp1=dat$Y), dat$h1, func = "r.g",
         duleg=TRUE, control = how(nperm=R))
     ## F-ratio
     fv <- anova(lm(Y ~ h1, dat))
-    
+
     out <- matrix(NA, 5, 2)
     colnames(out) <- c("stat", "pass")
     rownames(out) <- c("I0", "IX", "IV", "PH", "FR")
@@ -80,7 +80,7 @@ est_fun1 <- function(..., R=999, level=0.95) {
     if (rg$sign[1,"s.B"] != 1)
         out[4,2] <- -out[4,2]
     ## F-ratio cannot tell which is low/high
-    t(out)    
+    t(out)
 }
 
 vals <- expand.grid(
@@ -100,27 +100,27 @@ clusterEvalQ(cl, library(opticut))
 clusterEvalQ(cl, library(indicspecies))
 
 ## contrast (I)
-res1 <- parLapply(cl, seq(0.1, 0.9, by=0.1), function(z) 
+res1 <- parLapply(cl, seq(0.1, 0.9, by=0.1), function(z)
     replicate(B, est_fun1(b1=z)))
 
 ## confounding
-res2 <- parLapply(cl, seq(0, 1, by=0.1), function(z) 
+res2 <- parLapply(cl, seq(0, 1, by=0.1), function(z)
     replicate(B, est_fun1(b2=z)))
 
 ## noise
-res3 <- parLapply(cl, seq(0.1, 1, by=0.1), function(z) 
+res3 <- parLapply(cl, seq(0.1, 1, by=0.1), function(z)
     replicate(B, est_fun1(b3=z)))
 
 ## mixing
-res4 <- parLapply(cl, seq(0, 1, by=0.1), function(z) 
+res4 <- parLapply(cl, seq(0, 1, by=0.1), function(z)
     replicate(B, est_fun1(b4=z)))
 
 ## conf & mixing
-res5 <- parLapply(cl, 1:nrow(vals), function(z) 
+res5 <- parLapply(cl, 1:nrow(vals), function(z)
     replicate(B, est_fun1(b2=vals[z,1], b4=vals[z,2])))
 
 ## all
-res6 <- parLapply(cl, 1:nrow(vals2), function(z) 
+res6 <- parLapply(cl, 1:nrow(vals2), function(z)
     replicate(B, est_fun1(b2=vals2[z,1], b4=vals2[z,2],
         b1=vals2[z,3], b3=vals2[z,4])))
 
@@ -149,21 +149,21 @@ summary(t(r1-r1v))
 op <- par(mfrow=c(2,5))
 rr <- r6v[,vals2$b1==0.1 & vals2$b3==0.1]
 for (i in 1:5)
-image(unique(vals$b2), unique(vals$b4), 
+image(unique(vals$b2), unique(vals$b4),
     matrix(-rr[i,], length(unique(vals$b2)), length(unique(vals$b4))),
     main=rownames(rr)[i],
     xlab="Confounding", ylab="Misclassification")
 
 rr <- r6v[,vals2$b1==0.9 & vals2$b3==1]
 for (i in 1:5)
-image(unique(vals$b2), unique(vals$b4), 
+image(unique(vals$b2), unique(vals$b4),
     matrix(-rr[i,], length(unique(vals$b2)), length(unique(vals$b4))),
     main=rownames(rr)[i],
     xlab="Confounding", ylab="Misclassification")
 par(op)
 
 r6c <- sapply(res6, function(z) rowSums(z[2,,]>0))
-xx <- data.frame(success=as.numeric(t(r6c)), 
+xx <- data.frame(success=as.numeric(t(r6c)),
     failure=B-as.numeric(t(r6c)),
     method=rep(rownames(r6c), nrow(vals2)), vals2)
 xx$method <- relevel(xx$method, "IX")
@@ -186,3 +186,50 @@ opticut1(ifelse(Y>0,1,0), Z=z, dist="binomial")
 
 print(opticut1(Y, Z=allComb(z)), cut=-Inf)
 print(opticut1(ifelse(Y>0,1,0), Z=allComb(z), dist="binomial"), cut=-Inf)
+
+
+allComb(z)
+rankComb(Y, matrix(1, length(Y), 1), z)
+
+set.seed(123)
+oc <- opticut(Y ~ 1, strata=z)
+uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
+#uc2 <- uncertainty(oc, 1, type="boot", B=999)
+#uc3 <- uncertainty(oc, 1, type="multi", B=999)
+
+Y <- cbind(Sp1=c(4, 6, 3, 5, 5, 6, 3, 4, 4, 1, 3, 2),
+           Sp2=c(0, 0, 0, 0, 1, 0, 0, 1, 5, 2, 3, 4),
+           Sp3=c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4))
+oc <- opticut(Y ~ 1, strata=z)
+plot(oc)
+uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
+#uc2 <- uncertainty(oc, 1, type="boot", B=999)
+#uc3 <- uncertainty(oc, 2, type="multi", B=999)
+
+
+## Binomial & uncertainty / mixing
+
+library(opticut)
+
+set.seed(1234)
+n <- 5*200
+g <- as.factor(rep(LETTERS[1:5], each=n/5))
+mu <- qlogis(c(0.2, 0.8))
+p <- numeric(n)
+p[g=="A"] <- plogis(mu[1])
+p[g=="B"] <- plogis(sample(mu, n/5, replace=TRUE, prob=c(0.75, 0.25)))
+p[g=="C"] <- plogis(sample(mu, n/5, replace=TRUE, prob=c(0.5, 0.5)))
+p[g=="D"] <- plogis(sample(mu, n/5, replace=TRUE, prob=c(0.25, 0.75)))
+p[g=="E"] <- plogis(mu[2])
+Y <- rbinom(n, 1, p)
+
+B <- 200
+BB <- replicate(B, sample.int(n, n, replace=TRUE))
+
+oc <- opticut(Y ~ 1, strata=g, dist="binomial")
+uc <- uncertainty(oc, type="multi", B=BB)
+uc$uncertainty[[1]]
+oc$species[[1]]
+wplot(uc$uncertainty[[1]])
+plot(uc$uncertainty[[1]])
+table(Y, g)
