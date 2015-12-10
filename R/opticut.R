@@ -215,12 +215,14 @@ function(Y, X, Z, dist="gaussian", ...)
         warning("Negative prediction: I-value set to NA")
         I[I < 0 | I > 1] <- NA
     }
-    out <- data.frame(assoc=h, I=I, W=W,
+    out <- data.frame(assoc=h, I=I,
+        W=W,
         null=cfnull,
         mu0=cf0, mu1=cf1,
         logL=ll, logLR=ll-res0$logLik, w=w)
     rownames(out) <- colnames(Z)
     attr(out, "logL_null") <- res0$logLik
+    attr(out, "penalty") <- getOption("ocoptions")$penalty
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else dist

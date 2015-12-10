@@ -94,6 +94,7 @@ Get the package and load it:
 ```{r}
 #devtools::install_github("psolymos/opticut")
 #devtools::install("~/repos/opticut")
+#devtools::check("~/repos/opticut")
 #devtools::build("~/repos/opticut", binary=TRUE)
 library(opticut)
 ```
@@ -328,7 +329,8 @@ Dune <- as.matrix(dune)
 #Dune <- Dune[,apply(Dune, 2, function(z) length(unique(z)))>2]
 x1 <- opticut(Dune ~ 1, dune.env, strata=Management, dist="ordered")
 summary(x1)
-plot(x1)
+
+plot(x1, mar=c(8,8,3,3))
 
 ## Binarizing data
 Dune01 <- ifelse(as.matrix(dune)>0,1,0)
