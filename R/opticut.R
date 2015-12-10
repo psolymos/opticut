@@ -200,12 +200,17 @@ function(Y, X, Z, dist="gaussian", ...)
     cf1 <- res0$linkinv(cf[,1L] + cf[,2L])
     h <- sign(cf[,2L])
     I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-    ic_null <- -2*res0$logLik
+    ## AIC weight has a penalty dependent 'midpoint'
     ## only 1 df difference, this length of coef is not important
-    ic <- cbind(id = -2*ll + getOption("ocoptions")$penalty, 
-        ic_null = -2*res0$logLik)
-    Delta <- t(apply(ic, 1, function(z) z - min(z)))
-    W <- apply(Delta, 1, function(z) exp(-0.5*z[1]) / sum(exp(-0.5*z)))
+    #ic <- cbind(ic = -2*ll + getOption("ocoptions")$penalty,
+    #    ic_null = -2*res0$logLik)
+    #Delta <- t(apply(ic, 1, function(z) z - min(z)))
+    #W <- apply(Delta, 1, function(z) exp(-0.5*z[1]) / sum(exp(-0.5*z)))
+    ## delta IC with inverse Fisher transform is more intuitive
+    ## 0 when there is no support for a partition
+    ## 1 when logLR is HUGE
+    ## this is trasformed (AIC_null - AIC_m)
+    W <- pmax(0, tanh(2*ll - 2*res0$logLik - getOption("ocoptions")$penalty))
     if (any(cf0 < 0) || any(cf1 < 0)) {
         warning("Negative prediction: I-value set to NA")
         I[I < 0 | I > 1] <- NA
@@ -357,7 +362,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         if (any(Failed)) {
             if (length(failed) == length(res))
                 stop("Bad news: opticut failed for all species.")
-            warning("Bad news: opticut failed for ", length(failed), 
+            warning("Bad news: opticut failed for ", length(failed),
                 " out of ", length(res), " species.")
         }
     } else {
