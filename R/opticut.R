@@ -289,12 +289,22 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (is.null(cl)) {
         ## show progress bar
         if (ncol(Y) > 1L && interactive()) {
-            res <- pbapply::pbapply(Y, 2, function(yy, ...)
-                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+            if (getOption("ocoptions")$try_error) {
+                res <- pbapply::pbapply(Y, 2, function(yy, ...)
+                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, ...)), ...)
+            } else {
+                res <- pbapply::pbapply(Y, 2, function(yy, ...)
+                    opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+            }
         ## do not show progress bar
         } else {
-            res <- apply(Y, 2, function(yy, ...)
-                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+            if (getOption("ocoptions")$try_error) {
+                res <- apply(Y, 2, function(yy, ...)
+                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, ...)), ...)
+            } else {
+                res <- apply(Y, 2, function(yy, ...)
+                    opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+            }
         }
     ## parallel
     } else {
@@ -308,8 +318,13 @@ comb=c("rank", "all"), cl=NULL, ...)
             assign("X", X, envir=e)
             assign("Z", X, envir=e)
             parallel::clusterExport(cl, c("X","Z","dist"), envir=e)
-            res <- parallel::parApply(cl, Y, 2, function(yy, ...)
-                opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+            if (getOption("ocoptions")$try_error) {
+                res <- parallel::parApply(cl, Y, 2, function(yy, ...)
+                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, ...)), ...)
+            } else {
+                res <- parallel::parApply(cl, Y, 2, function(yy, ...)
+                    opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+            }
             parallel::clusterEvalQ(cl, rm(list=c("X","Z","dist")))
             parallel::clusterEvalQ(cl, detach(package:opticut))
         ## forking
@@ -319,15 +334,34 @@ comb=c("rank", "all"), cl=NULL, ...)
                      "try cl as a cluster instead.")
             if (cl < 2)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
-            res <- parallel::mclapply(1:ncol(Y), function(i, ...)
-                opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...),
-                mc.cores = cl, ...)
+            if (getOption("ocoptions")$try_error) {
+                res <- parallel::mclapply(1:ncol(Y), function(i, ...)
+                    try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...)),
+                    mc.cores = cl, ...)
+            } else {
+                res <- parallel::mclapply(1:ncol(Y), function(i, ...)
+                    opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...),
+                    mc.cores = cl, ...)
+            }
         }
     }
+    if (getOption("ocoptions")$try_error) {
+        Failed <- sapply(res, inherits, "try-error")
+        failed <- names(res)[Failed]
+        if (any(Failed)) {
+            if (length(failed) == length(res))
+                stop("Bad news: opticut failed for all species.")
+            warning("Bad news: opticut failed for", length(failed), 
+                "out of", length(res), "species.")
+        }
+    } else {
+        Failed <- logical(length(res))
+        failed <- character(0)
+    }
     out <- list(call=match.call(),
-        species=res,
+        species=res[!Failed],
         X=X,
-        Y=Y,
+        Y=Y[,!Failed],
         strata=Z,
         nobs=NROW(Y),
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
@@ -336,6 +370,7 @@ comb=c("rank", "all"), cl=NULL, ...)
         dist=if (is.function(dist))
             deparse(substitute(dist)) else dist,
         comb=comb,
+        failed=failed,
         collapse=getOption("ocoptions")$collapse)
     class(out) <- "opticut"
     out

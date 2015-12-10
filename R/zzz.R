@@ -8,7 +8,8 @@
             cut=2,
             sort=TRUE,
             theme="br",
-            check_comb=TRUE))
+            check_comb=TRUE,
+            try_error=FALSE))
     invisible(NULL)
 }
 
