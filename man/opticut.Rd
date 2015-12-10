@@ -30,7 +30,7 @@ wplot(x, ...)
     las = 1, ylab = "Model weight * Association",
     xlab = "Partitions", theme, ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
-    las = 1, ylab = "Relative abundance", xlab = "Partitions",
+    las = 1, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
     theme, mar = c(5, 4, 4, 4) + 0.1, ...)
 
