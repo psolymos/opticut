@@ -367,7 +367,7 @@ comb=c("rank", "all"), cl=NULL, ...)
     out <- list(call=match.call(),
         species=res[!Failed],
         X=X,
-        Y=Y[,!Failed],
+        Y=Y[,!Failed,drop=FALSE],
         strata=Z,
         nobs=NROW(Y),
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
