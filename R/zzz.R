@@ -9,7 +9,8 @@
             sort=TRUE,
             theme="br",
             check_comb=TRUE,
-            try_error=FALSE))
+            try_error=FALSE,
+            penalty=2))
     invisible(NULL)
 }
 

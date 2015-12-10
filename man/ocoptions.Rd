@@ -36,6 +36,8 @@ Tags are the following:
   \item{try_error}{if \code{\link{opticut}} should \code{\link{try}} to exclude
   species where the models failed (\code{TRUE}), the default 
   is to stop when an error is encountered (\code{FALSE}).}
+  \item{penalty}{the penalty to be applied when calculating indicator weights,
+  the default is 2.}
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

@@ -200,11 +200,17 @@ function(Y, X, Z, dist="gaussian", ...)
     cf1 <- res0$linkinv(cf[,1L] + cf[,2L])
     h <- sign(cf[,2L])
     I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+    ic_null <- -2*res0$logLik
+    ## only 1 df difference, this length of coef is not important
+    ic <- cbind(id = -2*ll + getOption("ocoptions")$penalty, 
+        ic_null = -2*res0$logLik)
+    Delta <- t(apply(ic, 1, function(z) z - min(z)))
+    W <- apply(Delta, 1, function(z) exp(-0.5*z[1]) / sum(exp(-0.5*z)))
     if (any(cf0 < 0) || any(cf1 < 0)) {
         warning("Negative prediction: I-value set to NA")
         I[I < 0 | I > 1] <- NA
     }
-    out <- data.frame(assoc=h, I=I,
+    out <- data.frame(assoc=h, I=I, W=W,
         null=cfnull,
         mu0=cf0, mu1=cf1,
         logL=ll, logLR=ll-res0$logLik, w=w)
