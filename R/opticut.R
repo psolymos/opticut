@@ -351,8 +351,8 @@ comb=c("rank", "all"), cl=NULL, ...)
         if (any(Failed)) {
             if (length(failed) == length(res))
                 stop("Bad news: opticut failed for all species.")
-            warning("Bad news: opticut failed for", length(failed), 
-                "out of", length(res), "species.")
+            warning("Bad news: opticut failed for ", length(failed), 
+                " out of ", length(res), " species.")
         }
     } else {
         Failed <- logical(length(res))
