@@ -319,7 +319,7 @@ data(dune.env)
 dune.env$manure <- as.integer(dune.env$Manure) - 1
 dune.env$moisture <- as.integer(dune.env$Moisture) - 1
 
-oc <- ocoptions(collapse="+")
+oc <- ocoptions(collapse="+", cut=-Inf)
 
 ## ordinal regr
 ## (when nlevels() < 3 use logistic regression instead !!!
@@ -328,7 +328,7 @@ Dune <- as.matrix(dune)
 x1 <- opticut(Dune ~ 1, dune.env, strata=Management, dist="ordered")
 summary(x1)
 
-plot(x1, mar=c(8,8,3,3))
+plot(x1, mar=c(5,5,3,3))
 
 ## Binarizing data
 Dune01 <- ifelse(as.matrix(dune)>0,1,0)
