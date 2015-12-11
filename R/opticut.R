@@ -102,7 +102,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                     mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
                         method="logistic", ...)
                 }
-                cf <- c(0, coef(mod))
+                cf <- c(mod$zeta[1], coef(mod))
             } else {
                 mod <- stats::glm(Y ~ .-1, data=XX, family=binomial("logit"), ...)
                 cf <- coef(mod)
@@ -199,7 +199,7 @@ function(Y, X, Z, dist="gaussian", ...)
     cf0 <- res0$linkinv(cf[,1L])
     cf1 <- res0$linkinv(cf[,1L] + cf[,2L])
     h <- sign(cf[,2L])
-    I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+
     ## AIC weight has a penalty dependent 'midpoint'
     ## only 1 df difference, this length of coef is not important
     #ic <- cbind(ic = -2*ll + getOption("ocoptions")$penalty,
@@ -210,13 +210,23 @@ function(Y, X, Z, dist="gaussian", ...)
     ## 0 when there is no support for a partition
     ## 1 when logLR is HUGE
     ## this is trasformed (AIC_null - AIC_m)
-    W <- pmax(0, tanh(2*ll - 2*res0$logLik - getOption("ocoptions")$penalty))
-    if (any(cf0 < 0) || any(cf1 < 0)) {
-        warning("Negative prediction: I-value set to NA")
-        I[I < 0 | I > 1] <- NA
-    }
+    #W <- pmax(0, tanh(2*ll - 2*res0$logLik - getOption("ocoptions")$penalty))
+
+    ## problem with prediction based I is that
+    ## - it depends on covariates if not centered
+    ## - ordered intercept can be ill-defined in some cases
+#    I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+#    if (any(cf0 < 0) || any(cf1 < 0)) {
+#        warning("Negative prediction: I-value set to NA")
+#        I[I < 0 | I > 1] <- NA
+#    }
+    ## we want model based I (i.e. not mean(Y|z))
+    ## thus the 0-1 rescaled version of \beta_1
+    ## this is independent from linkinv scaling (and covariates in some sense)
+    ## thus comparable across species AND across studies
+    I <- tanh(abs(cf[,2L]))
+
     out <- data.frame(assoc=h, I=I,
-        W=W,
         null=cfnull,
         mu0=cf0, mu1=cf1,
         logL=ll, logLR=ll-res0$logLik, w=w)

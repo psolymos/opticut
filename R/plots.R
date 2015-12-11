@@ -146,9 +146,14 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
         xx <- xx[xx$logLR >= cut, , drop=FALSE]
     }
     MinVal <- 0.01
-    xx$h0 <- pmin(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
+    ## when I is based on predictions (using linkinv)
+#    xx$h0 <- pmin(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
+#    xx$h1 <- pmax(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
+    ## when I is based on \beta_1
+    xx$h0 <- 1 - xx$I
+    xx$h1 <- xx$I
+
     xx$h0[xx$h0 < MinVal] <- MinVal
-    xx$h1 <- pmax(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
     xx$h0[is.na(xx$I)] <- MinVal
     xx$h1[is.na(xx$I)] <- MinVal
     n <- nrow(bp)
