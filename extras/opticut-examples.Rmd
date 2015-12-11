@@ -243,7 +243,7 @@ ocoptions(oc) # restore defaults
 
 BCI data
 
-```{r}
+```{r, eval=FALSE}
 library (vegan)
 data (BCI)
 library (BiodiversityR)  # available from R version 2.15.1, not older!
@@ -252,8 +252,6 @@ BCI.soil <- read.delim ('http://www.davidzeleny.net/anadat-r/lib/exe/fetch.php?m
 ###
 BCI.hab <- read.table("http://www.kharms.biology.lsu.edu/TORUS_Habitats.txt",
     sep="\t", header=TRUE)
-
-
 ```
 
 
@@ -376,10 +374,12 @@ varechem$grazing <- as.factor(ifelse(rownames(varechem) %in% c(5,6,7,8,13,14,15,
 x <- opticut(y ~ 1, varechem, strata=grazing, dist="beta")
 summary(x)
 plot(x, cut=-Inf)
+```
 
 
-## implement ZI-Beta (quite unreliable for such small data set)
+Implement ZI-Beta (quite unreliable for such small data set)
 
+```{r,eval=FALSE}
 zi_beta_fun <- function(Y, X, linkinv, ...) {
     kx <- ncol(X)
     id1 <- Y > 0
@@ -412,15 +412,6 @@ range(y[y>0])
 y <- y[,apply(y, 2, max) > 0.05]
 zi_beta_fun(y[,3], data.frame(matrix(1, nrow(y), 1)))
 opticut1(y[,1], matrix(1, nrow(y), 1), varechem$grazing, dist=zi_beta_fun)
-aa=t(sapply(1:ncol(y), function(i) zi_beta_fun(yy[,i], data.frame(matrix(1, nrow(yy), 1)))$coef))
-
-yy <- rbind(y,y,y,y,y)
-gr <- rep(varechem$grazing, 5)
-x <- opticut(yy ~ 1, strata=gr, dist=zi_beta_fun)
-summary(x)
-plot(x, cut=-Inf)
-
-
 ```
 
 
