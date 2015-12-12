@@ -210,7 +210,7 @@ function(Y, X, Z, dist="gaussian", ...)
     ## 0 when there is no support for a partition
     ## 1 when logLR is HUGE
     ## this is trasformed (AIC_null - AIC_m)
-    W <- pmax(0, tanh(2*ll - 2*res0$logLik - getOption("ocoptions")$penalty))
+    #W <- pmax(0, tanh(2*ll - 2*res0$logLik - getOption("ocoptions")$penalty))
 
     ## problem with prediction based I is that
     ## - it depends on covariates if not centered
@@ -227,8 +227,6 @@ function(Y, X, Z, dist="gaussian", ...)
     I <- tanh(abs(cf[,2L]))
 
     out <- data.frame(assoc=h, I=I,
-        W=W,
-        IW=I*W,
         null=cfnull,
         mu0=cf0, mu1=cf1,
         logL=ll, logLR=ll-res0$logLik, w=w)
