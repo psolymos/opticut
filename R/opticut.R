@@ -224,15 +224,17 @@ function(Y, X, Z, dist="gaussian", ...)
     ## thus the 0-1 rescaled version of \beta_1
     ## this is independent from linkinv scaling (and covariates in some sense)
     ## thus comparable across species AND across studies
-    I <- tanh(abs(cf[,2L]))
+#    I <- tanh(abs(cf[,2L]))
 
-    out <- data.frame(assoc=h, I=I,
+    out <- data.frame(assoc=h,
+        I=tanh(abs(cf[,2L])),
+#        I=2*(plogis(abs(cf[,2L]))-0.5),
         null=cfnull,
         mu0=cf0, mu1=cf1,
         logL=ll, logLR=ll-res0$logLik, w=w)
     rownames(out) <- colnames(Z)
     attr(out, "logL_null") <- res0$logLik
-    attr(out, "penalty") <- getOption("ocoptions")$penalty
+#    attr(out, "penalty") <- getOption("ocoptions")$penalty
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else dist

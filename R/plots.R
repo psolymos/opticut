@@ -145,19 +145,6 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
         bp <- bp[xx$logLR >= cut, , drop=FALSE]
         xx <- xx[xx$logLR >= cut, , drop=FALSE]
     }
-    MinVal <- 0.01
-    MaxVal <- 1 - MinVal
-    ## when I is based on predictions (using linkinv)
-#    xx$h0 <- pmin(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
-#    xx$h1 <- pmax(xx$mu0, xx$mu1) / (xx$mu0 + xx$mu1)
-    ## when I is based on \beta_1
-    xx$h1 <- round(xx$I, 2)
-    xx$h0 <- 1 - xx$h1
-
-    xx$h0[xx$h0 < MinVal] <- MinVal
-    xx$h1[xx$h1 > MaxVal] <- MaxVal
-    xx$h0[is.na(xx$I)] <- MinVal
-    xx$h1[is.na(xx$I)] <- MinVal
     n <- nrow(bp)
     p <- ncol(bp)
     op <- par(las=las, mar=mar)
@@ -175,17 +162,16 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
     if (show_I)
         axis(4, at=seq_len(n)-0.5,
             labels=format(round(xx$I, 2), nsmall=2), tick=FALSE)
-    Cols <- occolors(theme)(101)
-    Br <- seq(0, 1, length=101)
+    Cols <- occolors(theme)(100)
     if (hr)
         abline(h=1:n-0.5, col=Cols[1L])
     for (i in seq_len(n)) {
         for (j in seq_len(p)) {
             h <- if (bp[i,j] == 1)
-                xx$h1[i] else xx$h0[i]
-            Col <- Cols[which.min(h >= Br)[1L]]
+                0.5*xx$I[i]+0.5 else 0.5*(1-xx$I[i])
+            ColID <- as.integer(pmin(pmax(1, floor(h * 100) + 1), 100))
             polygon(c(0,1,1,0)+j-1, 0.45*c(-h,-h,h,h)+i-0.5,
-                col=Col, border=NA)
+                col=Cols[ColID], border=NA)
         }
     }
     box(col="grey")
