@@ -323,12 +323,12 @@ oc <- ocoptions(collapse="+", cut=-Inf)
 
 ## ordinal regr
 ## (when nlevels() < 3 use logistic regression instead !!!
-Dune <- as.matrix(dune)
+#Dune <- as.matrix(dune)
 #Dune <- Dune[,apply(Dune, 2, function(z) length(unique(z)))>2]
-x1 <- opticut(Dune ~ 1, dune.env, strata=Management, dist="ordered")
-summary(x1)
+#x1 <- opticut(Dune ~ 1, dune.env, strata=Management, dist="ordered")
+#summary(x1)
 
-plot(x1, mar=c(5,5,3,3))
+#plot(x1, mar=c(5,5,3,3))
 
 ## Binarizing data
 Dune01 <- ifelse(as.matrix(dune)>0,1,0)
@@ -348,12 +348,12 @@ x5 <- opticut(Dune2 ~ manure, dune.env, strata=dune.env$Management, dist="beta")
 summary(x5)
 plot(x5)
 
-xx <- data.frame(ord0=summary(x1)$summary$split,
+xx <- data.frame(#ord0=summary(x1)$summary$split,
     bin0=summary(x2)$summary$split,
     binx=summary(x3)$summary$split,
     bet0=summary(x4)$summary$split,
     betx=summary(x5)$summary$split)
-rownames(xx) <- rownames(summary(x1)$summary)
+rownames(xx) <- rownames(summary(x2)$summary)
 xx
 ocoptions(oc)
 ```
