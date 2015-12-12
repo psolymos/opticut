@@ -299,15 +299,27 @@ comb=c("rank", "all"), cl=NULL, ...)
     }
     Y <- data.matrix(Y)
 
-    ## sanity check for rsf/rspf
-    if (!is.function(dist) && dist %in% c("rsf", "rspf")) {
-        if (ncol(Y) > 1L)
-            stop("rsf/rspf is only available for single species in RHS")
-        if (identical(as.character(ff[[2]]), "1"))
-            stop("invalid formula, no covariates")
-        factonly <- all(unique(sapply(mf, .MFclass)[-1]) %in% c("ordered", "factor"))
-        if (factonly && dist == "rspf")
-            stop("provide at least 1 continuous covariate for RSPF")
+    if (!is.function(dist)) {
+        Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1]][1]
+        Dist <- match.arg(Dist,
+            c("gaussian","poisson","binomial","negbin",
+            "beta","zip","zinb","ordered", "rsf", "rspf",
+            "zip2", "zinb2"))
+        ## sanity check for rsf/rspf
+        if (Dist %in% c("rsf", "rspf")) {
+            if (ncol(Y) > 1L)
+                stop("rsf/rspf is only available for single species in RHS")
+            if (identical(as.character(ff[[2]]), "1"))
+                stop("invalid formula, no covariates")
+            factonly <- all(unique(sapply(mf, .MFclass)[-1]) %in% c("ordered", "factor"))
+            if (factonly && dist == "rspf")
+                stop("provide at least 1 continuous covariate for RSPF")
+        }
+        ## sanity check for rsf/rspf
+        if (Dist == "ordered") {
+            if (ncol(Y) > 1L)
+                stop("ordered is only available for single species in RHS")
+        }
     }
 
     ## sequential
