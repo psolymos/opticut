@@ -231,6 +231,7 @@ function(Y, X, Z, dist="gaussian", ...)
 #        I=2*(plogis(abs(cf[,2L]))-0.5),
         null=cfnull,
         mu0=cf0, mu1=cf1,
+        beta0=cf[,1L], beta1=cf[,2L],
         logL=ll, logLR=ll-res0$logLik, w=w)
     rownames(out) <- colnames(Z)
     attr(out, "logL_null") <- res0$logLik
