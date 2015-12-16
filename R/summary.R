@@ -162,7 +162,7 @@ function(object, level=0.95, ...)
     ucl <- lapply(object$uncertainty, function(z)
         rev(sort(table(z$best)))[1L] / (object$B + 1))
     object$uctab <- data.frame(split=sapply(ucl, names),
-        w=unname(unlist(ucl)),
+        p=unname(unlist(ucl)),
         I=object$summary$I,
         lower=ucq[1L,], upper=ucq[2L,])
     object$level <- level
