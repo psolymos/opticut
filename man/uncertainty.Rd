@@ -96,8 +96,8 @@ lam <- exp(0.5 + 1*x1 + -0.2*x2)
 Y <- rpois(n, lam)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
-uc1 <- uncertainty(oc, type="asymp", B=1000)
-uc2 <- uncertainty(oc, type="boot", B=20)
+uc1 <- uncertainty(oc, type="asymp", B=999)
+uc2 <- uncertainty(oc, type="boot", B=19)
 ## use user-supplied indices
 B <- replicate(20, sample.int(n, replace=TRUE))
 uc3 <- uncertainty(oc, type="multi", B=B)

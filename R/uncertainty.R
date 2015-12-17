@@ -42,7 +42,6 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         }
     }
     if (type == "boot") {
-        bm <- rownames(obj)[k]
         cf <- if (pb) {
             t(pbapply::pbapply(BB, 2, function(z) {
                 .extractOpticut(object, which,
@@ -51,13 +50,6 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                     full_model=FALSE,
                     best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
-#            t(pbapply::pbsapply(seq_len(B), function(z) {
-#                .extractOpticut(object, which,
-#                    boot=TRUE,
-#                    internal=TRUE,
-#                    full_model=FALSE,
-#                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
-#            }))
         } else {
             t(apply(BB, 2, function(z) {
                 .extractOpticut(object, which,
@@ -66,13 +58,6 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                     full_model=FALSE,
                     best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
-#            t(sapply(seq_len(B), function(z) {
-#                .extractOpticut(object, which,
-#                    boot=TRUE,
-#                    internal=TRUE,
-#                    full_model=FALSE,
-#                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
-#            }))
         }
         cf <- rbind(coef(m1)[c(1L, 2L)], cf)
         cf0 <- linkinv(cf[,1L])
@@ -98,10 +83,6 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                 boot=BB[,j],
                 internal=FALSE,
                 best=FALSE, ...)[[1L]]
-#            mod <- .extractOpticut(object, which,
-#                boot=TRUE,
-#                internal=FALSE,
-#                best=FALSE, ...)[[1L]]
             k <- which.max(mod$logLR)
             bm[j + 1L] <- rownames(mod)[k]
             tmp <- as.numeric(mod[k, -1L])
@@ -119,9 +100,6 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     attr(out, "collapse") <- object$collapse
     out
 }
-#str(.uncertaintyOpticut1(oc, 1, type="asymp", B=1000))
-#str(.uncertaintyOpticut1(oc, 1, type="boot", B=20))
-#str(.uncertaintyOpticut1(oc, 1, type="multi", B=20))
 
 uncertainty <- function (object, ...)
     UseMethod("uncertainty")

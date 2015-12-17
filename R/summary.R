@@ -156,9 +156,9 @@ function(x, ...)
 summary.uncertainty <-
 function(object, level=0.95, ...)
 {
-    p <- c((1-level)/2, 1-(1-level)/2)
+    prob <- c((1-level)/2, 1-(1-level)/2)
     ucq <- sapply(object$uncertainty, function(z)
-        quantile(z$I, p))
+        quantile(z$I, prob))
     ucl <- lapply(object$uncertainty, function(z)
         rev(sort(table(z$best)))[1L] / (object$B + 1))
     object$uctab <- data.frame(split=sapply(ucl, names),
