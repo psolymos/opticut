@@ -579,6 +579,40 @@ opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")$species
 opticut(Y ~ x2, strata=x0, dist="poisson", offset=log(A), comb="rank")$species
 ```
 
+## GAM models
+
+```{r}
+library(mgcv)
+library(detect)
+data(oven)
+oven$veg <- factor(NA, c("agr","open","decid","conif", "mix"))
+oven$veg[oven$pforest < 0.5] <- "open"
+oven$veg[oven$pagri > 0.5 & oven$pforest < 0.5] <- "agr"
+oven$veg[oven$pforest >= 0.5] <- "mix"
+oven$veg[oven$pforest >= 0.5 & oven$pdecid >= 0.8] <- "decid"
+oven$veg[oven$pforest >= 0.5 & oven$pdecid < 0.2] <- "conif"
+table(oven$veg, useNA="always")
+oven$xlat <- scale(oven$lat)
+oven$xlong <- scale(oven$long)
+gamfun <- function(Y, X, linkinv, Data, ...) {
+    X <- as.matrix(X)
+    m <- mgcv::gam(Y ~ X-1 + s(xlat) + s(xlong), Data, ...)
+    list(coef=coef(m),
+        logLik=logLik(m),
+        linkinv=family(m)$linkinv)
+}
+x <- ifelse(oven$veg=="agr",1,0)
+X <- model.matrix(~x)
+gamfun(oven$count, X, Data=oven, family=poisson)
+print(opticut1(oven$count, X=X[,1,drop=FALSE], oven$veg, dist=gamfun, 
+    Data=oven, family=poisson), cut=-Inf)
+
+o <- opticut(count ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=poisson)
+summary(o)
+o <- opticut(count ~ 1, oven, strata=veg, dist="poisson")
+summary(o)
+```
+
 # Finding best partitions
 
 It is useful to access the best binary partition
