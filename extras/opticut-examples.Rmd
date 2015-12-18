@@ -611,6 +611,11 @@ o <- opticut(count ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=poisson
 summary(o)
 o <- opticut(count ~ 1, oven, strata=veg, dist="poisson")
 summary(o)
+oven$pa <- ifelse(oven$count > 0, 1, 0)
+o <- opticut(pa ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=binomial)
+summary(o)
+o <- opticut(pa ~ 1, oven, strata=veg, dist="binomial")
+summary(o)
 ```
 
 # Finding best partitions
