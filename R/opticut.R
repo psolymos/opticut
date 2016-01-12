@@ -279,6 +279,10 @@ comb=c("rank", "all"), cl=NULL, ...)
     if (is.null(dim(strata))) {
         if (nchar(getOption("ocoptions")$collapse) < 1)
             stop("nchar(getOption('ocoptions')$collapse) must be > 0")
+        if (is.ordered(strata)) {
+            warning("ordering in strata ignored")
+            class(strata) <- "factor"
+        }
         strata <- droplevels(as.factor(strata)) # factor
         ## make syntactically valid names
         #levels(strata) <- make.names(levels(strata), unique = TRUE)
