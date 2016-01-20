@@ -1,4 +1,4 @@
-export("opticut", "optilevel", "opticut1",
+export("opticut", "optilevel", "opticut1", "wrsi",
     "ocoptions", "occolors",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "uncertainty", "wplot")
