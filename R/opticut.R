@@ -405,12 +405,15 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         Failed <- logical(length(res))
         failed <- character(0)
     }
+    NOBS <- if (is.null(sset))
+        NROW(Y) else NROW(data.matrix(Y)[sset,,drop=FALSE])
     out <- list(call=match.call(),
         species=res[!Failed],
         X=X,
         Y=Y[,!Failed,drop=FALSE],
         strata=Z,
         nobs=NROW(Y),
+        sset=sset,
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
             (nlevels(Z) - 1L) else ncol(Z),
         collapse=getOption("ocoptions")$collapse,
