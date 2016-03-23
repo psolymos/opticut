@@ -154,7 +154,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
 ## X is model matrix for nuisance variables
 ## Z is design matrix for binary splits or a factor (using rankComb)
 opticut1 <-
-function(Y, X, Z, dist="gaussian", ...)
+function(Y, X, Z, dist="gaussian", sset=NULL, ...)
 {
     if (missing(X))
         X <- matrix(1, length(Y), 1)
@@ -183,6 +183,11 @@ function(Y, X, Z, dist="gaussian", ...)
         rownames(Z) <- apply(Z, 1, paste, collapse="")
     }
     N <- ncol(Z)
+    if (!is.na(sset)) {
+        Y <- Y[sset]
+        X <- X[sset,,drop=FALSE]
+        Z <- Z[sset,,drop=FALSE]
+    }
     res0 <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf <- matrix(0, N, length(res0$coef)+1)
     rownames(cf) <- colnames(Z)
@@ -248,7 +253,7 @@ function(Y, X, Z, dist="gaussian", ...)
 ## this is the main user interface
 opticut <-
 function(formula, data, strata, dist="gaussian",
-comb=c("rank", "all"), cl=NULL, ...)
+comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
 {
     comb <- match.arg(comb)
     if (missing(data))
@@ -333,19 +338,19 @@ comb=c("rank", "all"), cl=NULL, ...)
         if (ncol(Y) > 1L && interactive()) {
             if (getOption("ocoptions")$try_error) {
                 res <- pbapply::pbapply(Y, 2, function(yy, ...)
-                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, ...)), ...)
+                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
             } else {
                 res <- pbapply::pbapply(Y, 2, function(yy, ...)
-                    opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+                    opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
             }
         ## do not show progress bar
         } else {
             if (getOption("ocoptions")$try_error) {
                 res <- apply(Y, 2, function(yy, ...)
-                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, ...)), ...)
+                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
             } else {
                 res <- apply(Y, 2, function(yy, ...)
-                    opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+                    opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
             }
         }
     ## parallel
@@ -362,10 +367,10 @@ comb=c("rank", "all"), cl=NULL, ...)
             parallel::clusterExport(cl, c("X","Z","dist"), envir=e)
             if (getOption("ocoptions")$try_error) {
                 res <- parallel::parApply(cl, Y, 2, function(yy, ...)
-                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, ...)), ...)
+                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
             } else {
                 res <- parallel::parApply(cl, Y, 2, function(yy, ...)
-                    opticut1(Y=yy, X=X, Z=Z, dist=dist, ...), ...)
+                    opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
             }
             parallel::clusterEvalQ(cl, rm(list=c("X","Z","dist")))
             parallel::clusterEvalQ(cl, detach(package:opticut))
@@ -378,11 +383,11 @@ comb=c("rank", "all"), cl=NULL, ...)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             if (getOption("ocoptions")$try_error) {
                 res <- parallel::mclapply(1:ncol(Y), function(i, ...)
-                    try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...)),
+                    try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)),
                     mc.cores = cl, ...)
             } else {
                 res <- parallel::mclapply(1:ncol(Y), function(i, ...)
-                    opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, ...),
+                    opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...),
                     mc.cores = cl, ...)
             }
         }

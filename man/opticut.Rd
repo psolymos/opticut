@@ -18,9 +18,9 @@ model selection. Possibly controlling for modifying/confounding
 variables. The general algorithm is described in Kemencei et al. 2014.
 }
 \usage{
-opticut1(Y, X, Z, dist = "gaussian", ...)
+opticut1(Y, X, Z, dist = "gaussian", sset=NULL, ...)
 opticut(formula, data, strata, dist = "gaussian",
-    comb = c("rank", "all"), cl = NULL, ...)
+    comb = c("rank", "all"), sset=NULL, cl = NULL, ...)
 
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut,
@@ -47,7 +47,7 @@ model terms for modifying effects in the right-hand side
 (its structure depending on the underlying functions).
 Centering the modifying terms (or choosing the origin wisely)
 is generally recommended (especially for Gaussian distribution
-where linear predictors are additive on the response scale) 
+where linear predictors are additive on the response scale)
 because the relative abundance contrast is estimated at the origin (0).
 }
   \item{data}{
@@ -71,6 +71,9 @@ See Details and Examples.
 character, how to define the binary partitions.
 \code{"rank"} uses \code{\link{rankComb}},
 \code{"all"} uses \code{\link{allComb}}.
+}
+  \item{sset}{
+an optional vector specifying a subset of observations to be used in the fitting process. \code{NULL} means no subset taken.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel computations
