@@ -183,7 +183,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         rownames(Z) <- apply(Z, 1, paste, collapse="")
     }
     N <- ncol(Z)
-    if (!is.na(sset)) {
+    if (!is.null(sset)) {
         Y <- Y[sset]
         X <- X[sset,,drop=FALSE]
         Z <- Z[sset,,drop=FALSE]
