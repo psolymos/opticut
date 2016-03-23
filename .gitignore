@@ -1,14 +1,21 @@
-# History files
-.Rhistory
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
 
-# Example code in package build process
-*-Ex.R
+# Folder config file
+Desktop.ini
 
-# R data files from past sessions
-.Rdata
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
 
-# RStudio files
-.Rproj.user/
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
 
 # =========================
 # Operating System Files
@@ -35,24 +42,8 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-# Windows
-# =========================
-
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
-
-# Folder config file
-Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
+## R related files
+*.Rdata
+*.Rhistory
+.Rproj.user*
+.Rproj.user
