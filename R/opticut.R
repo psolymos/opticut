@@ -412,7 +412,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         X=X,
         Y=Y[,!Failed,drop=FALSE],
         strata=Z,
-        nobs=NROW(Y),
+        nobs=NOBS,
         sset=sset,
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
             (nlevels(Z) - 1L) else ncol(Z),
