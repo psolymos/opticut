@@ -200,7 +200,7 @@ function(x, ...)
 ## use oComb(attr(x, "est")) to get habitats
 ## return B x K matrix (0,1)
 wplot.uncertainty1 <-
-function(x, ylab, ...)
+function(x, ylab, plot=TRUE, ...)
 {
     if (missing(ylab))
         ylab <- "Selection"
@@ -212,9 +212,11 @@ function(x, ylab, ...)
             attr(x, "collapse"), fixed=TRUE)[[1L]]
         mat[i,j] <- 1L
     }
-    f <- rev(sort(colSums(mat) / nrow(x)))
-    barplot(f, col=rev(occolors()(length(f))),
-        ylim=c(0,1), ylab=ylab, ...)
-    box()
+    if (plot) {
+        f <- rev(sort(colSums(mat) / nrow(x)))
+        barplot(f, col=rev(occolors()(length(f))),
+            ylim=c(0,1), ylab=ylab, ...)
+        box()
+    }
     invisible(mat)
 }

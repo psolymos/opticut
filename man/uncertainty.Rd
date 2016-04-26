@@ -21,7 +21,7 @@ uncertainty(object, ...)
 
 \method{print}{uncertainty1}(x, ...)
 \method{plot}{uncertainty1}(x, ...)
-\method{wplot}{uncertainty1}(x, ylab, ...)
+\method{wplot}{uncertainty1}(x, ylab, plot = TRUE, ...)
 \method{print}{uncertainty}(x, ...)
 \method{print}{summary.uncertainty}(x, ...)
 \method{summary}{uncertainty}(object, level = 0.95, ...)
@@ -65,6 +65,9 @@ an object to be printed or plotted.
   \item{ylab}{
 label for the y axis.
 }
+  \item{plot}{
+logical, if a plot is to be drawn or not.
+}
   \item{level}{
 the confidence level required.
 }
@@ -79,6 +82,8 @@ output as elements (object class 'uncertainty1').
 Each 'uncertainty1' output is a data frame with 4 columns:
 \code{best} partition, indicator value \code{I},
 and expected values \code{mu0}, and \code{mu1}.
+
+Plot methods invisibly return data that was plotted.
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
@@ -115,6 +120,8 @@ plot(uc3$uncertainty[[1]])
 ## selection frequencies for partitions
 ## (only for type = 'multi')
 wplot(uc3$uncertainty[[1]])
+## selection frequencies are based on this matrix:
+wplot(uc3$uncertainty[[1]], plot=FALSE)
 }
 \keyword{ manip }
 \keyword{ models }
