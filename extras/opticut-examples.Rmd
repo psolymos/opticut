@@ -42,7 +42,7 @@ values (0, 1). The superscript $m = 1, ..., M$ indicates a possible combination 
 There can also be other site descriptors denoted as $x_{ij}$
 taking discrete or continuous values ($j = 1, ..., p$; number of predictors).
 
-A suitable parametric model describe the
+A suitable parametric model describes the
 relationship between the observations and the site descriptors
 through the probability density function 
 $P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$ 
@@ -69,7 +69,8 @@ calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
 The best supported binary partition is
 the model with the highest log-likelihood ratio value.
 
-The indicator value ($I$) for each candidate partition can be calculated
+One way of calculating the indicator value for each 
+candidate partition is 
 based on expected values using the inverse link function as 
 $\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and 
 $\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
@@ -78,6 +79,22 @@ Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and
 $\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
 for the observations given the binary partition $z_{i}^{(m)}$
 and at 0 value for all $x_{ij}$. 
+This approach can be sensitive to the range of values supported
+by the link function. For example it works nicely with logarithmic
+or logistic link function where non-negativity of predicted values
+is ensured by definition. This is, however, not the case for the
+identity link in the Gaussian case, when negative values can
+invaludate the indicator value calculations as described above.
+
+As an alternative, one can use the estimate $\beta_{1}^{(m)}$ itself
+to express the contrast between the two strata.
+We used the hyperbolic tangent function (or inverse Fisher's $z$ transform)
+to scale the real valued
+$\beta_{1}^{(m)}$ into the unit range (0-1):
+$I = tanh(\mid \beta_{1}^{(m)} \mid) = \frac{exp(2 \mid \beta_{1}^{(m)} \mid) - 1}{exp(2 \mid \beta_{1}^{(m)} \mid) + 1}$.
+Positive and negative cases are taken as absolute values, so that
+the index reflects only the contrast between strata, and not the
+direction of it (negative value can happen when using all combinations).
 
 ## Finding all possible binary partitions
 
@@ -669,6 +686,7 @@ uc3$uncertainty[[1]]
 
 plot(uc3$uncertainty[[1]])
 wplot(uc3$uncertainty[[1]])
+(wplot(uc3$uncertainty[[1]], plot=FALSE))
 
 ## performance comparisons for 10 species
 YYY <- cbind(Y, Y, Y, Y, Y, Y, Y, Y, Y, Y)

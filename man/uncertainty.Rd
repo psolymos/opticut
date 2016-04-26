@@ -121,7 +121,7 @@ plot(uc3$uncertainty[[1]])
 ## (only for type = 'multi')
 wplot(uc3$uncertainty[[1]])
 ## selection frequencies are based on this matrix:
-wplot(uc3$uncertainty[[1]], plot=FALSE)
+(wplot(uc3$uncertainty[[1]], plot=FALSE))
 }
 \keyword{ manip }
 \keyword{ models }
