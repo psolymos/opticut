@@ -156,15 +156,21 @@ function(x, ...)
 summary.uncertainty <-
 function(object, level=0.95, ...)
 {
-    prob <- c((1-level)/2, 1-(1-level)/2)
-    ucq <- sapply(object$uncertainty, function(z)
-        quantile(z$I, prob))
+    prob <- c((1-level)/2, 0.5, 1-(1-level)/2)
     ucl <- lapply(object$uncertainty, function(z)
         rev(sort(table(z$best)))[1L] / (object$B + 1))
+#    ucq <- sapply(object$uncertainty, function(z)
+#        quantile(z$I, prob))
+    ucq <- sapply(1:length(ucl), function(i) {
+        z <- object$uncertainty[[i]]
+        j <- z$best == names(ucl[[i]])
+        c(mean(z$I[j]), quantile(z$I[j], prob))
+    })
+    rownames(ucq) <- c("Mean", "Lower", "Median", "Upper")
     object$uctab <- data.frame(split=sapply(ucl, names),
-        p=unname(unlist(ucl)),
-        I=object$summary$I,
-        lower=ucq[1L,], upper=ucq[2L,])
+        p=unname(unlist(ucl)), t(ucq))
+#        I=object$summary$I,
+#        lower=ucq[1L,], upper=ucq[2L,])
     object$level <- level
     class(object) <- "summary.uncertainty"
     object
