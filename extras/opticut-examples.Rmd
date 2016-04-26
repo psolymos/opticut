@@ -85,16 +85,19 @@ or logistic link function where non-negativity of predicted values
 is ensured by definition. This is, however, not the case for the
 identity link in the Gaussian case, when negative values can
 invaludate the indicator value calculations as described above.
+(This usually happens when confounding variables are not centered
+and the intercept then reflects that difference as part of the baseline.)
 
 As an alternative, one can use the estimate $\beta_{1}^{(m)}$ itself
 to express the contrast between the two strata.
+This also makes the index more comparable when different link functions are used.
 We used the hyperbolic tangent function (or inverse Fisher's $z$ transform)
 to scale the real valued
 $\beta_{1}^{(m)}$ into the unit range (0-1):
 $I = tanh(\mid \beta_{1}^{(m)} \mid) = \frac{exp(2 \mid \beta_{1}^{(m)} \mid) - 1}{exp(2 \mid \beta_{1}^{(m)} \mid) + 1}$.
 Positive and negative cases are taken as absolute values, so that
 the index reflects only the contrast between strata, and not the
-direction of it (negative value can happen when using all combinations).
+direction of it. Negative value can happen when using all combinations.
 
 ## Finding all possible binary partitions
 
