@@ -95,10 +95,15 @@ or a design matrix (custom matrix or as returned by \code{\link{allComb}}.
 object to plot, print, summarize.
 }
   \item{cut}{
-log likelihood ratio value for showing species.
+log likelihood ratio value to be used as a cut-off for showing species
+whose log likelihood ratio is not less than the cut-off.
 }
   \item{sort}{
-logical, if species should be sorted by indicator values in the output.
+logical value indicating if species/partitions
+should be meaningfully sorted, the default is \code{TRUE}.
+It can take numeric value when only species (\code{1})
+or partitions (\code{2}) are to be sorted (\code{1:2} is equivalent to
+\code{TRUE}, wile any other numeric value is equivalent to \code{FALSE}).
 }
   \item{show_I}{
 logical, if indicator values should be shown.

@@ -27,7 +27,10 @@ Tags are the following:
   values are excluded from summaries and plots,
   the default is \code{2}.}
   \item{sort}{logical value indicating if species/partitions
-  should be meaningfully sorted, the default is \code{TRUE}.}
+  should be meaningfully sorted, the default is \code{TRUE}.
+  It can take numeric value when only species (\code{1})
+  or partitions (\code{2}) are to be sorted (\code{1:2} is equivalent to
+  \code{TRUE}, wile any other numeric value is equivalent to \code{FALSE}).}
   \item{theme}{the color theme to be used based on \code{\link{occolors}},
   the default is \code{"br"}.}
   \item{check_comb}{check the design matrices for complementary partitions
