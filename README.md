@@ -9,6 +9,13 @@ variables as described in Kemencei et al. (2014).
 
 [![Build Status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut)
 
+## Install
+
+```
+library(devtools)
+install_github("psolymos/opticut")
+```
+
 ## Report a problem
 
 Use the [issue tracker](https://github.com/psolymos/opticut/issues)
