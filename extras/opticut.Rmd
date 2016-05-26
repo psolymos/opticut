@@ -3,11 +3,11 @@ title: "Likelihood based optimal partitioning for indicator species analysis"
 author: "Peter Solymos, Ermias T. Azeria. et al."
 date: "December 7, 2015"
 output:
-  word_document: default
   pdf_document:
     keep_tex: no
     number_sections: no
     toc: no
+  word_document: default
 ---
 
 # Introduction
@@ -412,5 +412,6 @@ Trends Ecol. Evol. 13: 46-47.
 
 Jancey, R.C. 1979. Species ordering on a variance criterion. 
 Vegetatio 39: 59--63.
+
 
 
