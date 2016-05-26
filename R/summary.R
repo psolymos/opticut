@@ -14,10 +14,13 @@ print.opticut1 <- function(x, cut, sort, digits, ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
-    if (missing(sort))
-        sort <- getOption("ocoptions")$sort
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
+    if (missing(sort))
+        sort <- getOption("ocoptions")$sort
+    ## sorting only rows/species here
+    sort <- if (is.logical(sort))
+        sort[1L] else 1 %in% sort
     xx <- x
     xx$assoc <- .parseAssoc(xx)
     xx <- xx[, c("assoc", "I", "mu0", "mu1", "logLR", "w")]
@@ -73,10 +76,12 @@ print.opticut <- function(x, digits, ...) {
 print.summary.opticut <- function(x, cut, sort, digits, ...) {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
-    if (missing(sort))
-        sort <- getOption("ocoptions")$sort
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
+    if (missing(sort))
+        sort <- getOption("ocoptions")$sort
+    sort <- if (is.logical(sort))
+        sort[1L] else 1 %in% sort
     xx <- x$summary[, c("split", "assoc", "I", "mu0", "mu1", "logLR", "w")]
     if (sort) {
         xx <- xx[attr(x$bestpart, "row.order"),]
