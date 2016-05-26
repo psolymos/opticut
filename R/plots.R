@@ -48,6 +48,8 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
         cut <- getOption("ocoptions")$cut
     if (missing(sort))
         sort <- getOption("ocoptions")$sort
+    sort <- if (is.logical(sort))
+        sort[1L] else 1 %in% sort
     if (!is.null(which) && length(which) == 1L) {
         wplot.opticut1(x$species[[which]],
             cut=cut, las=las, ylab=ylab, xlab=xlab, theme=theme, ...)
@@ -128,16 +130,25 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
         cut <- getOption("ocoptions")$cut
     if (missing(sort))
         sort <- getOption("ocoptions")$sort
+    if (is.logical(sort)) {
+        sort_r <- sort[1L]
+        sort_c <- sort[1L]
+    } else {
+        sort_r <- 1 %in% sort
+        sort_c <- 2 %in% sort
+    }
     if (!is.null(which)) {
         x$species <- x$species[which]
     }
     ss <- summary(x)
     xx <- ss$summary
     bp <- ss$bestpart
-    if (sort) {
-        bp <- bp[attr(ss$bestpart, "row.order"),
-            attr(ss$bestpart, "col.order"),drop=FALSE]
+    if (sort_r) {
+        bp <- bp[attr(ss$bestpart, "row.order"),,drop=FALSE]
         xx <- xx[attr(ss$bestpart, "row.order"),,drop=FALSE]
+    }
+    if (sort_c) {
+        bp <- bp[,attr(ss$bestpart, "col.order"),drop=FALSE]
     }
     if (!any(xx$logLR >= cut)) {
         warning("All logLR < cut: cut ignored")
@@ -213,7 +224,11 @@ function(x, ylab, plot=TRUE, ...)
         mat[i,j] <- 1L
     }
     if (plot) {
-        f <- rev(sort(colSums(mat) / nrow(x)))
+        sort <- getOption("ocoptions")$sort
+        sort <- if (is.logical(sort))
+            sort[1L] else 1 %in% sort
+        f <- if (sort)
+            rev(sort(colSums(mat) / nrow(x))) else colSums(mat) / nrow(x)
         barplot(f, col=rev(occolors()(length(f))),
             ylim=c(0,1), ylab=ylab, ...)
         box()
