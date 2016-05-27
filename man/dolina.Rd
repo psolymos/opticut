@@ -70,8 +70,10 @@ Solymos, P., Kemencei, Z. Pall-Gergely, B., Farkas, R., Vilisics, F., Nagy, A., 
 data(dolina)
 str(dolina)
 
-## species richness by microhabitat
+## species richness by microhabitat and method
 Richness <- rowSums(dolina$xtab > 0)
-boxplot(Richness ~ mhab, dolina$samp, ylab="Species richness")
+boxplot(Richness ~ mhab + method, dolina$samp,
+    ylab="Species richness", main="Dolina data set",
+    col=rep(c("#2C7BB6", "#D7191C"), each=4))
 }
 \keyword{datasets}
