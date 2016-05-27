@@ -56,16 +56,22 @@ constituted the 'broken' group. This 'broken' group was
 excluded from the data set.
 }
 \source{
-Kemencei et al. 2014.
+Solymos et al. 2016 and Kemencei et al. 2014.
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
 E. & Solymos, P. (2014): Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
+
+Solymos, P., Kemencei, Z. Pall-Gergely, B., Farkas, R., Vilisics, F., Nagy, A., Kisfali, M. & Hornung, E. (2016): Public data from the dolina project. Version 1.0. Zenodo, DOI: 10.5281/zenodo.53080
 }
 \examples{
 data(dolina)
 str(dolina)
+
+## species richness by microhabitat
+Richness <- rowSums(dolina$xtab > 0)
+boxplot(Richness ~ mhab, dolina$samp, ylab="Species richness")
 }
 \keyword{datasets}
