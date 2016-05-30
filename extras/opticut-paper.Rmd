@@ -1,0 +1,452 @@
+---
+title: "Likelihood based optimal partitioning for indicator species analysis"
+author: "Peter Solymos, Ermias T. Azeria. et al."
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    keep_tex: no
+    number_sections: no
+    toc: no
+  word_document: default
+---
+
+# Motivation
+
+confounding, data types, null distr, all/rank comb
+
+# Workflow
+
+summaries indices plots etc
+
+## Data and model types
+
+list distributions and give examples (table?)
+
+## Special cases
+
+ordered, RS(P)F
+
+## Extensibility
+
+N-mix, mixedm models
+
+## Uncertainty
+
+# HPC
+
+# Data sets
+
+dolina, ARU date/time, ABMI birds forest age
+
+need a simple example to explain the work flow.
+
+need to rewrite the I value part and explain how scaling of
+predictors can lead to funny values with identity link, and thus the tanh.
+
+Figure out other metrics: w (model weight), P (reliability): need to figure something out not just for partitions (P), but habitat based frequencies (wplot).
+
+# Introduction
+
+The distributions of organisms on Earth show different levels of aggregation
+determined by climate, vegetation,
+species interactions, barriers to dispersal, and anthropogenic disturbances
+(cit. Humboldt, Whittaker, Rosenzweig).
+Species' responses to environmental factors thus allow predictions,
+i.e. identify regions or locations where a species can be found
+with higher probability, or in higher numbers.
+This knowledge of species-environment relationships has been
+at the core of human endeavor, e.g. knowing where to find
+food, medicinal plants, species used to make tools from or used as
+construction material, according to the archaeological (cit) record and
+studies in traditional ecological knowledge (cit).
+Species with strong environmental associations are often referred to as
+differential, character, or indicator species. These species
+are used to characterize certain habitats or vegetation types (Botta-Dukat),
+indicate naturalness or degradation of ecosystems (McGeoch & Chown),
+measure success of habitat restoration,
+alerting about critical community thresholds (TITAN),
+or indicate the presence of cryptic or rare species (Beals, Indpower, TWINSPAN).
+
+There are three main types of algorithms that are used to quantify the 
+degree of association for species. The contingency table based measures (e.g. the
+phi-coefficient, or Chi-square metric) that compare
+agreement in binary classifications based on some function of
+species' abundances and *a priori* classification of the environment (Chytry etc);
+Contingency table based methods quantify association as a correlation
+measure indicating the magnitude and sign
+(-1: maximum avoidance, 0: no association, +1: maximum preference).
+The major limitation of these correlation
+measures is that the use of binary classification for species observations
+is either based on presence/absence (detection/non-detection) data thus
+ignoring possibly available abundance information (e.g. >1 counts), or
+is based on arbitrary thresholds when binarizing the abundance data
+(Tsiripidis, Tichy). Uncertainty in the strength of associations
+can be expressed based on
+large sample asymptotics or randomization tests, comparing against the
+null hypothesis of no association (Agresti, Count data book).
+
+The analysis of variance (ANOVA) based measures compare
+between and within group variance (F-ratio) in species abundance given
+an *a priori* classification (Jancey, Wildi). The F-ratio
+is used to rank species based on the degree of associations, but
+it is not explicitly testing the sign of the associations.
+Uncertainty in the strength of associations is commonly expressed
+using an F-test and corresponding p-value testing the null
+hypothesis of equal abundance.
+The parametric assumptions of the ANOVA imply normality and
+homoskedastic errors, which might not always be satisfied
+in most field situations (e.g. using 0/1, biomass, or % cover data).
+
+The third and most widely adopted approach is the IndVal method
+that quantifies the concentration of species occurrence and
+abundances given an a-priory classification (Dufrene & Legendre).
+The IndVal index combines the species' abundance and occurrence information
+into a single index which reflects the magnitude of positive
+environment-associations (0-1). Uncertainty
+in the strength of associations can be quantified based on
+bootstrap (DeCaceres), but this approach is not testing against
+the null hypothesis of equal expected abundance within the
+partitions, because the method is non-parametric.
+The p-value for the null hypothesis is based on permutation tests.
+Randomization is used to derive the p-value is based on
+randomly placing samples or individuals, and this randomization
+might not always be meaningful for continuous input data
+(e.g. biomass, or % cover).
+
+A common limitation of the available methods is that
+assumptions about the distribution (Binomial, Normal)
+or type (0/1, counts) of the species data are too restrictive.
+As a result, ecologists need to adjust the input data
+(binarization, rounding to integers) to meet the needs of the
+analysis options. However, non-count or non-normal
+data are commonplace, e.g. vegetation studies measuring the
+response on ordinal scale, % cover, or biomass.
+Besides, none of these approaches are designed to deal with some other
+aspects of field data, for example confounding variables,
+sample selection bias (presence-only data),
+sampling effort differences, or imperfect detection.
+
+In this paper we introduce a general and extensible likelihood-based
+framework for indicator species analysis, that we call the opticut approach.
+The opticut approach provides a solution to the limitations
+of currently available and used options as listed above.
+We compare the power of traditional approaches and opticut
+to identify an indicator species when there
+is true indication in terms of abundance differences among partitions using
+simulations. We also show how to assess uncertainty in the strength
+of association, and also uncertainty in classification based on
+resampling, thus introducing a wider set of tools for statistical inference.
+Finally, we illustrate the breadth of situations where the use of opticut
+might be advantageous using case studies.
+We also provide the opticut R extension package that implements
+computationally efficient algorithm for finding indicator species,
+and tools for exploring and visualizing the results.
+
+
+## Methods
+
+### Parametric model
+
+In indicator species analysis we are faced with the
+general problem of finding an optimal
+partitioning of low vs. high species abundance with respect to
+an a-priory stratification.
+The observations are usually organized as a community data matrix with
+sites or samples as rows ($i = 1, ..., n$) and species as columns.
+We describe the theory for a single species only.
+The community-wide inference replicates the analyses for each species
+independently of one another. $Y_{i}$'s are observations for a single species
+from $n$ locations.
+$g_{i}$ is a known descriptor of stratification for the location $i$
+that can take any of $K$ discrete values ($K > 1$).
+Let us denote $z^{(m)}$ as a binary reclassification of $g$ taking values (0, 1).
+The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification. There can also be other site descriptors denoted as $x_{ij}$
+taking discrete or continuous values ($j = 1, ..., p$; the number of predictors).
+
+A suitable parametric model describes the
+relationship between the observations and the site descriptors, including
+the binary partitioning, through the probability density function
+$P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$
+where $\theta$ is the vector of model parameters:
+$\theta = (\beta_{0}, \beta_{1}, \alpha_{1}, ..., \alpha_{p})$.
+The choice of the parametric model depends on the nature of the
+observations. It can be Gaussian, Binomial, Poisson,
+ordinal, Beta regression, or zero-inflated models, with a
+suitable link function ($f$) for the mean:
+$f(\eta_{i}) = \beta_{0}^{(m)} + \beta_{1}^{(m)} z_{i}^{(m)} + \sum_{j=1}^{p} \alpha_{j}^{(m)} x_{ij}$.
+
+The opticut R extension package implements different parametric models.
+The default is a Gaussian linear model with an identity link.
+Other models include logistic regression (Binomial distribution with
+logistic link function), log-linear count models (Poisson, Negative
+Binomial, Zero-inflated Poisson and Negative Binomial with logarithmic link).
+Ordinal species observations can be analyzed using
+the proportional ordered logistic regression (cit MASS). Percent cover data
+may be analyzed based on a Beta regression (cit package).
+Presence-only data (e.g. museum records, incidental sightings,
+most citizen science observations), or animal movement data can be analyzed
+based on resource selection (probability) functions (Lele & Keim).
+Other custom distributions can also be defined in the R package,
+such as linear mixed models, generalized linear mixed models (cit),
+occupancy (cit MacKenzie, Lele et al) or N-mixture models (Royle, Solymos).
+
+### Defining the set of partitions
+
+The maximum number of binary partitions based on $K$ levels is
+$2^K - 1$ (see DeCaceres), including complements like
+(0, 0, 1) and (1, 1, 0) counted as separate
+partitions. Such complementary partitions represent identical stratification,
+thus should not affect the result of indicator species analysis.
+(It does affect the IndVal value for $K>2$ cases.)
+When complements are not counted twice, the number of
+possible binary partitions of the stratification with $K$ strata (or levels)
+is $M = 2^{K-1} - 1$.
+Finding all combinations does not require a model or observed responses.
+It only takes a classification vector with $K > 1$ partitions.
+As a consequence, the partitions can be set up for all species in the
+community matrix at once, and used for finding the best partition for each
+species.
+
+Blindly fitting a model to all possible partitions is wasteful
+use of resources because the number of candidate partitions
+grows steeply with increasing $K$. Instead, one can rank the
+$K$ partitions based on expected response values
+($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$,
+where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
+This way we have to explore only $M=K-1$ partitions. For $K=3$
+we have the following partitions: (1), (1, 2), (1, 2, 3),
+where rank 1 is for lowest and 3 is for highest expected abundance.
+The ranking varies from species to species, thus
+it is not possible to supply the resulting stratification a-priory
+for for all species in the community matrix.
+There is an overhead of fitting the model to calculate the ranking first.
+But computing efficiencies are significant for $K>3$ cases.
+For example for $K=10$ the difference is
+56-fold (511 all partitions vs. 9 rank based partitions).
+
+$\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the
+model parameters given the data and partition $m$,
+with corresponding log-likelihood value 
+$l(\widehat{\theta^{(m)}}; y) = l^{(m)}$.
+Finding MLEs for all $M$ candidate binary partitions
+leads to a set of log-likelihood values. One can compare
+the log-likelihood values to a null model (no binary partitioning is necessary)
+where we fix $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
+and corresponding log-likelihood value for the null model:
+$l(\widehat{\theta^{(0)}}; y) = l^{(0)}$.
+The log-likelihood ratio for each candidate partition can be
+calculated as $log(LR)^{(m)} = l^{(m)} - l^{(0)}$.
+The best supported binary partition is
+the model with the highest log-likelihood ratio value (CITATION).
+
+## Indicator value
+
+The indicator value ($I$) for each candidate partition can be calculated
+based on expected values using the inverse link function as
+$\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and
+$\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
+$I^{(m)} = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
+Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and
+$\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
+for the observations given the binary partition $z_{i}^{(m)}$
+and at 0 value for all $x_{ij}$.
+The strength of association of the species with a given partition is 
+determined by $I^{(m)}$.
+The value of $I^{(m)}$ is minimal (0) when $\mu_{0}^{(m)} = \mu_{1}^{(m)}$,
+whereas $I^{(m)}$ is maximal (1) when one of the expected values
+is close to 0 (i.e. the species is absent). This is also referred to as
+high fidelity in plant ecology (citation).
+The sign of the association equals $sign(\beta_{1}^{(m)})$. 
+
+The ranking of the $M$ candidate models based on 
+$I$ and $log(LR)$ is usually not identical
+because $I$ only considers the contrast between predicted
+abundances in the two strata, whereas $log(LR)$ represents
+goodness of fit and is a function of not only the model
+parameters but the data as well. $I$ and $log(LR)$ convey
+different information that needs to be presented together
+for meaningful statistical inference. Ranking of models
+should follow $log(LR)$ (best fit) and not $I$ (largest contrast).
+
+!!! TODO: use DeCaceres 1-species example from Oikos paper to
+explain the Gaussian opticut approach.
+
+```{r}
+## Gaussian example
+library(opticut)
+(Y <- c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4))
+(z <- as.factor(rep(LETTERS[1:3], each=4)))
+
+opticut1(Y, Z=z)
+opticut1(ifelse(Y>0,1,0), Z=z, dist="binomial")
+
+print(opticut1(Y, Z=allComb(z)), cut=-Inf)
+print(opticut1(ifelse(Y>0,1,0), Z=allComb(z), dist="binomial"), cut=-Inf)
+
+allComb(z)
+rankComb(Y, matrix(1, length(Y), 1), z)
+
+set.seed(123)
+oc <- opticut(Y ~ 1, strata=z)
+uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
+#uc2 <- uncertainty(oc, 1, type="boot", B=999)
+#uc3 <- uncertainty(oc, 1, type="multi", B=999)
+
+Y <- cbind(Sp1=c(4, 6, 3, 5, 5, 6, 3, 4, 4, 1, 3, 2),
+           Sp2=c(0, 0, 0, 0, 1, 0, 0, 1, 5, 2, 3, 4),
+           Sp3=c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4))
+oc <- opticut(Y ~ 1, strata=z)
+plot(oc)
+uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
+#uc2 <- uncertainty(oc, 1, type="boot", B=999)
+#uc3 <- uncertainty(oc, 2, type="multi", B=999)
+
+```
+
+## Quantifying uncertainty
+
+### Model weights
+
+The relative support for the candidate partitions can be measured
+by the log-likelihood ratio. A value of >2 means support for
+a partition over the null model, a value of >8 indicates strong support
+over the null model. Model weights can be calculated as 
+$w^{(m)} = \Delta^{(m)} / \sum_{m=1}^{M} \Delta^{(m)}$,
+where $\Delta^{(m)} = exp(l^{(m)} - max(l^{(1)}, ..., l^{(M)}))$ (Burnham & Anderson).
+
+### Asymptotic (large sample) inference
+
+Describe how to get asymptotic CIs for mu0, mu1, I (but best partition is fixed). This is of little value, because we rarely test if I for one species is
+different from I for another species. Also, significance of differences between
+mu0 and mu1 (contrasts) are of little value on their own. But one might want to 
+explore the distributions and interpret the results visually.
+
+### Bootstrap based inference
+
+Small sample based inference (CIs can be asymmetric and wider than
+asymptotics). Best partition can be fixed (same applies as for asymptotics).
+Best partition can be selected for each bootstrap iteration, thus
+giving a probabilistic measure of 'mixing'. DeCaceres also mentioned this.
+
+## Simulations
+
+K=2 case: study effect of:
+
+* contrast
+* confounding
+* noise
+* misclassification
+
+K=3 case: recovering mixing proportions using bootstrap
+
+## Case studies
+
+# Results
+
+Confounding effect is fixed by opticut (IX),
+others are similar (I0: interpret only opticut, IV: IndVal,
+PH: phi coefficient, FR: F-ratio). Red = 1, yellow=0 (proportion passed).
+
+```{r,echo=FALSE}
+load("~/Dropbox/collaborations/opticut/opticut-simuls.Rdata")
+r6v <- sapply(res6, function(z) rowMeans(z[2,,]>0))
+op <- par(mfrow=c(2,3))
+rr <- r6v[,vals2$b1==0.9 & vals2$b3==1]
+for (i in 1:5)
+image(unique(vals$b2), unique(vals$b4), 
+    matrix(-rr[i,], length(unique(vals$b2)), length(unique(vals$b4))),
+    main=rownames(rr)[i],
+    xlab="Confounding", ylab="Misclassification")
+par(op)
+```
+
+Power (pass/fail) analyzed with Binomial GLM,
+see sign & magnitude of effects and deviance table.
+b1: contrast, b2: confounding, b3: noise, b4: misclassification
+(small value: small effect etc).
+
+```{r,echo=FALSE}
+r6c <- sapply(res6, function(z) rowSums(z[2,,]>0))
+xx <- data.frame(success=as.numeric(t(r6c)), 
+    failure=B-as.numeric(t(r6c)),
+    method=rep(rownames(r6c), nrow(vals2)), vals2)
+xx$method <- relevel(xx$method, "IX")
+mm <- glm(cbind(success, failure) ~ method + (b1 + b2 + b3 + b4), xx, family=binomial)
+summary(mm)
+av <- anova(mm)
+av$Perc <- round(100 * anova(mm)$Deviance / 1041142, 2)
+sum(av$Perc, na.rm=TRUE)
+av
+```
+
+# Discussion
+
+# References
+
+McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. 
+Trends in Ecology and Evolution 13: 46--47.
+
+Podani J and Csanyi B (2010) Detecting indicator species: some extensions of the
+INDVAL measure. Ecological Indicators 10: 1119-1124.
+
+Hill MO (1979) TWINSPAN - A FORTRAN Program for Arranging Multivariate Data
+in an Ordered Two-way Table by Classification of the Individuals and Attributes.
+Ithaca, New York: Section of Ecology and Systematics, CornellUniversity.
+
+Dufrene M and Legendre P (1997) Species assemblages and indicator species: The
+need for a flexible asymmetrical approach. Ecological Monographs 67: 345--366.
+
+De Caceres M and Legendre P (2009) Associations between species and groups of
+sites: Indices and statistical inference. Ecology 90: 3566--3574.
+
+De Caceres M, Legendre P, and Moretti M (2010) Improving indicator species
+analysis by combining groups of sites. Oikos 119: 1674--1684.
+
+SANDER GREENLAND AND HAL MORGENSTERN 1989. 
+Ecological Bias, Confounding, and Effect Modification.
+International Journal of Epidemiology, 18: 269--274.
+
+Tsiripidis, Ioannis; Bergmeier, Erwin; Fotiadis, Georgios & Dimopoulos, Panayotis
+2009. A new algorithm for the determination of differential taxa.
+Journal of Vegetation Science 20: 233--240.
+
+Tichy, Lubomir & Chytry, Milan 2006.
+Statistical determination of diagnostic species for site groups of unequal size.
+Journal of Vegetation Science 17: 809--818.
+
+Z. Botta-Dukat and A. Borhidi 1999.
+New objective method for calculating fidelity. Example: the Illyrian beechwoods.
+ANNALI DI BOTANICA LVII: 73--90.
+
+Matthew E. Baker and Ryan S. King 2010
+A new method for detecting and interpreting biodiversity and ecological community thresholds.
+Methods in Ecology and Evolution, 1, 25--37.
+
+O. Wildi and E. Feldmeyer-Christe 2013.
+Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data.
+COMMUNITY ECOLOGY 14(2): 139--143.
+
+E. van der Maarel 1979.
+Transformation of Cover-Abundance Values in Phytosociology and Its Effects on Community
+Similarity. Vegetatio, Vol. 39: 97--114.
+
+Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002.
+Determination of diagnostic species with statistical fidelity measures.
+Journal of Vegetation Science 13: 79--90.
+
+KENNETH P. BURNHAM & DAVID R. ANDERSON 2004.
+Multimodel Inference - Understanding AIC and BIC in Model Selection.
+SOCIOLOGICAL METHODS & RESEARCH, 33: 261--304
+
+Wildi, O. 1989. A new numerical solution to traditional phytosociological
+tabular classification. Vegetatio 81: 95-106.
+
+McGeoch, M.A. and Chown, S.L.1998. 
+Scaling up the value of bioindicators. 
+Trends Ecol. Evol. 13: 46-47.
+
+Jancey, R.C. 1979. Species ordering on a variance criterion. 
+Vegetatio 39: 59--63.
+
+
+
