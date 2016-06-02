@@ -10,14 +10,11 @@
             theme="br",
             check_comb=TRUE,
             try_error=FALSE))
-    .pboptions_old_vals <<- pboptions(style=4)
     invisible(NULL)
 }
 
 .onUnload <- function(libpath){
     options("ocoptions"=NULL)
-    pboptions(.pboptions_old_vals)
-    rm(.pboptions_old_vals)
     invisible(NULL)
 }
 
