@@ -1,6 +1,6 @@
 # opticut: Likelihood Based Optimal Partitioning for Indicator Species Analysis
 
-Likelihood based optimal partitioning for indicator species analysis.
+Likelihood based optimal partitioning for indicator species analysis and more.
 Finding the best binary partition for each species based on
 model selection, possibly controlling for modifying/confounding
 variables as described in Kemencei et al. (2014).
