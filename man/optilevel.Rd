@@ -7,7 +7,7 @@ Optimal number of factor levels.
 Finds the optimal number of factor levels given the data and a model.
 }
 \usage{
-optilevel(y, x, alpha = 0, dist = "gaussian", ...)
+optilevel(y, x, z = NULL, alpha = 0, dist = "gaussian", ...)
 }
 \arguments{
   \item{y}{
@@ -16,6 +16,18 @@ vector of observations.
   \item{x}{
 a factor or a matrix of proportions (i.e. the values 0 and 1 should have
 consistent meaning across the columns, often through a unit sum constraint).
+It is the user's responsibility to ensure that values supplied
+for \code{x} are sensible. \code{x} is not expected to
+include an intercept.
+}
+  \item{z}{
+a design matrix with predictor variables besides the one(s) defined
+via the argument \code{x}.
+It is the user's responsibility to ensure that values supplied
+for \code{z} are sensible and it also makes sense to bind
+\code{x} and \code{z} together. It is best to center and scale these
+variables, because the design matrix from \code{x} is not expected to
+include an intercept.
 }
   \item{alpha}{
 weighting factor for calculating information criteria for model selection
@@ -40,7 +52,12 @@ A list with the following elements:
 \code{ic}: IC values along the selection path considering best models.
 
 \code{coef}: matrix of coefficients (linear predictor scale)
+corresponding to argument \code{x}
 along the selection path considering best models.
+
+\code{zcoef}: matrix of coefficients (linear predictor scale)
+corresponding to argument \code{z} when not \code{NULL}
+along the selection path considering best models, or \code{NULL}.
 
 \code{rank}: matrix ranks based on the coefficients
 along the selection path considering best models.
@@ -53,7 +70,12 @@ considering all competing models.
 considering all competing models.
 
 \code{coeflist}: matrix of coefficients (linear predictor scale)
+corresponding to argument \code{x}
 along the selection path considering all competing models.
+
+\code{zcoeflist}: matrix of coefficients (linear predictor scale)
+corresponding to argument \code{z} when not \code{NULL}
+along the selection path considering all competing models, or \code{NULL}.
 
 \code{ranklist}: matrix ranks based on the coefficients
 along the selection path considering all competing models.
