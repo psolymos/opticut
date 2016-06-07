@@ -45,6 +45,13 @@ predictors can lead to funny values with identity link, and thus the tanh.
 
 Figure out other metrics: w (model weight), P (reliability): need to figure something out not just for partitions (P), but habitat based frequencies (wplot).
 
+DeCaceres example:
+```{r}
+y <- c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4)
+z <- rep(1:3, each=4)
+```
+
+
 # Introduction
 
 The distributions of organisms on Earth show different levels of aggregation
