@@ -25,8 +25,8 @@ a design matrix with predictor variables besides the one(s) defined
 via the argument \code{x}.
 It is the user's responsibility to ensure that values supplied
 for \code{z} are sensible and it also makes sense to bind
-\code{x} and \code{z} together. It is best to center and scale these
-variables, because the design matrix from \code{x} is not expected to
+\code{x} and \code{z} together. It is best to center and nomalize (unit SD)
+these variables, because the design matrix from \code{x} is not expected to
 include an intercept.
 }
   \item{alpha}{
