@@ -123,7 +123,8 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
         rank=rnkmat,
         deltalist=delta_list, iclist=IC_list,
         coeflist=cfmat_list, zcoeflist=if (is.null(Z)) Z else cfzmat_list,
-        ranklist=rnkmat_list)
+        ranklist=rnkmat_list,
+        alpha=alpha, dist=dist, Y=Y, X=X, Z=Z)
 }
 
 optilevel <-
@@ -151,5 +152,7 @@ function(y, x, z = NULL, alpha=0, dist="gaussian", ...)
         names(levs[[i]]) <- colnames(out$coef)
     }
     out$levels <- levs
+    out$factor <- is.factor(x)
+    class(out) <- "optilevel"
     out
 }

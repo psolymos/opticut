@@ -46,7 +46,7 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
 }
 \value{
-A list with the following elements:
+An object of class 'optilevel' that is a list with the following elements:
 
 \code{delta}: delta IC values along the selection path considering best models.
 
@@ -83,6 +83,20 @@ along the selection path considering all competing models.
 
 \code{levels}: list of (merged) factor levels along the selection path
 considering best models.
+
+\code{Y}: vector of observations (argument \code{y}).
+
+\code{X}: design matrix component corresponding to argument \code{x}.
+
+\code{Z}: design matrix component corresponding to argument \code{z}.
+
+\code{alpha}: weighting argument.
+
+\code{dist}: distribution argument
+
+\code{factor}: logical, indicating if argument \code{x} is a factor
+(\code{TRUE}) or a matrix (\code{FALSE}).
+
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

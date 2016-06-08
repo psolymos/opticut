@@ -12,13 +12,15 @@ Accessing best model and partition from fitted object.
 \usage{
 bestmodel(object, ...)
 \method{bestmodel}{opticut}(object, which = NULL, ...)
+\method{bestmodel}{optilevel}(object, ...)
 
 bestpart(object, ...)
 \method{bestpart}{opticut}(object, ...)
 }
 \arguments{
   \item{object}{
-fitted model object from \code{\link{opticut}}.
+fitted model object from \code{\link{opticut}} or
+\code{\link{optilevel}}.
 }
   \item{which}{
 numeric, character (can be a vector) defining
