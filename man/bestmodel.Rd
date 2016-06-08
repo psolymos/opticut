@@ -1,6 +1,7 @@
 \name{bestmodel}
 \alias{bestmodel}
 \alias{bestmodel.opticut}
+\alias{bestmodel.optilevel}
 \alias{bestpart}
 \alias{bestpart.opticut}
 \title{
