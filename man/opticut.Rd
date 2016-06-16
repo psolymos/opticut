@@ -3,6 +3,7 @@
 \alias{opticut1}
 \alias{plot.opticut}
 \alias{wplot}
+\alias{fix_levels}
 \alias{wplot.opticut}
 \alias{wplot.opticut1}
 \alias{print.opticut}
@@ -21,6 +22,8 @@ variables. The general algorithm is described in Kemencei et al. 2014.
 opticut1(Y, X, Z, dist = "gaussian", sset=NULL, ...)
 opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), sset=NULL, cl = NULL, ...)
+
+fix_levels(x, sep = "_")
 
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut,
@@ -92,7 +95,7 @@ this triggers \code{\link{rankComb}}),
 or a design matrix (custom matrix or as returned by \code{\link{allComb}}.
 }
   \item{x, object}{
-object to plot, print, summarize.
+object to plot, print, summarize. For \code{fix_levels} it needs to be a factor.
 }
   \item{cut}{
 log likelihood ratio value to be used as a cut-off for showing species
@@ -130,6 +133,9 @@ numeric, number of significant digits in output.
 numeric, character (can be a vector) defining
 a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
+}
+  \item{sep}{
+a character string to separate the sub-strings in factor levels.
 }
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.
@@ -191,6 +197,12 @@ matrix-like object for multiple species.
 Intercept only model is not accepted for \code{"rspf"}.
 
 Custom distributions can be defined, see Examples.
+
+\code{fix_levels} is a utility function for replacing characters in
+factor levels that are identical to the value of the
+\code{getOption("ocoptions")$collapse} value.
+This case can lead to an error when specifying the \code{strata} argument,
+and the \code{fix_levels} can help.
 }
 \section{Warning}{
 The use of the \code{opticut1} function is generally discouraged.
@@ -204,6 +216,8 @@ as \code{X} argument in \code{opticut1}).
 \code{opticut1} returns an object of class opticut1.
 
 \code{opticut} returns an object of class opticut.
+
+\code{fix_levels} returns a factor with modified levels.
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
@@ -330,6 +344,13 @@ opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
     dist=fun, zi_term=dolina$samp$method)
 dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
+
+## current collapse value
+getOption("ocoptions")$collapse
+## needs to be manipulated before feeding it to opticut
+fix_levels(as.factor(c("A b", "C d")), sep=":")
+fix_levels(as.factor(c("A b", "C d")), sep="")
 }
 }
 \keyword{ models }
+\keyword{ utilities }
