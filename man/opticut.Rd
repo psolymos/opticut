@@ -238,7 +238,7 @@ for manipulating fitted objects.
 \code{\link{ocoptions}} on how to set some of the global options
 related to the presentation of the results in the package.
 
-\code{\link{optilevel}} for finding the optimal number of factor levels.
+\code{\link{optilevels}} for finding the optimal number of factor levels.
 }
 \examples{
 ## --- Gaussian
