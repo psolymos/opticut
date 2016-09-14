@@ -335,7 +335,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     ## sequential
     if (is.null(cl)) {
         ## show progress bar
-        if (!ncol(Y) < 2L) {
+        if (ncol(Y) < 2L) {
             pbo <- pboptions(type = "none")
             on.exit(pboptions(pbo))
         }
@@ -359,21 +359,15 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
             assign("Z", X, envir=.oc_envir)
             assign("Y", Y, envir=.oc_envir)
             assign("sset", sset, envir=.oc_envir)
-#            parallel::clusterExport(cl, c("Y", "X","Z","dist"), envir=e)
-            parallel::clusterExport(cl, ".oc_envir")
+            parallel::clusterExport(cl, c("Y", "X","Z","dist"), envir=.oc_envir)
             if (getOption("ocoptions")$try_error) {
                 res <- parallel::parLapply(cl, seq_len(ncol(Y)), function(i, ...)
-                    try(opticut1(Y=.oc_envir$Y[,i],
-                        X=.oc_envir$X, Z=.oc_envir$Z,
-                        dist=.oc_envir$dist, sset=.oc_envir$sset, ...)), ...)
+                    try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
             } else {
                 res <- parallel::parLapply(cl, seq_len(ncol(Y)), function(i, ...)
-                    opticut1(Y=.oc_envir$Y[,i],
-                        X=.oc_envir$X, Z=.oc_envir$Z,
-                        dist=.oc_envir$dist, sset=.oc_envir$sset, ...), ...)
+                    opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...), ...)
             }
-            #parallel::clusterEvalQ(cl, rm(list=c("Y", "X","Z","dist")))
-            parallel::clusterEvalQ(cl, rm(list=".oc_envir"))
+            parallel::clusterEvalQ(cl, rm(list=c("Y", "X","Z","dist")))
             parallel::clusterEvalQ(cl, detach(package:opticut))
         ## forking
         } else {
