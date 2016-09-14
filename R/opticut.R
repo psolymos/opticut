@@ -147,7 +147,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
         mod else out
 }
 
-## todo: if Z inherits from class optilevel,
+## todo: if Z inherits from class optilevels,
 ## use that as best binary partition (check no. of levels)
 
 ## Y is abundance vector
@@ -335,23 +335,16 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     ## sequential
     if (is.null(cl)) {
         ## show progress bar
-        if (ncol(Y) > 1L && interactive()) {
-            if (getOption("ocoptions")$try_error) {
-                res <- pbapply::pbapply(Y, 2, function(yy, ...)
-                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
-            } else {
-                res <- pbapply::pbapply(Y, 2, function(yy, ...)
-                    opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
-            }
-        ## do not show progress bar
+        if (!ncol(Y) < 2L) {
+            pbo <- pboptions(type = "none")
+            on.exit(pboptions(pbo))
+        }
+        if (getOption("ocoptions")$try_error) {
+            res <- pbapply::pbapply(Y, 2, function(yy, ...)
+                try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
         } else {
-            if (getOption("ocoptions")$try_error) {
-                res <- apply(Y, 2, function(yy, ...)
-                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
-            } else {
-                res <- apply(Y, 2, function(yy, ...)
-                    opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
-            }
+            res <- pbapply::pbapply(Y, 2, function(yy, ...)
+                opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
         }
     ## parallel
     } else {
@@ -360,19 +353,27 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
             if (length(cl) < 2)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             parallel::clusterEvalQ(cl, library(opticut))
-            e <- new.env()
-            assign("dist", dist, envir=e)
-            assign("X", X, envir=e)
-            assign("Z", X, envir=e)
-            parallel::clusterExport(cl, c("X","Z","dist"), envir=e)
+            .oc_envir <- new.env()
+            assign("dist", dist, envir=.oc_envir)
+            assign("X", X, envir=.oc_envir)
+            assign("Z", X, envir=.oc_envir)
+            assign("Y", Y, envir=.oc_envir)
+            assign("sset", sset, envir=.oc_envir)
+#            parallel::clusterExport(cl, c("Y", "X","Z","dist"), envir=e)
+            parallel::clusterExport(cl, ".oc_envir")
             if (getOption("ocoptions")$try_error) {
-                res <- parallel::parApply(cl, Y, 2, function(yy, ...)
-                    try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
+                res <- parallel::parLapply(cl, seq_len(ncol(Y)), function(i, ...)
+                    try(opticut1(Y=.oc_envir$Y[,i],
+                        X=.oc_envir$X, Z=.oc_envir$Z,
+                        dist=.oc_envir$dist, sset=.oc_envir$sset, ...)), ...)
             } else {
-                res <- parallel::parApply(cl, Y, 2, function(yy, ...)
-                    opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
+                res <- parallel::parLapply(cl, seq_len(ncol(Y)), function(i, ...)
+                    opticut1(Y=.oc_envir$Y[,i],
+                        X=.oc_envir$X, Z=.oc_envir$Z,
+                        dist=.oc_envir$dist, sset=.oc_envir$sset, ...), ...)
             }
-            parallel::clusterEvalQ(cl, rm(list=c("X","Z","dist")))
+            #parallel::clusterEvalQ(cl, rm(list=c("Y", "X","Z","dist")))
+            parallel::clusterEvalQ(cl, rm(list=".oc_envir"))
             parallel::clusterEvalQ(cl, detach(package:opticut))
         ## forking
         } else {
@@ -382,11 +383,11 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
             if (cl < 2)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             if (getOption("ocoptions")$try_error) {
-                res <- parallel::mclapply(1:ncol(Y), function(i, ...)
+                res <- parallel::mclapply(seq_len(ncol(Y)), function(i, ...)
                     try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)),
                     mc.cores = cl, ...)
             } else {
-                res <- parallel::mclapply(1:ncol(Y), function(i, ...)
+                res <- parallel::mclapply(seq_len(ncol(Y)), function(i, ...)
                     opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...),
                     mc.cores = cl, ...)
             }
