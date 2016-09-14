@@ -1,7 +1,7 @@
 \name{bestmodel}
 \alias{bestmodel}
 \alias{bestmodel.opticut}
-\alias{bestmodel.optilevel}
+\alias{bestmodel.optilevels}
 \alias{bestpart}
 \alias{bestpart.opticut}
 \title{
@@ -13,7 +13,7 @@ Accessing best model and partition from fitted object.
 \usage{
 bestmodel(object, ...)
 \method{bestmodel}{opticut}(object, which = NULL, ...)
-\method{bestmodel}{optilevel}(object, ...)
+\method{bestmodel}{optilevels}(object, ...)
 
 bestpart(object, ...)
 \method{bestpart}{opticut}(object, ...)
@@ -21,7 +21,7 @@ bestpart(object, ...)
 \arguments{
   \item{object}{
 fitted model object from \code{\link{opticut}} or
-\code{\link{optilevel}}.
+\code{\link{optilevels}}.
 }
   \item{which}{
 numeric, character (can be a vector) defining

@@ -7,7 +7,7 @@
 
 ## estimation
 
-.optilevel <-
+.optilevels <-
 function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
 {
     if (!is.function(dist)) {
@@ -15,9 +15,9 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
             c("gaussian","poisson","binomial","negbin",
             "beta","zip","zinb","ordered", "rspf"))
         if (dist == "rspf")
-            stop("dist='rspf' not supported for optilevel")
+            stop("dist='rspf' not supported for optilevels")
         if (dist == "rsf")
-            stop("dist='rsf' not supported for optilevel")
+            stop("dist='rsf' not supported for optilevels")
     }
     if (is.null(colnames(X)))
         colnames(X) <- paste0("X", seq_len(ncol(X)))
@@ -127,7 +127,7 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
         alpha=alpha, dist=dist, Y=Y, X=X, Z=Z)
 }
 
-optilevel <-
+optilevels <-
 function(y, x, z = NULL, alpha=0, dist="gaussian", ...)
 {
     if (is.null(dim(x))) {
@@ -142,7 +142,7 @@ function(y, x, z = NULL, alpha=0, dist="gaussian", ...)
             stop("zombie (sum=0) columns in x")
         X <- as.matrix(x)
     }
-    out <- .optilevel(Y=y, X=X, Z=z, alpha=alpha, dist=dist, ...)
+    out <- .optilevels(Y=y, X=X, Z=z, alpha=alpha, dist=dist, ...)
     levs <- list()
     for (i in seq_len(length(out$ranklist))) {
         levi <- sapply(1:max(out$rank[i,]), function(j)
@@ -154,11 +154,11 @@ function(y, x, z = NULL, alpha=0, dist="gaussian", ...)
     out$levels <- levs
     out$factor <- is.factor(x)
     out$call <- match.call()
-    class(out) <- "optilevel"
+    class(out) <- "optilevels"
     out
 }
 
-bestmodel.optilevel <-
+bestmodel.optilevels <-
 function (object, ...)
 {
     ## need to combine X and Z for best model

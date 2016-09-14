@@ -1,10 +1,10 @@
-export("opticut", "optilevel", "opticut1", "wrsi",
+export("opticut", "optilevels", "opticut1", "wrsi",
     "ocoptions", "occolors",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "uncertainty", "wplot",
     "fix_levels")
 S3method("bestmodel", "opticut")
-S3method("bestmodel", "optilevel")
+S3method("bestmodel", "optilevels")
 S3method("bestpart", "opticut")
 S3method("plot", "opticut")
 S3method("plot", "uncertainty1")

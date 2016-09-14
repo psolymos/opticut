@@ -1,5 +1,5 @@
-\name{optilevel}
-\alias{optilevel}
+\name{optilevels}
+\alias{optilevels}
 \title{
 Optimal number of factor levels.
 }
@@ -7,7 +7,7 @@ Optimal number of factor levels.
 Finds the optimal number of factor levels given the data and a model.
 }
 \usage{
-optilevel(y, x, z = NULL, alpha = 0, dist = "gaussian", ...)
+optilevels(y, x, z = NULL, alpha = 0, dist = "gaussian", ...)
 }
 \arguments{
   \item{y}{
@@ -46,7 +46,7 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
 }
 \value{
-An object of class 'optilevel' that is a list with the following elements:
+An object of class 'optilevels' that is a list with the following elements:
 
 \code{delta}: delta IC values along the selection path considering best models.
 
@@ -119,7 +119,7 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
 rownames(spp) <- gr
 spp
 
-ol <- optilevel(spp[,"Species3"], gr)
+ol <- optilevels(spp[,"Species3"], gr)
 ol[c("delta", "coef", "rank", "levels")]
 
 ## get the final factor level
@@ -146,7 +146,7 @@ X <- model.matrix(~.-1, data=data.frame(x))
 lam <- exp(drop(X \%*\% b))
 y <- rpois(n, lam)
 
-z <- optilevel(y, x, dist="poisson")
+z <- optilevels(y, x, dist="poisson")
 
 ## estimates
 plogis(z$coef)
