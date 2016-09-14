@@ -1,17 +1,18 @@
 Package: opticut
 Type: Package
 Title: Likelihood Based Optimal Partitioning for Indicator Species Analysis
-Version: 0.1-1
-Date: 2016-06-03
+Version: 0.1-2
+Date: 2016-09-14
 Author: Peter Solymos
 Maintainer: Peter Solymos <solymos@ualberta.ca>
 Description: Likelihood based optimal partitioning for indicator
-  species analysis. Finding the best binary partition for each species 
+  species analysis. Finding the best binary partition for each species
   based on model selection, possibly controlling for modifying/confounding
   variables as described in Kemencei et al. (2014, Com. Ecol. 15:180--186).
 URL: https://github.com/psolymos/opticut
 BugReports: https://github.com/psolymos/opticut/issues
-Imports: MASS, pscl, betareg, ResourceSelection (>= 0.2-6), parallel, pbapply, mefa4
+Depends: pbapply
+Imports: MASS, pscl, betareg, ResourceSelection (>= 0.2-6), parallel, mefa4
 License: GPL-2
 LazyLoad: yes
 LazyData: true
