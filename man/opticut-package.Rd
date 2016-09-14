@@ -16,7 +16,7 @@ The DESCRIPTION file:
 The main user interface is the \code{\link{opticut}} function
 to find the optimal binary partitioning.
 
-\code{\link{optilevel}} finds the optimal number of factor levels.
+\code{\link{optilevels}} finds the optimal number of factor levels.
 }
 \author{
 \packageAuthor{opticut}
