@@ -25,7 +25,7 @@ A data frame (class \code{wrsi}).
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{optilevel}} for finding optimal number of factor levels.
+\code{\link{optilevels}} for finding optimal number of factor levels.
 }
 \examples{
 ## --- habitat composition matrix
