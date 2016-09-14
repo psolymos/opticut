@@ -24,9 +24,9 @@ to find the optimal binary partitioning.
 Maintainer: \packageMaintainer{opticut}
 }
 \references{
-Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, 
-E. & Solymos, P. (2014): Microhabitat associations of land snails in 
-forested dolinas: implications for coarse filter conservation. 
+Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
+E. & Solymos, P. (2014): Microhabitat associations of land snails in
+forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
 }
 \examples{
@@ -43,7 +43,7 @@ spp
 summary(oc <- opticut(spp ~ 1, strata=gr, comb="all"))
 plot(oc)
 
-ol <- optilevel(spp[,"Species3"], as.factor(gr))
+ol <- optilevels(spp[,"Species3"], as.factor(gr))
 ol[c("delta", "coef", "rank", "levels")]
 }
 \keyword{ package }
