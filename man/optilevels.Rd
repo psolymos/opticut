@@ -104,7 +104,8 @@ Peter Solymos <solymos@ualberta.ca>
 \seealso{
 \code{\link{opticut}} for finding best binary partitions.
 
-\code{\link{wrsi}} for weighted relative suitability index.
+\code{\link{selind}} and \code{\link{wrsi}}
+for weighted relative suitability index.
 }
 \examples{
 ## --- Factor levels with Gaussian distribution
