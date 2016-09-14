@@ -345,12 +345,14 @@ opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
 dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
 
+}
+
 ## current collapse value
 getOption("ocoptions")$collapse
-## needs to be manipulated before feeding it to opticut
+## factor levels sometimes need to be manipulated
+## before feeding it to opticut
 fix_levels(as.factor(c("A b", "C d")), sep=":")
 fix_levels(as.factor(c("A b", "C d")), sep="")
-}
 }
 \keyword{ models }
 \keyword{ utilities }

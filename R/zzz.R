@@ -12,10 +12,10 @@
             try_error=FALSE))
     options("pboptions" = list(
         type = if (interactive()) "timer" else "none",
-        char = "+",
+        char = "-",
         txt.width = 50,
         gui.width = 300,
-        style = 4,
+        style = 3,
         initial = 0,
         title = "R progress bar",
         label = "",

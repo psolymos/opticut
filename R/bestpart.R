@@ -93,7 +93,7 @@ function (object, which=NULL, ...)
         full_model=TRUE, ...)
 }
 
-bestmodel.optilevel <-
+bestmodel.optilevels <-
 function (object, ...)
 {
     NULL
