@@ -1,5 +1,6 @@
-\name{wrsi}
+\name{selind}
 \alias{wrsi}
+\alias{selind}
 \title{
 Weighted relative suitability index
 }
@@ -7,11 +8,13 @@ Weighted relative suitability index
 Calculates weighted relative suitability index.
 }
 \usage{
+selind(y, x)
 wrsi(y, x)
 }
 \arguments{
   \item{y}{
-vector of observations.
+matrix of observations for \code{selind},
+vector of observations for \code{wrsi}.
 }
   \item{x}{
 a matrix of proportions (i.e. the values 0 and 1 should have
@@ -19,7 +22,25 @@ consistent meaning across the columns, often through a unit sum constraint).
 }
 }
 \value{
-A data frame (class \code{wrsi}).
+\code{wrsi} returns a data frame (class 'wrsi') with the following columns:
+
+\code{WRSI}: weighted relative suitability index, range (0- Inf).
+
+\code{zWRSI}: log of \code{WRSI} (z-transformed), range (-Inf, Inf).
+
+\code{rWRSI}: inverse Fisher z-transformed \code{zWRSI}, range (-1, 1).
+
+\code{Pused} and \code{Pavail}: total proportion of used (\code{y > 0})
+and available of each feature (column) in \code{x}.
+
+\code{Pw}: weighted proportions from \code{y}.
+
+\code{u} and \code{a}: used and available totals
+for each feature (column) in \code{x}.
+
+\code{selind} returns a data frame (class 'selind') with
+one column for each species, and one row for each feature (column) in \code{x}.
+Cell values are inverse Fisher z-transformed (\code{zWRSI}) indices.
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
@@ -62,5 +83,10 @@ plot(lam, colSums(yy) / sum(yy), type="b")
 plot(lam, w$rWRSI, type="b")
 abline(h=0, lty=2)
 par(op)
+
+## --- selind calculations for multiple species
+y2 <- cbind(Spp1=y, Spp2=rev(y), Spp3=sample(y))
+(w2 <- selind(y2, x))
+heatmap(as.matrix(w2))
 }
 \keyword{ models }
