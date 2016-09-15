@@ -353,13 +353,13 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
             if (length(cl) < 2)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             parallel::clusterEvalQ(cl, library(opticut))
-            .oc_envir <- new.env()
-            assign("dist", dist, envir=.oc_envir)
-            assign("X", X, envir=.oc_envir)
-            assign("Z", X, envir=.oc_envir)
-            assign("Y", Y, envir=.oc_envir)
-            assign("sset", sset, envir=.oc_envir)
-            parallel::clusterExport(cl, c("Y", "X","Z","dist"), envir=.oc_envir)
+            e <- new.env()
+            assign("dist", dist, envir=e)
+            assign("X", X, envir=e)
+            assign("Z", X, envir=e)
+            assign("Y", Y, envir=e)
+            assign("sset", sset, envir=e)
+            parallel::clusterExport(cl, c("Y", "X","Z","dist"), envir=e)
             if (getOption("ocoptions")$try_error) {
                 res <- parallel::parLapply(cl, seq_len(ncol(Y)), function(i, ...)
                     try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
@@ -372,8 +372,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         ## forking
         } else {
             if (.Platform$OS.type == "windows" && cl != 1)
-                stop("Unfortunately forking (cl > 1) does not work on Windows:",
-                     "try cl as a cluster instead.")
+                stop("Did you know that forking (cl > 1) does not work on Windows?",
+                     "Try cl as a cluster instead, see ?makeCluster.")
             if (cl < 2)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             if (getOption("ocoptions")$try_error) {

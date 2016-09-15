@@ -182,8 +182,8 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
         ## forking
         } else {
             if (.Platform$OS.type == "windows" && cl != 1)
-                stop("Unfortunately forking (cl > 1) does not work on Windows:",
-                     "try cl as a cluster instead.")
+                stop("Did you know that forking (cl > 1) does not work on Windows?",
+                     "Try cl as a cluster instead, see ?makeCluster.")
             if (cl < 2)
                 stop("Are you kidding? Set cl to utilize at least 2 workers.")
             res <- parallel::mclapply(spp, function(i, ...)
