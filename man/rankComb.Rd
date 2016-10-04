@@ -30,7 +30,7 @@ character, distribution argument passed to underlying functions,
 see listed on the help page of \code{\link{opticut}}.
 }
   \item{x}{
-a vector for \code{allComb} (can be of any type but treated as factor, must have at least 2 unique values); and a numeric matrix for \code{checkComb}.
+and a numeric vector.
 }
   \item{collapse}{
 character, what to paste between levels.

@@ -4,6 +4,8 @@
 \alias{bestmodel.optilevels}
 \alias{bestpart}
 \alias{bestpart.opticut}
+\alias{bestpart.uncertainty}
+\alias{bestpart.uncertainty1}
 \title{
 Accessing best model and partition from fitted object
 }
@@ -17,6 +19,8 @@ bestmodel(object, ...)
 
 bestpart(object, ...)
 \method{bestpart}{opticut}(object, ...)
+\method{bestpart}{uncertainty}(object, ...)
+\method{bestpart}{uncertainty1}(object, ...)
 }
 \arguments{
   \item{object}{
@@ -64,6 +68,8 @@ mods
 ## explore further
 str(predict(mods[[1]]))
 confint(mods[[1]])
+
+## !!! FIXME: add uncertainty related bestpart example here !!!
 }
 \keyword{ manip }
 \keyword{ models }
