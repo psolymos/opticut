@@ -81,8 +81,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     }
 
     if (ncol(Y) < 2L) {
-        pbo <- pboptions(type = "none")
-        on.exit(pboptions(pbo), add=TRUE)
+        pbo <- pbapply::pboptions(type = "none")
+        on.exit(pbapply::pboptions(pbo), add=TRUE)
     }
     if (inherits(cl, "cluster")) {
         if (length(cl) < 2)
@@ -99,8 +99,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         on.exit(parallel::clusterEvalQ(cl, detach(package:opticut)), add=TRUE)
     }
     if (getOption("ocoptions")$try_error) {
-        res <- pbapply::pbapply(Y, 2, function(yy, ...)
-            try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), cl=cl, ...)
+        res <- pbapply::pblapply(seq_len(ncol(Y)), function(i, ...)
+            try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)), cl=cl, ...)
         Failed <- sapply(res, inherits, "try-error")
         failed <- names(res)[Failed]
         if (any(Failed)) {
@@ -110,8 +110,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
                 " out of ", length(res), " species.")
         }
     } else {
-        res <- pbapply::pbapply(Y, 2, function(yy, ...)
-            opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), cl=cl, ...)
+        res <- pbapply::pblapply(seq_len(ncol(Y)), function(i, ...)
+            opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...), cl=cl, ...)
         Failed <- logical(length(res))
         failed <- character(0)
     }
