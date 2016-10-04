@@ -80,62 +80,27 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         }
     }
 
-    ## sequential
-    if (is.null(cl)) {
-        ## show progress bar
-        if (ncol(Y) < 2L) {
-            pbo <- pboptions(type = "none")
-            on.exit(pboptions(pbo))
-        }
-        if (getOption("ocoptions")$try_error) {
-            res <- pbapply::pbapply(Y, 2, function(yy, ...)
-                try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
-        } else {
-            res <- pbapply::pbapply(Y, 2, function(yy, ...)
-                opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), ...)
-        }
-    ## parallel
-    } else {
-        ## snow type cluster
-        if (inherits(cl, "cluster")) {
-            if (length(cl) < 2)
-                stop("Are you kidding? Set cl to utilize at least 2 workers.")
-            parallel::clusterEvalQ(cl, library(opticut))
-            e <- new.env()
-            assign("dist", dist, envir=e)
-            assign("X", X, envir=e)
-            assign("Z", X, envir=e)
-            assign("Y", Y, envir=e)
-            assign("sset", sset, envir=e)
-            parallel::clusterExport(cl, c("Y", "X","Z","dist"), envir=e)
-            if (getOption("ocoptions")$try_error) {
-                res <- parallel::parLapply(cl, seq_len(ncol(Y)), function(i, ...)
-                    try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)), ...)
-            } else {
-                res <- parallel::parLapply(cl, seq_len(ncol(Y)), function(i, ...)
-                    opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...), ...)
-            }
-            parallel::clusterEvalQ(cl, rm(list=c("Y", "X","Z","dist")))
-            parallel::clusterEvalQ(cl, detach(package:opticut))
-        ## forking
-        } else {
-            if (.Platform$OS.type == "windows" && cl != 1)
-                stop("Did you know that forking (cl > 1) does not work on Windows?",
-                     "Try cl as a cluster instead, see ?makeCluster.")
-            if (cl < 2)
-                stop("Are you kidding? Set cl to utilize at least 2 workers.")
-            if (getOption("ocoptions")$try_error) {
-                res <- parallel::mclapply(seq_len(ncol(Y)), function(i, ...)
-                    try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)),
-                    mc.cores = cl, ...)
-            } else {
-                res <- parallel::mclapply(seq_len(ncol(Y)), function(i, ...)
-                    opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...),
-                    mc.cores = cl, ...)
-            }
-        }
+    if (ncol(Y) < 2L) {
+        pbo <- pboptions(type = "none")
+        on.exit(pboptions(pbo), add=TRUE)
+    }
+    if (inherits(cl, "cluster")) {
+        if (length(cl) < 2)
+            stop("Are you kidding? Set cl to utilize at least 2 workers.")
+        parallel::clusterEvalQ(cl, library(opticut))
+        e <- new.env()
+        assign("dist", dist, envir=e)
+        assign("X", X, envir=e)
+        assign("Z", X, envir=e)
+        assign("Y", Y, envir=e)
+        assign("sset", sset, envir=e)
+        parallel::clusterExport(cl, c("Y", "X","Z","dist"), envir=e)
+        on.exit(parallel::clusterEvalQ(cl, rm(list=c("Y", "X","Z","dist"))), add=TRUE)
+        on.exit(parallel::clusterEvalQ(cl, detach(package:opticut)), add=TRUE)
     }
     if (getOption("ocoptions")$try_error) {
+        res <- pbapply::pbapply(Y, 2, function(yy, ...)
+            try(opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...)), cl=cl, ...)
         Failed <- sapply(res, inherits, "try-error")
         failed <- names(res)[Failed]
         if (any(Failed)) {
@@ -145,9 +110,12 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
                 " out of ", length(res), " species.")
         }
     } else {
+        res <- pbapply::pbapply(Y, 2, function(yy, ...)
+            opticut1(Y=yy, X=X, Z=Z, dist=dist, sset=sset, ...), cl=cl, ...)
         Failed <- logical(length(res))
         failed <- character(0)
     }
+
     NOBS <- if (is.null(sset))
         NROW(Y) else NROW(data.matrix(Y)[sset,,drop=FALSE])
     out <- list(call=match.call(),
