@@ -8,7 +8,7 @@ function(y, x)
         stop("Dang! Dimension mismatch in inputs.")
     if (is.null(colnames(X)))
         colnames(X) <- paste0("V", seq_len(ncol(X)))
-    res <- data.frame(opticut:::.wrsi(Y, X))
+    res <- data.frame(opticut::.wrsi(Y, X))
     rownames(res) <- colnames(X)
     class(res) <- c("wrsi", "data.frame")
     res

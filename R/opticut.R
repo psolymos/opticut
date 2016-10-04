@@ -101,6 +101,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     if (getOption("ocoptions")$try_error) {
         res <- pbapply::pblapply(seq_len(ncol(Y)), function(i, ...)
             try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)), cl=cl, ...)
+        names(res) <- colnames(Y)
         Failed <- sapply(res, inherits, "try-error")
         failed <- names(res)[Failed]
         if (any(Failed)) {
@@ -112,6 +113,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     } else {
         res <- pbapply::pblapply(seq_len(ncol(Y)), function(i, ...)
             opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...), cl=cl, ...)
+        names(res) <- colnames(Y)
         Failed <- logical(length(res))
         failed <- character(0)
     }

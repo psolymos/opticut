@@ -30,3 +30,4 @@ importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
            "vcov", "density", "quantile", ".MFclass", "nobs")
 importFrom("utils", "combn")
+importFrom("pbapply", "pboptions", "pbapply")
