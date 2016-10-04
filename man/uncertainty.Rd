@@ -2,7 +2,6 @@
 \alias{uncertainty}
 \alias{uncertainty.opticut}
 \alias{print.uncertainty1}
-\alias{wplot.uncertainty1}
 \alias{print.uncertainty}
 \alias{print.summary.uncertainty}
 \alias{summary.uncertainty}
@@ -19,7 +18,6 @@ uncertainty(object, ...)
     B = 99, cl = NULL, ...)
 
 \method{print}{uncertainty1}(x, ...)
-\method{wplot}{uncertainty1}(x, ylab, plot = TRUE, ...)
 \method{print}{uncertainty}(x, ...)
 \method{print}{summary.uncertainty}(x, ...)
 \method{summary}{uncertainty}(object, level = 0.95, ...)
@@ -58,13 +56,7 @@ a cluster object, or an integer for multiple cores in parallel computations
 (this does nothing on Windows).
 }
   \item{x}{
-an object to be printed or plotted.
-}
-  \item{ylab}{
-label for the y axis.
-}
-  \item{plot}{
-logical, if a plot is to be drawn or not.
+an object to be printed.
 }
   \item{level}{
 the confidence level required.
@@ -81,7 +73,10 @@ Each 'uncertainty1' output is a data frame with 4 columns:
 \code{best} partition, indicator value \code{I},
 and expected values \code{mu0}, and \code{mu1}.
 
-Plot methods invisibly return data that was plotted.
+The summary method prints the name of the best supported split,
+selection frequency (R, reliability), indicator values (I, based on
+the distribution of values within the best supported split with highest
+reliability) and conficence interval for I (based on \code{level}).
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
