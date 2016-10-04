@@ -19,7 +19,7 @@
         initial = 0,
         title = "R progress bar",
         label = "",
-        nout = 100L)
+        nout = 100L))
     invisible(NULL)
 }
 
