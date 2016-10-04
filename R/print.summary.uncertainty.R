@@ -7,7 +7,7 @@ function(x, ...)
         "\nlevel = ", format(round(x$level, 2), nsmall=2),
         "\n\n", sep="")
     uct <- x$uctab
-    #uct <- uct[order(uct$split, -uct$PC),]
+    uct <- uct[order(uct$split, -uct$R, -uct$I),]
     print(uct, ...)
     invisible(x)
 }
