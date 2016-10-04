@@ -2,7 +2,6 @@
 \alias{uncertainty}
 \alias{uncertainty.opticut}
 \alias{print.uncertainty1}
-\alias{plot.uncertainty1}
 \alias{wplot.uncertainty1}
 \alias{print.uncertainty}
 \alias{print.summary.uncertainty}
@@ -20,7 +19,6 @@ uncertainty(object, ...)
     B = 99, cl = NULL, ...)
 
 \method{print}{uncertainty1}(x, ...)
-\method{plot}{uncertainty1}(x, ...)
 \method{wplot}{uncertainty1}(x, ylab, plot = TRUE, ...)
 \method{print}{uncertainty}(x, ...)
 \method{print}{summary.uncertainty}(x, ...)
@@ -114,9 +112,6 @@ summary(uc3)
 ## individual species results
 uc3$uncertainty
 
-## density plots
-## note: multimodality is due to uncertainty in partitions
-plot(uc3$uncertainty[[1]])
 ## selection frequencies for partitions
 ## (only for type = 'multi')
 wplot(uc3$uncertainty[[1]])
