@@ -112,11 +112,7 @@ summary(uc3)
 ## individual species results
 uc3$uncertainty
 
-## selection frequencies for partitions
-## (only for type = 'multi')
-wplot(uc3$uncertainty[[1]])
-## selection frequencies are based on this matrix:
-(wplot(uc3$uncertainty[[1]], plot=FALSE))
+## !!! FIXME: add example about heatplot like bestpart application !!!
 }
 \keyword{ manip }
 \keyword{ models }
