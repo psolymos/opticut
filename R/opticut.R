@@ -85,8 +85,6 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         on.exit(pbapply::pboptions(pbo), add=TRUE)
     }
     if (inherits(cl, "cluster")) {
-        if (length(cl) < 2)
-            stop("Are you kidding? Set cl to utilize at least 2 workers.")
         parallel::clusterEvalQ(cl, library(opticut))
         e <- new.env()
         assign("dist", dist, envir=e)

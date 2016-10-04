@@ -43,7 +43,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     }
     if (type == "boot") {
         cf <- if (pb) {
-            t(pbapply::pbapply(BB, 2, function(z) {
+            t(pbapply::pbapply(BB, 2, function(z, ...) {
                 .extractOpticut(object, which,
                     boot=z,
                     internal=TRUE,
@@ -51,7 +51,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                     best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
         } else {
-            t(apply(BB, 2, function(z) {
+            t(apply(BB, 2, function(z, ...) {
                 .extractOpticut(object, which,
                     boot=z,
                     internal=TRUE,
@@ -75,7 +75,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         mat[1L, ] <- tmp[c("I", "mu0", "mu1")]
         if (pb) {
             pbar <- pbapply::startpb(0, niter)
-            on.exit(pbapply::closepb(pbar))
+            on.exit(pbapply::closepb(pbar), add=TRUE)
         }
         for (j in seq_len(niter)) {
             ## Z is factor, thus 'rank' applied

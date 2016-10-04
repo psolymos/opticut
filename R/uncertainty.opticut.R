@@ -43,48 +43,20 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
     out$Y <- out$Y[,spp,drop=FALSE]
     class(out) <- "uncertainty"
 
-    ## sequential
-    if (is.null(cl)) {
-        ## show progress bar by species
-        if (length(spp) > 1L && interactive()) {
-            res <- pbapply::pblapply(spp, function(i, ...)
-                .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    pb = FALSE, ...), ...)
-        ## show progress bar when interactive (by B iterations)
-        } else {
-            res <- lapply(spp, function(i, ...)
-                .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    pb = interactive(), ...), ...)
-        }
-    ## parallel (not showing progress)
-    } else {
-        ## snow type cluster
-        if (inherits(cl, "cluster")) {
-            if (length(cl) < 2)
-                stop("Are you kidding? Set cl to utilize at least 2 workers.")
-            parallel::clusterEvalQ(cl, library(opticut))
-            e <- new.env()
-            assign("object", object, envir=e)
-            assign("type", type, envir=e)
-            assign("B", B, envir=e)
-            parallel::clusterExport(cl, c("object","type","B"), envir=e)
-            res <- parallel::parLapply(cl, spp, function(i, ...)
-                .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    pb = FALSE, ...), ...)
-            parallel::clusterEvalQ(cl, rm(list=c("object","type","B")))
-            parallel::clusterEvalQ(cl, detach(package:opticut))
-        ## forking
-        } else {
-            if (.Platform$OS.type == "windows" && cl != 1)
-                stop("Did you know that forking (cl > 1) does not work on Windows?",
-                     "Try cl as a cluster instead, see ?makeCluster.")
-            if (cl < 2)
-                stop("Are you kidding? Set cl to utilize at least 2 workers.")
-            res <- parallel::mclapply(spp, function(i, ...)
-                .uncertaintyOpticut1(object=object, i, type=type, B=B,
-                    pb = FALSE, ...), mc.cores = cl, ...)
-        }
+    if (inherits(cl, "cluster")) {
+        parallel::clusterEvalQ(cl, library(opticut))
+        e <- new.env()
+        assign("object", object, envir=e)
+        assign("type", type, envir=e)
+        assign("B", B, envir=e)
+        parallel::clusterExport(cl, c("object","type","B"), envir=e)
+        on.exit(parallel::clusterEvalQ(cl, rm(list=c("object","type","B"))), add=TRUE)
+        on.exit(parallel::clusterEvalQ(cl, detach(package:opticut)), add=TRUE)
     }
+    res <- pbapply::pblapply(spp, function(i, ...)
+        .uncertaintyOpticut1(object=object, i, type=type, B=B,
+            pb = FALSE, ...), cl=cl, ...)
+
     out$uncertainty <- res
     out
 }
