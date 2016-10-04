@@ -15,7 +15,7 @@
         char = "=",
         txt.width = 50,
         gui.width = 300,
-        style = 6,
+        style = 3,
         initial = 0,
         title = "R progress bar",
         label = "",
