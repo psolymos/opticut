@@ -7,7 +7,7 @@ variables as described in Kemencei et al. (2014).
 
 ## Build status
 
-[![Build Status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut)
+[![Build Status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut) [![codecov](https://codecov.io/gh/psolymos/opticut/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/opticut)
 
 ## Install
 
@@ -23,7 +23,7 @@ to report a problem.
 
 ## References
 
-Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, 
-E. & Solymos, P. (2014): Microhabitat associations of land snails in 
-forested dolinas: implications for coarse filter conservation. 
+Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
+E. & Solymos, P. (2014): Microhabitat associations of land snails in
+forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
