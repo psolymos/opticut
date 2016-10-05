@@ -248,6 +248,8 @@ the model with the highest log-likelihood ratio value (CITATION).
 
 ## Indicator value
 
+NOTE: I=tan(abs(beta)): $I=tan(|\beta_{1}|)$
+
 The indicator value ($I$) for each candidate partition can be calculated
 based on expected values using the inverse link function as
 $\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and
