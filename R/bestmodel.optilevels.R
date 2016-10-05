@@ -15,7 +15,6 @@ function (object, ...)
 #    CALL$dist <- NULL
     CALL$Y <- as.name("Y")
     CALL$X <- as.name("X")
-    CALL$Z1 <- as.name("Z")
     CALL$full_model <- TRUE
     out <- eval(CALL, envir=object)
     out

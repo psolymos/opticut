@@ -191,12 +191,15 @@ z <- scale(model.matrix(~ stratum + lmoist - 1,
 ## without additional covariates
 dol1 <- optilevels(y, x, z=NULL, dist="poisson")
 dol1$rank
-bestmodel(dol1)
+summary(bestmodel(dol1))
 
 ## with additional covariates
 dol2 <- optilevels(y, x, z, dist="poisson")
 dol2$rank
-bestmodel(dol2)
+summary(bestmodel(dol2))
+
+## compare the two models
+AIC(bestmodel(dol1), bestmodel(dol2))
 }
 }
 \keyword{ manip }
