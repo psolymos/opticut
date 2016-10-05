@@ -89,6 +89,6 @@ par(op)
 ## --- selind calculations for multiple species
 y2 <- cbind(Spp1=y, Spp2=rev(y), Spp3=sample(y))
 (w2 <- selind(y2, x))
-heatmap(as.matrix(w2), scale="none")
+heatmap(as.matrix(w2), scale="none", col=occolors()(25))
 }
 \keyword{ models }

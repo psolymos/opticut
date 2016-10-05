@@ -326,7 +326,7 @@ confint(mods[[1]])
 
 \dontrun{
 ## --- Zero-inflated Negative Binomial
-## dolina analysis
+## dolina example
 data(dolina)
 ## stratum as ordinal
 dolina$samp$stratum <- as.integer(dolina$samp$stratum)
@@ -373,7 +373,6 @@ opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
     dist=fun, zi_term=dolina$samp$method)
 dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
-
 }
 
 ## current collapse value
