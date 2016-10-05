@@ -95,11 +95,13 @@ n <- 50
 x0 <- sample(1:4, n, TRUE)
 x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
+x3 <- ifelse(x0 \%in\% 2:4, 1, 0)
 lam1 <- exp(0.5 + 1*x1 + -0.2*x2)
 Y1 <- rpois(n, lam1)
-lam2 <- exp(1 - 0.1*x1)
+lam2 <- exp(1 + 0.5*x3)
 Y2 <- rpois(n, lam2)
-Y <- cbind(Spp1=Y1, Spp2=Y2)
+Y3 <- rpois(n, exp(0))
+Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
@@ -119,6 +121,7 @@ summary(uc3)
 ## best partitions:
 ## selection frequencies for strata and species
 bestpart(uc3)
+heatmap(bestpart(uc3), scale="none")
 
 ## individual species results
 uc3$uncertainty
