@@ -144,13 +144,12 @@ dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
 ## parallel computing for uncertainty
 library(parallel)
 cl <- makeCluster(2)
-
 ucdol <- uncertainty(dol, type="multi", B=25)
+stopCluster(cl)
+
 bestpart(ucdol)
 heatmap(bestpart(ucdol), scale="none", col=occolors()(25),
     distfun=function(x) dist(x, "manhattan"))
-
-stopCluster(cl)
 }
 }
 \keyword{ manip }
