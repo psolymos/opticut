@@ -10,6 +10,8 @@
 \alias{print.opticut1}
 \alias{summary.opticut}
 \alias{print.summary.opticut}
+\alias{bestmodel.opticut}
+\alias{bestpart.opticut}
 \title{
 Likelihood based optimal partitioning for indicator species analysis
 }
@@ -24,6 +26,9 @@ opticut(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), sset=NULL, cl = NULL, ...)
 
 fix_levels(x, sep = "_")
+
+\method{bestmodel}{opticut}(object, which = NULL, ...)
+\method{bestpart}{opticut}(object, ...)
 
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut,
@@ -144,57 +149,57 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 \details{
 Currently available distributions:
 
-\code{"gaussian"}: real valued continuous observations, e.g. biomass,
-uses \code{\link[stats]{lm}} of the stats package.
+\item{\code{"gaussian"}}{real valued continuous observations, e.g. biomass,
+uses \code{\link[stats]{lm}} of the stats package.}
 
-\code{"poisson"}: Poisson count data,
-uses \code{\link[stats]{glm}} of the stats package.
+\item{\code{"poisson"}}{Poisson count data,
+uses \code{\link[stats]{glm}} of the stats package.}
 
-\code{"binomial"}: presence-absence (detection-nondetection) type data,
-uses \code{\link[stats]{glm}} of the stats package.
+\item{\code{"binomial"}}{presence-absence (detection-nondetection) type data,
+uses \code{\link[stats]{glm}} of the stats package.}
 
-\code{"negbin"}: overdispersed Negative Binomial count data,
-uses \code{\link[MASS]{glm.nb}} of the MASS package.
+\item{\code{"negbin"}}{overdispersed Negative Binomial count data,
+uses \code{\link[MASS]{glm.nb}} of the MASS package.}
 
-\code{"beta"}: continuous response in the unit interval, e.g. percent cover,
-uses \code{\link[betareg]{betareg}}  of the betareg package.
+\item{\code{"beta"}}{continuous response in the unit interval, e.g. percent cover,
+uses \code{\link[betareg]{betareg}}  of the betareg package.}
 
-\code{"zip"}: zero-inflated Poisson counts,
+\item{\code{"zip"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the abundance model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
 
-\code{"zinb"}: zero-inflated Negative Binomial counts,
+\item{\code{"zinb"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the abundance model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
 
-\code{"zip2"}: zero-inflated Poisson counts,
+\item{\code{"zip2"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the zero-model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
 
-\code{"zinb2"}: zero-inflated Negative Binomial counts,
+\item{\code{"zinb2"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the zero-model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
 
-\code{"ordered"}: response measured on ordinal scale,
+\item{\code{"ordered"}}{response measured on ordinal scale,
 e.g. ordinal vegetation cover,
-uses \code{\link[MASS]{polr}} of the MASS package.
+uses \code{\link[MASS]{polr}} of the MASS package.}
 
-\code{"rsf"}: presence-only data using resource selection
+\item{\code{"rsf"}}{presence-only data using resource selection
 functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
 in the ResourceSelection package.
 The \code{"rsf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model is accepted for \code{"rsf"}.
+Intercept only model is accepted for \code{"rsf"}.}
 
-\code{"rspf"}: presence-only data using resource selection
+\item{\code{"rspf"}}{presence-only data using resource selection
 probability functions (RSPF)
 as explained in \code{\link[ResourceSelection]{rspf}}
 in the ResourceSelection package.
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model is not accepted for \code{"rspf"}.
+Intercept only model is not accepted for \code{"rspf"}.}
 
 Custom distributions can be defined, see Examples.
 
@@ -218,6 +223,18 @@ as \code{X} argument in \code{opticut1}).
 \code{opticut} returns an object of class opticut.
 
 \code{fix_levels} returns a factor with modified levels.
+
+The \code{print} and \code{summary} methods are called for their side effects.
+
+The \code{plot} method presents the contrasts by species and strata.
+
+The \code{wplot} (weight plot) shows model weights for partitions.
+
+\code{bestpart} returns a matrix with the best supported
+partitions for each species (species as columns).
+
+\code{bestmodel} returns the best supported model for further
+manipulation (e.g. prediction).
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
@@ -283,17 +300,27 @@ opticut1(Y1, X, Z, dist="binomial")
 opticut1(Y1, X, as.factor(x0), dist="binomial")
 
 ## all partitions, multiple species
-m <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
-summary(m)
+m1 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
+summary(m1)
 ## show all species
-summary(m, cut=0)
+summary(m1, cut=0)
 ## model weights
-wplot(m)
+wplot(m1)
 ## associations
-plot(m)
+plot(m1)
 
 ## rank based partitions, multiple species
-summary(opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
+summary(m2 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
+
+## best partition
+head(bestpart(m2))
+
+## best model
+mods <- bestmodel(m2)
+mods
+## explore further
+str(predict(mods[[1]]))
+confint(mods[[1]])
 
 \dontrun{
 ## --- Zero-inflated Negative Binomial

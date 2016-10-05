@@ -1,5 +1,6 @@
 \name{optilevels}
 \alias{optilevels}
+\alias{bestmodel.optilevels}
 \title{
 Optimal number of factor levels.
 }
@@ -8,6 +9,8 @@ Finds the optimal number of factor levels given the data and a model.
 }
 \usage{
 optilevels(y, x, z = NULL, alpha = 0, dist = "gaussian", ...)
+
+\method{bestmodel}{optilevels}(object, ...)
 }
 \arguments{
   \item{y}{
@@ -48,55 +51,57 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 \value{
 An object of class 'optilevels' that is a list with the following elements:
 
-\code{delta}: delta IC values along the selection path considering best models.
+\item{\code{delta}: delta IC values along the selection path considering best models.}
 
-\code{ic}: IC values along the selection path considering best models.
+\item{\code{ic}}{IC values along the selection path considering best models.}
 
-\code{coef}: matrix of coefficients (linear predictor scale)
+\item{\code{coef}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{x}
-along the selection path considering best models.
+along the selection path considering best models.}
 
-\code{zcoef}: matrix of coefficients (linear predictor scale)
+\item{\code{zcoef}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{z} when not \code{NULL}
-along the selection path considering best models, or \code{NULL}.
+along the selection path considering best models, or \code{NULL}.}
 
-\code{rank}: matrix ranks based on the coefficients
+\item{\code{rank}}{matrix ranks based on the coefficients
 along the selection path considering best models.
-Ranking uses the default \code{ties.method = "average"} in \code{\link{rank}}.
+Ranking uses the default \code{ties.method = "average"} in \code{\link{rank}}.}
 
-\code{deltalist}: delta IC values along the selection path
-considering all competing models.
+\item{\code{deltalist}}{delta IC values along the selection path
+considering all competing models.}
 
-\code{iclist}: IC values along the selection path
-considering all competing models.
+\item{\code{iclist}}{IC values along the selection path
+considering all competing models.}
 
-\code{coeflist}: matrix of coefficients (linear predictor scale)
+\item{\code{coeflist}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{x}
-along the selection path considering all competing models.
+along the selection path considering all competing models.}
 
-\code{zcoeflist}: matrix of coefficients (linear predictor scale)
+\item{\code{zcoeflist}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{z} when not \code{NULL}
-along the selection path considering all competing models, or \code{NULL}.
+along the selection path considering all competing models, or \code{NULL}.}
 
-\code{ranklist}: matrix ranks based on the coefficients
-along the selection path considering all competing models.
+\item{\code{ranklist}}{matrix ranks based on the coefficients
+along the selection path considering all competing models.}
 
-\code{levels}: list of (merged) factor levels along the selection path
-considering best models.
+\item{\code{levels}}{list of (merged) factor levels along the selection path
+considering best models.}
 
-\code{Y}: vector of observations (argument \code{y}).
+\item{\code{Y}}{vector of observations (argument \code{y}).}
 
-\code{X}: design matrix component corresponding to argument \code{x}.
+\item{\code{X}}{design matrix component corresponding to argument \code{x}.}
 
-\code{Z}: design matrix component corresponding to argument \code{z}.
+\item{\code{Z}}{design matrix component corresponding to argument \code{z}.}
 
-\code{alpha}: weighting argument.
+\item{\code{alpha}}{weighting argument.}
 
-\code{dist}: distribution argument
+\item{\code{dist}}{distribution argument.}
 
-\code{factor}: logical, indicating if argument \code{x} is a factor
-(\code{TRUE}) or a matrix (\code{FALSE}).
+\item{\code{factor}}{logical, indicating if argument \code{x} is a factor
+(\code{TRUE}) or a matrix (\code{FALSE}).}
 
+\code{bestmodel} returns the best supported model for further
+manipulation (e.g. prediction).
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
@@ -148,6 +153,9 @@ lam <- exp(drop(X \%*\% b))
 y <- rpois(n, lam)
 
 z <- optilevels(y, x, dist="poisson")
+
+## best model refit
+bestmodel(z)
 
 ## estimates
 plogis(z$coef)

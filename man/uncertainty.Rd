@@ -5,6 +5,8 @@
 \alias{print.uncertainty}
 \alias{print.summary.uncertainty}
 \alias{summary.uncertainty}
+\alias{bestpart.uncertainty}
+\alias{bestpart.uncertainty1}
 \title{
 Quantifying uncertainty for fitted objects
 }
@@ -16,6 +18,9 @@ uncertainty(object, ...)
 \method{uncertainty}{opticut}(object,
     which = NULL, type = c("asymp", "boot", "multi"),
     B = 99, cl = NULL, ...)
+
+\method{bestpart}{uncertainty}(object, ...)
+\method{bestpart}{uncertainty1}(object, ...)
 
 \method{print}{uncertainty1}(x, ...)
 \method{print}{uncertainty}(x, ...)
@@ -90,24 +95,34 @@ n <- 50
 x0 <- sample(1:4, n, TRUE)
 x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
-lam <- exp(0.5 + 1*x1 + -0.2*x2)
-Y <- rpois(n, lam)
+lam1 <- exp(0.5 + 1*x1 + -0.2*x2)
+Y1 <- rpois(n, lam1)
+lam2 <- exp(1 - 0.1*x1)
+Y2 <- rpois(n, lam2)
+Y <- cbind(Spp1=Y1, Spp2=Y2)
+
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
+## asymptotic confidence intervals
 uc1 <- uncertainty(oc, type="asymp", B=999)
+summary(uc1)
+## bootstrap-based confidence intervals
 uc2 <- uncertainty(oc, type="boot", B=19)
+summary(uc2)
+
 ## use user-supplied indices
+## multi-model bootstrap based uncertainties
 B <- replicate(20, sample.int(n, replace=TRUE))
 uc3 <- uncertainty(oc, type="multi", B=B)
-
-## selection probabilities (p) for best supported split
-## and confidence intervals for I
 summary(uc3)
+
+## best partitions:
+## selection frequencies for strata and species
+bestpart(uc3)
 
 ## individual species results
 uc3$uncertainty
-
-## !!! FIXME: add example about heatplot like bestpart application !!!
+bestpart(uc3$uncertainty[[1]])
 }
 \keyword{ manip }
 \keyword{ models }
