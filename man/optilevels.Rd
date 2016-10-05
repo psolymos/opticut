@@ -44,6 +44,9 @@ see listed on the help page of \code{\link{opticut}}
 which does not have a sound theoretical
 basis due to non-identifiability of piece-wise constant RSPF models).
 }
+  \item{object}{
+fitted object.
+}
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
