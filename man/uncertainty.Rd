@@ -117,18 +117,41 @@ summary(uc2)
 
 ## use user-supplied indices
 ## multi-model bootstrap based uncertainties
-B <- replicate(20, sample.int(n, replace=TRUE))
+B <- replicate(25, sample.int(n, replace=TRUE))
 uc3 <- uncertainty(oc, type="multi", B=B)
 summary(uc3)
 
 ## best partitions:
 ## selection frequencies for strata and species
 bestpart(uc3)
-heatmap(bestpart(uc3), scale="none")
+heatmap(bestpart(uc3), scale="none", col=occolors()(25))
 
 ## individual species results
 uc3$uncertainty
 bestpart(uc3$uncertainty[[1]])
+
+\dontrun{
+## dolina example
+data(dolina)
+## stratum as ordinal
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+## filter species to speed up things a bit
+Y <- ifelse(dolina$xtab[,colSums(dolina$xtab > 0) >= 20] > 0, 1, 0)
+## opticut results, note the cloglog link function
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial:cloglog")
+
+## parallel computing for uncertainty
+library(parallel)
+cl <- makeCluster(2)
+
+ucdol <- uncertainty(dol, type="multi", B=25)
+bestpart(ucdol)
+heatmap(bestpart(ucdol), scale="none", col=occolors()(25),
+    distfun=function(x) dist(x, "manhattan"))
+
+stopCluster(cl)
+}
 }
 \keyword{ manip }
 \keyword{ models }
