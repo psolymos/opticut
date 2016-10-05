@@ -24,6 +24,7 @@ consistent meaning across the columns, often through a unit sum constraint).
 \value{
 \code{wrsi} returns a data frame (class 'wrsi') with the following columns:
 
+\describe{
 \item{\code{WRSI}}{weighted relative suitability index, range (0- Inf).}
 
 \item{\code{zWRSI}}{log of \code{WRSI} (z-transformed), range (-Inf, Inf).}
@@ -37,6 +38,7 @@ and available of each feature (column) in \code{x}.}
 
 \item{\code{u} and \code{a}}{used and available totals
 for each feature (column) in \code{x}.}
+}
 
 \code{selind} returns a data frame (class 'selind') with
 one column for each species, and one row for each feature (column) in \code{x}.

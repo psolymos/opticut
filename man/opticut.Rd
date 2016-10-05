@@ -149,6 +149,7 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 \details{
 Currently available distributions:
 
+\describe{
 \item{\code{"gaussian"}}{real valued continuous observations, e.g. biomass,
 uses \code{\link[stats]{lm}} of the stats package.}
 
@@ -200,6 +201,7 @@ The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
 Intercept only model is not accepted for \code{"rspf"}.}
+}
 
 Custom distributions can be defined, see Examples.
 

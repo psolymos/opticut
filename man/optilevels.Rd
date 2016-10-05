@@ -51,7 +51,8 @@ other arguments passed to the underlying functions, see \code{\link{opticut}}.
 \value{
 An object of class 'optilevels' that is a list with the following elements:
 
-\item{\code{delta}: delta IC values along the selection path considering best models.}
+\describe{
+\item{\code{delta}}{delta IC values along the selection path considering best models.}
 
 \item{\code{ic}}{IC values along the selection path considering best models.}
 
@@ -99,6 +100,7 @@ considering best models.}
 
 \item{\code{factor}}{logical, indicating if argument \code{x} is a factor
 (\code{TRUE}) or a matrix (\code{FALSE}).}
+}
 
 \code{bestmodel} returns the best supported model for further
 manipulation (e.g. prediction).

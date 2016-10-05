@@ -24,7 +24,7 @@ uncertainty(object, ...)
 
 \method{print}{uncertainty1}(x, ...)
 \method{print}{uncertainty}(x, ...)
-\method{print}{summary.uncertainty}(x, ...)
+\method{print}{summary.uncertainty}(x, digits, ...)
 \method{summary}{uncertainty}(object, level = 0.95, ...)
 }
 \arguments{
@@ -65,6 +65,9 @@ an object to be printed.
 }
   \item{level}{
 the confidence level required.
+}
+  \item{digits}{
+numeric, number of significant digits in output.
 }
 \item{\dots}{
 other arguments passed to the underlying functions.
