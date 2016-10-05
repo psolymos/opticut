@@ -17,6 +17,7 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
         colnames(X) <- paste0("X", seq_len(ncol(X)))
     colnames(X) <- gsub("\\s", "", colnames(X))
 #    nx <- ncol(X)
+    X0 <- X
     if (!is.null(Z)) {
         Z <- data.matrix(Z)
         if (is.null(colnames(Z)))
@@ -118,5 +119,5 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
         deltalist=delta_list, iclist=IC_list,
         coeflist=cfmat_list, zcoeflist=if (is.null(Z)) Z else cfzmat_list,
         ranklist=rnkmat_list,
-        alpha=alpha, dist=dist, Y=Y, X=X, Z=Z)
+        alpha=alpha, dist=dist, Y=Y, X=X0, Z=Z)
 }

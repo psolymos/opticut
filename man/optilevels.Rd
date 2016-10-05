@@ -178,6 +178,26 @@ m0 <- glm(y ~ x - 1, family="poisson")
 m1 <- glm(y ~ x1 - 1, family="poisson")
 data.frame(AIC(m0, m1), delta=AIC(m0, m1)$AIC - AIC(m0))
 z$delta # should be identical
+
+\dontrun{
+## dolina example with factor
+data(dolina)
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+y <- dolina$xtab[dolina$samp$method == "Q", "ppyg"]
+x <- dolina$samp$mhab[dolina$samp$method == "Q"]
+z <- scale(model.matrix(~ stratum + lmoist - 1,
+    dolina$samp[dolina$samp$method == "Q",]))
+
+## without additional covariates
+dol1 <- optilevels(y, x, z=NULL, dist="poisson")
+dol1$rank
+bestmodel(dol1)
+
+## with additional covariates
+dol2 <- optilevels(y, x, z, dist="poisson")
+dol2$rank
+bestmodel(dol2)
+}
 }
 \keyword{ manip }
 \keyword{ models }
