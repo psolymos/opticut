@@ -24,11 +24,18 @@ Issues with previous attempts:
 * confounding effects to classification can impact power,
 * assessing the ranking of partitions without inferential statements.
 
-Goals: 
+Goals:
 
 * describe a general and extensible approach that addresses the above limitations,
 * implement a computationally efficient algorithm,
 * tools for exploring the results (i.e. summaries, plots) in a object oriented framework.
+
+Why opticut?
+
+* HPC is natively supported
+* efficient for large number of partitions
+* lots of models defined, extensible
+* uncertainty and partitioning reliability
 
 # Theory
 
@@ -44,24 +51,24 @@ taking discrete or continuous values ($j = 1, ..., p$; number of predictors).
 
 A suitable parametric model describes the
 relationship between the observations and the site descriptors
-through the probability density function 
-$P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$ 
-where $\theta$ is the vector of model parameters: 
+through the probability density function
+$P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$
+where $\theta$ is the vector of model parameters:
 $\theta = (\beta_{0}, \beta_{1}, \alpha_{1}, ..., \alpha_{p})$.
-The choice of the parametric model depends on the nature of the 
+The choice of the parametric model depends on the nature of the
 observations. It can be Gaussian, Binomial, Poisson,
-ordinal, Beta regression, or zero-inflated models, with a 
+ordinal, Beta regression, or zero-inflated models, with a
 suitable link function ($f$) for the mean:
 $f(\eta_{i}) = \beta_{0}^{(m)} + \beta_{1}^{(m)} z_{i}^{(m)} + \sum_{j=1}^{p} \alpha_{j}^{(m)} x_{ij}$.
 
-$\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the 
-model parameters given the data and classification $m$, 
+$\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the
+model parameters given the data and classification $m$,
 with corresponding log-likelihood value $l(\widehat{\theta^{(m)}}; y)$.
 Finding MLEs for all $M$ candidate binary partitions
 leads to a set of log-likelihood values. One can compare
 the log-likelihood values to a null model (no binary partition is necessary)
 where $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
-and corresponding log-likelihood value for the null model: 
+and corresponding log-likelihood value for the null model:
 $l(\widehat{\theta^{(0)}}; y)$.
 
 The log-likelihood ratio for each candidate partition can be
@@ -69,16 +76,16 @@ calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
 The best supported binary partition is
 the model with the highest log-likelihood ratio value.
 
-One way of calculating the indicator value for each 
-candidate partition is 
-based on expected values using the inverse link function as 
-$\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and 
+One way of calculating the indicator value for each
+candidate partition is
+based on expected values using the inverse link function as
+$\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and
 $\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
 $I = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
-Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and 
+Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and
 $\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
 for the observations given the binary partition $z_{i}^{(m)}$
-and at 0 value for all $x_{ij}$. 
+and at 0 value for all $x_{ij}$.
 This approach can be sensitive to the range of values supported
 by the link function. For example it works nicely with logarithmic
 or logistic link function where non-negativity of predicted values
@@ -174,8 +181,8 @@ Describe here what is what in the output.
 
 Blindly fitting a model to all possible partitions is wasteful
 use of resources. Instead, one can rank the $K$ partitions
-based on expected response values 
-($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$, 
+based on expected response values
+($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$,
 where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
 This way we have to explore only $K-1$ partitions:
 
@@ -207,6 +214,12 @@ There is an overhead of fitting the model to calculate the ranking.
 But computing efficiencies can be still high compared to all partitions
 when the number of levels ($k$) is high.
 
+A downside of this approach is that not all possible partitions are explored,
+thus the model weights do not represent all possible models, but only
+the top candidates. Thus model weight interpretation is different
+(i.e. cannot be used as a reliability matric, especially when support for the
+best model is not dominant).
+
 # Distributions
 
 Currently available distributions:
@@ -218,10 +231,10 @@ Currently available distributions:
 * `"beta"`: continuous response in the unit interval, e.g. percent cover,
 * `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
   `"zip"`, or in zero model: `"zip2"`),
-* `"zinb"`, `"zinb"`: zero-inflated Negative Binomial counts 
+* `"zinb"`, `"zinb"`: zero-inflated Negative Binomial counts
   (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`),
-* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover, 
-* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection 
+* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover,
+* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection
   probability functions.
 
 
@@ -411,7 +424,7 @@ zi_beta_fun <- function(Y, X, linkinv, ...) {
         alpha <- mu * gamma
         beta <- (1 - mu) * gamma
         loglik0 <- log(phi)
-        loglik1 <- log(1 - phi) + suppressWarnings(dbeta(Y, 
+        loglik1 <- log(1 - phi) + suppressWarnings(dbeta(Y,
             alpha, beta, log = TRUE))
         loglik <- sum(loglik0[id0]) + sum(loglik1[id1])
         if (!is.finite(loglik) || is.na(loglik))
@@ -455,7 +468,7 @@ bp <- bestpart(a)
 op <- par(mfrow=c(3,4), mar=c(2,2,1,1))
 for (i in 1:12) {
     plot(ab[,i], aber$ages$Depth, type="l", ann=FALSE)
-    segments(x0=rep(0, nrow(ab)), y0=aber$ages$Depth, x1=ab[,i], 
+    segments(x0=rep(0, nrow(ab)), y0=aber$ages$Depth, x1=ab[,i],
         col=ifelse(bp[,i] > 0, 2, 1))
     title(main=colnames(ab)[i])
 }
@@ -498,7 +511,7 @@ mod2$species
 # Custom distributions
 
 The `distr` argument accepts a function, so other parametric models
-can be supplied which are avoided due to package dependencies. 
+can be supplied which are avoided due to package dependencies.
 
 ## Mixed models
 
@@ -624,7 +637,7 @@ gamfun <- function(Y, X, linkinv, Data, ...) {
 x <- ifelse(oven$veg=="agr",1,0)
 X <- model.matrix(~x)
 gamfun(oven$count, X, Data=oven, family=poisson)
-print(opticut1(oven$count, X=X[,1,drop=FALSE], oven$veg, dist=gamfun, 
+print(opticut1(oven$count, X=X[,1,drop=FALSE], oven$veg, dist=gamfun,
     Data=oven, family=poisson), cut=-Inf)
 
 o <- opticut(count ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=poisson)
@@ -705,3 +718,20 @@ system.time(uncertainty(o, type="multi", B=100, cl=cl))
 stopCluster(cl)
 ```
 
+# Opticut logo
+
+```{r}
+y <- matrix(c(
+    1,	1,	1,	1,	1,	1,	1,	1,	1,	1,
+    1,	1,	0,	0,	1,	1,	1,	0,	0,	1,
+    1,	0,	1,	1,	0,	1,	0,	1,	1,	1,
+    1,	0,	1,	1,	0,	1,	0,	1,	1,	1,
+    1,	0,	1,	1,	0,	1,	0,	1,	1,	1,
+    1,	1,	0,	0,	1,	1,	1,	0,	0,	1,
+    1,	1,	1,	1,	1,	1,	1,	1,	1,	1),
+    7, 10, byrow=TRUE)
+yy <- t(1-y*0.85)
+colnames(yy) <- paste0("Spp", 1:7)
+x <- opticut(yy ~ 1, strata=0:9)
+plot(x, sort=FALSE, cut=-Inf, xlab="", ylab="")
+```

@@ -5,10 +5,11 @@ Finding the best binary partition for each species based on
 model selection, possibly controlling for modifying/confounding
 variables as described in Kemencei et al. (2014).
 
+![](https://github.com/psolymos/opticut/raw/master/images/oc-logo.png)
+
 ## Build status
 
-[![Build Status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut) [![codecov](https://codecov.io/gh/psolymos/opticut/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/opticut)
-
+[![Build Status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut)
 ## Install
 
 ```
