@@ -42,15 +42,15 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
         type="n", axes=FALSE, ann=FALSE, ...)
     title(ylab=ylab, xlab=xlab)
     axis(1, at=seq_len(p)-0.5,
-        labels=colnames(bp), tick=TRUE)
+        labels=colnames(bp), tick=TRUE, ...)
     axis(2, at=seq_len(n)-0.5,
-        labels=rownames(bp), tick=TRUE)
+        labels=rownames(bp), tick=TRUE, ...)
     if (show_S)
         axis(3, at=seq_len(ncol(bp))-0.5,
-            labels=colSums(bp), tick=FALSE)
+            labels=colSums(bp), tick=FALSE, ...)
     if (show_I)
         axis(4, at=seq_len(n)-0.5,
-            labels=format(round(xx$I, 2), nsmall=2), tick=FALSE)
+            labels=format(round(xx$I, 2), nsmall=2), tick=FALSE, ...)
     Cols <- occolors(theme)(100)
     if (hr)
         abline(h=1:n-0.5, col=Cols[1L])
