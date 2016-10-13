@@ -17,5 +17,3 @@ function(theme)
     }
     colorRampPalette(theme)
 }
-
-

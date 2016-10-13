@@ -35,7 +35,7 @@ opticut package.
 \examples{
 ## using palettes
 plot(1:100, rep(2, 100), pch = 15,
-    ylim = c(0, 15), axes = FALSE, ann = FALSE,
+    ylim = c(0, 21), axes = FALSE, ann = FALSE,
     col = occolors()(100)) # default 'bg'
 text(50, 1, "theme = 'br'")
 points(1:100, rep(5, 100), pch = 15,
@@ -48,7 +48,13 @@ points(1:100, rep(11, 100), pch = 15,
     col=occolors(terrain.colors)(100))
 text(50, 10, "theme = terrain.colors")
 points(1:100, rep(14, 100), pch = 15,
-    col=occolors(c("orange", "tan", "pink"))(100))
-text(50, 13, "theme = c('orange', 'tan', 'pink')")
+    col=occolors(c("purple", "pink", "orange"))(100))
+text(50, 13, "theme = c('purple', 'pink', 'orange')")
+points(1:100, rep(17, 100), pch = 15,
+    col=occolors(c("#a6611a", "#ffffbf", "#018571"))(100))
+text(50, 16, "theme = c('#a6611a', '#ffffbf', '#018571')")
+points(1:100, rep(20, 100), pch = 15,
+    col=occolors(c("#7b3294", "#ffffbf", "#008837"))(100))
+text(50, 19, "theme = c('#7b3294', '#ffffbf', '#008837')")
 }
 \keyword{ utilities }
