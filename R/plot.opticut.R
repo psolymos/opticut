@@ -2,7 +2,7 @@ plot.opticut <-
 function(x, which = NULL, cut, sort,
 las=1, ylab="Relative abundance", xlab="Strata",
 show_I=TRUE, show_S=TRUE, hr=TRUE,
-theme, mar=c(5, 4, 4, 4) + 0.1, ...)
+theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
@@ -41,9 +41,9 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
     plot(0, xlim=c(0, p), ylim=c(n, 0),
         type="n", axes=FALSE, ann=FALSE, ...)
     title(ylab=ylab, xlab=xlab)
-    axis(1, at=seq_len(p)-0.5,
+    axis(1, at=seq_len(p)-0.5, lwd=0, lwd.ticks=1,
         labels=colnames(bp), tick=TRUE, ...)
-    axis(2, at=seq_len(n)-0.5,
+    axis(2, at=seq_len(n)-0.5, lwd=0, lwd.ticks=1,
         labels=rownames(bp), tick=TRUE, ...)
     if (show_S)
         axis(3, at=seq_len(ncol(bp))-0.5,
@@ -63,6 +63,6 @@ theme, mar=c(5, 4, 4, 4) + 0.1, ...)
                 col=Cols[ColID], border=NA)
         }
     }
-    box(col="grey")
+    box(col="grey", bty=bty)
     invisible(xx)
 }

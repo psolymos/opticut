@@ -40,7 +40,7 @@ wplot(x, ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
     las = 1, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
-    theme, mar = c(5, 4, 4, 4) + 0.1, ...)
+    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 
 \method{print}{opticut1}(x, cut, sort, digits, ...)
 \method{print}{opticut}(x, digits, ...)
@@ -129,7 +129,11 @@ color theme as defined by \code{\link{occolors}}.
 numeric, graphical parameters for plot margin \code{\link{par}}.
 }
   \item{ylab, xlab, las, ylim}{
-graphical arguments.
+graphical arguments, see \code{\link{plot}}.
+}
+  \item{bty}{
+Character, determines the type of box which is drawn about plots,
+see \code{\link{par}}.
 }
   \item{digits}{
 numeric, number of significant digits in output.
