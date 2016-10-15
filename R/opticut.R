@@ -127,7 +127,6 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         sset=sset,
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
             (nlevels(Z) - 1L) else ncol(Z),
-        collapse=getOption("ocoptions")$collapse,
         dist=if (is.function(dist))
             deparse(substitute(dist)) else dist,
         comb=comb,
