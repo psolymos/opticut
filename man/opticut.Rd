@@ -242,6 +242,7 @@ with the following components:
 \item{\code{"comb"}}{combination type.}
 \item{\code{"failed"}}{IDs for failed species models.}
 \item{\code{"collapse"}}{character used for combining partition labels.}
+}
 
 \code{fix_levels} returns a factor with modified levels.
 
