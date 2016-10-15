@@ -23,19 +23,13 @@ consistent meaning across the columns, often through a unit sum constraint).
 }
 \value{
 \code{wrsi} returns a data frame (class 'wrsi') with the following columns:
-
 \describe{
 \item{\code{WRSI}}{weighted relative suitability index, range (0- Inf).}
-
 \item{\code{zWRSI}}{log of \code{WRSI} (z-transformed), range (-Inf, Inf).}
-
 \item{\code{rWRSI}}{inverse Fisher z-transformed \code{zWRSI}, range (-1, 1).}
-
 \item{\code{Pused} and \code{Pavail}}{total proportion of used (\code{y > 0})
 and available of each feature (column) in \code{x}.}
-
 \item{\code{Pw}}{weighted proportions from \code{y}.}
-
 \item{\code{u} and \code{a}}{used and available totals
 for each feature (column) in \code{x}.}
 }
