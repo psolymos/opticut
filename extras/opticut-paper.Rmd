@@ -3,56 +3,45 @@ title: "Likelihood based optimal partitioning for indicator species analysis"
 author: "Peter Solymos, Ermias T. Azeria. et al."
 date: "`r Sys.Date()`"
 output:
+  word_document: default
   pdf_document:
     keep_tex: no
     number_sections: no
     toc: no
-  word_document: default
 ---
 
-# Motivation
-
-confounding, data types, null distr, all/rank comb
-
-# Workflow
-
-summaries indices plots etc
-
-## Data and model types
-
-list distributions and give examples (table?)
-
-## Special cases
-
-ordered, RS(P)F
-
-## Extensibility
-
-N-mix, mixedm models
-
-## Uncertainty
-
-# HPC
-
-# Data sets
-
-dolina, ARU date/time, ABMI birds forest age
-
-need a simple example to explain the work flow.
-
-need to rewrite the I value part and explain how scaling of
-predictors can lead to funny values with identity link, and thus the tanh.
-
-Figure out other metrics: w (model weight), P (reliability): need to figure something out not just for partitions (P), but habitat based frequencies (wplot).
-
-DeCaceres example:
-```{r}
-y <- c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4)
-z <- rep(1:3, each=4)
-```
-
-
 # Introduction
+
+Motivation: Why we need parametric model
+
+* distributions vs. data types (randomization, continuous and ordinal data)
+* confounding/modifying variables
+
+General problem: find where species abundances are high vs. low in
+a way which leads to optimal classification by maximizing the
+contrast between the partitions.
+
+Previous attempts: historical review, highlighting IndVal.
+
+Issues with previous attempts:
+
+* summary statistics & Monte Carlo randomization with p-values, no model,
+* data types not always compatible with randomization (i.e. decimals),
+* confounding effects to classification can impact power,
+* assessing the ranking of partitions without inferential statements.
+
+Goals:
+
+* describe a general and extensible approach that addresses the above limitations,
+* implement a computationally efficient algorithm,
+* tools for exploring the results (i.e. summaries, plots) in a object oriented framework.
+
+Why opticut?
+
+* HPC is natively supported
+* efficient for large number of partitions
+* lots of models defined, extensible
+* uncertainty and partitioning reliability
 
 The distributions of organisms on Earth show different levels of aggregation
 determined by climate, vegetation,
@@ -74,7 +63,7 @@ measure success of habitat restoration,
 alerting about critical community thresholds (TITAN),
 or indicate the presence of cryptic or rare species (Beals, Indpower, TWINSPAN).
 
-There are three main types of algorithms that are used to quantify the 
+There are three main types of algorithms that are used to quantify the
 degree of association for species. The contingency table based measures (e.g. the
 phi-coefficient, or Chi-square metric) that compare
 agreement in binary classifications based on some function of
@@ -149,30 +138,25 @@ We also provide the opticut R extension package that implements
 computationally efficient algorithm for finding indicator species,
 and tools for exploring and visualizing the results.
 
+# Theory
 
-## Methods
+logLR, I, all/rank based combinations, uncertainty
 
-### Parametric model
+# Theory
 
-In indicator species analysis we are faced with the
-general problem of finding an optimal
-partitioning of low vs. high species abundance with respect to
-an a-priory stratification.
-The observations are usually organized as a community data matrix with
-sites or samples as rows ($i = 1, ..., n$) and species as columns.
-We describe the theory for a single species only.
-The community-wide inference replicates the analyses for each species
-independently of one another. $Y_{i}$'s are observations for a single species
-from $n$ locations.
-$g_{i}$ is a known descriptor of stratification for the location $i$
-that can take any of $K$ discrete values ($K > 1$).
-Let us denote $z^{(m)}$ as a binary reclassification of $g$ taking values (0, 1).
-The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification. There can also be other site descriptors denoted as $x_{ij}$
-taking discrete or continuous values ($j = 1, ..., p$; the number of predictors).
+## The quest for optimal binary partitioning
+
+$Y_{i}$'s are observations for a single species
+from $n$ locations ($i = 1, ..., n$).
+$g_{i}$'s are known discrete descriptors of the locations with
+$K$ levels ($K > 2$). $z^{(m)}$ is a binary reclassification of $g$ taking
+values (0, 1). The superscript $m = 1, ..., M$ indicates a possible combination of binary reclassification out of the total $M = 2^{K-1} - 1$ total combinations (excluding complements). See below for options for defining binary partitions.
+There can also be other site descriptors denoted as $x_{ij}$
+taking discrete or continuous values ($j = 1, ..., p$; number of predictors).
 
 A suitable parametric model describes the
-relationship between the observations and the site descriptors, including
-the binary partitioning, through the probability density function
+relationship between the observations and the site descriptors
+through the probability density function
 $P(Y_{i} = y_{i} \mid z_{i}^{(m)}, x_{ij}, \theta)$
 where $\theta$ is the vector of model parameters:
 $\theta = (\beta_{0}, \beta_{1}, \alpha_{1}, ..., \alpha_{p})$.
@@ -182,217 +166,142 @@ ordinal, Beta regression, or zero-inflated models, with a
 suitable link function ($f$) for the mean:
 $f(\eta_{i}) = \beta_{0}^{(m)} + \beta_{1}^{(m)} z_{i}^{(m)} + \sum_{j=1}^{p} \alpha_{j}^{(m)} x_{ij}$.
 
-The opticut R extension package implements different parametric models.
-The default is a Gaussian linear model with an identity link.
-Other models include logistic regression (Binomial distribution with
-logistic link function), log-linear count models (Poisson, Negative
-Binomial, Zero-inflated Poisson and Negative Binomial with logarithmic link).
-Ordinal species observations can be analyzed using
-the proportional ordered logistic regression (cit MASS). Percent cover data
-may be analyzed based on a Beta regression (cit package).
-Presence-only data (e.g. museum records, incidental sightings,
-most citizen science observations), or animal movement data can be analyzed
-based on resource selection (probability) functions (Lele & Keim).
-Other custom distributions can also be defined in the R package,
-such as linear mixed models, generalized linear mixed models (cit),
-occupancy (cit MacKenzie, Lele et al) or N-mixture models (Royle, Solymos).
-
-### Defining the set of partitions
-
-The maximum number of binary partitions based on $K$ levels is
-$2^K - 1$ (see DeCaceres), including complements like
-(0, 0, 1) and (1, 1, 0) counted as separate
-partitions. Such complementary partitions represent identical stratification,
-thus should not affect the result of indicator species analysis.
-(It does affect the IndVal value for $K>2$ cases.)
-When complements are not counted twice, the number of
-possible binary partitions of the stratification with $K$ strata (or levels)
-is $M = 2^{K-1} - 1$.
-Finding all combinations does not require a model or observed responses.
-It only takes a classification vector with $K > 1$ partitions.
-As a consequence, the partitions can be set up for all species in the
-community matrix at once, and used for finding the best partition for each
-species.
-
-Blindly fitting a model to all possible partitions is wasteful
-use of resources because the number of candidate partitions
-grows steeply with increasing $K$. Instead, one can rank the
-$K$ partitions based on expected response values
-($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$,
-where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
-This way we have to explore only $M=K-1$ partitions. For $K=3$
-we have the following partitions: (1), (1, 2), (1, 2, 3),
-where rank 1 is for lowest and 3 is for highest expected abundance.
-The ranking varies from species to species, thus
-it is not possible to supply the resulting stratification a-priory
-for for all species in the community matrix.
-There is an overhead of fitting the model to calculate the ranking first.
-But computing efficiencies are significant for $K>3$ cases.
-For example for $K=10$ the difference is
-56-fold (511 all partitions vs. 9 rank based partitions).
-
 $\widehat{\theta^{(m)}}$ is the maximum likelihood estimate (MLE) of the
-model parameters given the data and partition $m$,
-with corresponding log-likelihood value 
-$l(\widehat{\theta^{(m)}}; y) = l^{(m)}$.
+model parameters given the data and classification $m$,
+with corresponding log-likelihood value $l(\widehat{\theta^{(m)}}; y)$.
 Finding MLEs for all $M$ candidate binary partitions
 leads to a set of log-likelihood values. One can compare
-the log-likelihood values to a null model (no binary partitioning is necessary)
-where we fix $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
+the log-likelihood values to a null model (no binary partition is necessary)
+where $\beta_{1} = 0$ leading to the MLE $\widehat{\theta^{(0)}}$
 and corresponding log-likelihood value for the null model:
-$l(\widehat{\theta^{(0)}}; y) = l^{(0)}$.
+$l(\widehat{\theta^{(0)}}; y)$.
+
 The log-likelihood ratio for each candidate partition can be
-calculated as $log(LR)^{(m)} = l^{(m)} - l^{(0)}$.
+calculated as $l(\widehat{\theta^{(m)}}; y) - l(\widehat{\theta^{(0)}}; y)$.
 The best supported binary partition is
-the model with the highest log-likelihood ratio value (CITATION).
+the model with the highest log-likelihood ratio value.
 
-## Indicator value
-
-NOTE: I=tan(abs(beta)): $I=tan(|\beta_{1}|)$
-
-The indicator value ($I$) for each candidate partition can be calculated
+One way of calculating the indicator value for each
+candidate partition is
 based on expected values using the inverse link function as
 $\mu_{0}^{(m)} = f^{-1}(\beta_{0}^{(m)})$ and
 $\mu_{1}^{(m)} = f^{-1}(\beta_{0}^{(m)} + \beta_{1}^{(m)})$.
-$I^{(m)} = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
+$I = 1 - min(\mu_{0}^{(m)}, \mu_{1}^{(m)}) / max(\mu_{0}^{(m)}, \mu_{1}^{(m)})$.
 Where $\mu_{0}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=0, x_{ij}=0]$ and
 $\mu_{1}^{(m)} = E[Y_{i} \mid z_{i}^{(m)}=1, x_{ij}=0]$ are expected values
 for the observations given the binary partition $z_{i}^{(m)}$
 and at 0 value for all $x_{ij}$.
-The strength of association of the species with a given partition is 
-determined by $I^{(m)}$.
-The value of $I^{(m)}$ is minimal (0) when $\mu_{0}^{(m)} = \mu_{1}^{(m)}$,
-whereas $I^{(m)}$ is maximal (1) when one of the expected values
-is close to 0 (i.e. the species is absent). This is also referred to as
-high fidelity in plant ecology (citation).
-The sign of the association equals $sign(\beta_{1}^{(m)})$. 
+This approach can be sensitive to the range of values supported
+by the link function. For example it works nicely with logarithmic
+or logistic link function where non-negativity of predicted values
+is ensured by definition. This is, however, not the case for the
+identity link in the Gaussian case, when negative values can
+invaludate the indicator value calculations as described above.
+(This usually happens when confounding variables are not centered
+and the intercept then reflects that difference as part of the baseline.)
 
-The ranking of the $M$ candidate models based on 
-$I$ and $log(LR)$ is usually not identical
-because $I$ only considers the contrast between predicted
-abundances in the two strata, whereas $log(LR)$ represents
-goodness of fit and is a function of not only the model
-parameters but the data as well. $I$ and $log(LR)$ convey
-different information that needs to be presented together
-for meaningful statistical inference. Ranking of models
-should follow $log(LR)$ (best fit) and not $I$ (largest contrast).
+As an alternative, one can use the estimate $\beta_{1}^{(m)}$ itself
+to express the contrast between the two strata.
+This also makes the index more comparable when different link functions are used.
+We used the hyperbolic tangent function (or inverse Fisher's $z$ transform)
+to scale the real valued
+$\beta_{1}^{(m)}$ into the unit range (0-1):
+$I = tanh(\mid \beta_{1}^{(m)} \mid) = \frac{exp(2 \mid \beta_{1}^{(m)} \mid) - 1}{exp(2 \mid \beta_{1}^{(m)} \mid) + 1}$.
+Positive and negative cases are taken as absolute values, so that
+the index reflects only the contrast between strata, and not the
+direction of it. Negative value can happen when using all combinations.
 
-!!! TODO: use DeCaceres 1-species example from Oikos paper to
-explain the Gaussian opticut approach.
+## Finding all possible binary partitions
 
-```{r}
-## Gaussian example
-library(opticut)
-(Y <- c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4))
-(z <- as.factor(rep(LETTERS[1:3], each=4)))
+Finding all combinations does not require a model or observed responses.
+It only takes a classification vector with $K > 1$ partitions.
 
-opticut1(Y, Z=z)
-opticut1(ifelse(Y>0,1,0), Z=z, dist="binomial")
+`kComb` returns a 'contrast' matrix corresponding to
+all possible binary partitions of the factor with `K` levels.
+Complements are not counted twice, i.e.
+(0,0,1,1) is equivalent to (1,1,0,0).
+The number of such possible combinations is $M = 2^{K-1} - 1$.
 
-print(opticut1(Y, Z=allComb(z)), cut=-Inf)
-print(opticut1(ifelse(Y>0,1,0), Z=allComb(z), dist="binomial"), cut=-Inf)
+`allComb` this takes a classification vector with at least 2 levels
+and returns a model matrix with binary partitions. `checkComb`
+checks if combinations are unique and non-complementary
+(misfits are returned as attributes).
 
-allComb(z)
-rankComb(Y, matrix(1, length(Y), 1), z)
+## Rank based partitions
 
-set.seed(123)
-oc <- opticut(Y ~ 1, strata=z)
-uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
-#uc2 <- uncertainty(oc, 1, type="boot", B=999)
-#uc3 <- uncertainty(oc, 1, type="multi", B=999)
+Blindly fitting a model to all possible partitions is wasteful
+use of resources. Instead, one can rank the $K$ partitions
+based on expected response values
+($\mu_{1}, ..., \mu_{k}, ..., \mu_{K}$,
+where $\mu_{k}=E[Y_{i} \mid g_{i}=k, x_{ij}=0]$).
+This way we have to explore only $K-1$ partitions:
 
-Y <- cbind(Sp1=c(4, 6, 3, 5, 5, 6, 3, 4, 4, 1, 3, 2),
-           Sp2=c(0, 0, 0, 0, 1, 0, 0, 1, 5, 2, 3, 4),
-           Sp3=c(0, 0, 3, 0, 2, 3, 0, 5, 5, 6, 3, 4))
-oc <- opticut(Y ~ 1, strata=z)
-plot(oc)
-uc1 <- uncertainty(oc, 1, type="asymp", B=9999)
-#uc2 <- uncertainty(oc, 1, type="boot", B=999)
-#uc3 <- uncertainty(oc, 2, type="multi", B=999)
+`oComb` return the 'contrast' matrix based on the rank vector as input.
+Rank 1 means lowest expected value among the partitions.
 
-```
+The function `rankComb` fits the model with multiple ($K > 2$) factor levels
+to find out the ranking, and returns a binary classification matrix
+similarly to `allComb`:
 
-## Quantifying uncertainty
+Note that the ranking varies from species to species, thus
+it is not possible to supply the resulting matrix as
+`strata` definition:
 
-### Model weights
+There is an overhead of fitting the model to calculate the ranking.
+But computing efficiencies can be still high compared to all partitions
+when the number of levels ($k$) is high.
 
-The relative support for the candidate partitions can be measured
-by the log-likelihood ratio. A value of >2 means support for
-a partition over the null model, a value of >8 indicates strong support
-over the null model. Model weights can be calculated as 
-$w^{(m)} = \Delta^{(m)} / \sum_{m=1}^{M} \Delta^{(m)}$,
-where $\Delta^{(m)} = exp(l^{(m)} - max(l^{(1)}, ..., l^{(M)}))$ (Burnham & Anderson).
+A downside of this approach is that not all possible partitions are explored,
+thus the model weights do not represent all possible models, but only
+the top candidates. Thus model weight interpretation is different
+(i.e. cannot be used as a reliability matric, especially when support for the
+best model is not dominant).
 
-### Asymptotic (large sample) inference
+# Software implementation
 
-Describe how to get asymptotic CIs for mu0, mu1, I (but best partition is fixed). This is of little value, because we rarely test if I for one species is
-different from I for another species. Also, significance of differences between
-mu0 and mu1 (contrasts) are of little value on their own. But one might want to 
-explore the distributions and interpret the results visually.
+Install, HPC, options
 
-### Bootstrap based inference
+## Distributions
 
-Small sample based inference (CIs can be asymmetric and wider than
-asymptotics). Best partition can be fixed (same applies as for asymptotics).
-Best partition can be selected for each bootstrap iteration, thus
-giving a probabilistic measure of 'mixing'. DeCaceres also mentioned this.
+Currently available distributions:
 
-## Simulations
+* `"gaussian"`: real valued continuous observations, e.g. biomass,
+* `"poisson"`: Poisson count data,
+* `"binomial"`: presence-absence type data,
+* `"negbin"`: overdispersed Negative Binomial count data,
+* `"beta"`: continuous response in the unit interval, e.g. percent cover,
+* `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
+  `"zip"`, or in zero model: `"zip2"`),
+* `"zinb"`, `"zinb"`: zero-inflated Negative Binomial counts
+  (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`),
+* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover,
+* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection
+  probability functions.
 
-K=2 case: study effect of:
 
-* contrast
-* confounding
-* noise
-* misclassification
+Special cases: ordered, RS(P)F
 
-K=3 case: recovering mixing proportions using bootstrap
+Extensions: N-mix, GAM, LMM/GLMM, etc.
 
-## Case studies
+# Example workflow
 
-# Results
+summaries indices plots etc
 
-Confounding effect is fixed by opticut (IX),
-others are similar (I0: interpret only opticut, IV: IndVal,
-PH: phi coefficient, FR: F-ratio). Red = 1, yellow=0 (proportion passed).
+## Uncertainty
 
-```{r,echo=FALSE}
-load("~/Dropbox/collaborations/opticut/opticut-simuls.Rdata")
-r6v <- sapply(res6, function(z) rowMeans(z[2,,]>0))
-op <- par(mfrow=c(2,3))
-rr <- r6v[,vals2$b1==0.9 & vals2$b3==1]
-for (i in 1:5)
-image(unique(vals$b2), unique(vals$b4), 
-    matrix(-rr[i,], length(unique(vals$b2)), length(unique(vals$b4))),
-    main=rownames(rr)[i],
-    xlab="Confounding", ylab="Misclassification")
-par(op)
-```
+xxx
 
-Power (pass/fail) analyzed with Binomial GLM,
-see sign & magnitude of effects and deviance table.
-b1: contrast, b2: confounding, b3: noise, b4: misclassification
-(small value: small effect etc).
+## Extensibility
 
-```{r,echo=FALSE}
-r6c <- sapply(res6, function(z) rowSums(z[2,,]>0))
-xx <- data.frame(success=as.numeric(t(r6c)), 
-    failure=B-as.numeric(t(r6c)),
-    method=rep(rownames(r6c), nrow(vals2)), vals2)
-xx$method <- relevel(xx$method, "IX")
-mm <- glm(cbind(success, failure) ~ method + (b1 + b2 + b3 + b4), xx, family=binomial)
-summary(mm)
-av <- anova(mm)
-av$Perc <- round(100 * anova(mm)$Deviance / 1041142, 2)
-sum(av$Perc, na.rm=TRUE)
-av
-```
+N-mix, mixed effects models
 
-# Discussion
+# Conclusions
+
+xxx
 
 # References
 
-McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. 
+McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators.
 Trends in Ecology and Evolution 13: 46--47.
 
 Podani J and Csanyi B (2010) Detecting indicator species: some extensions of the
@@ -411,7 +320,7 @@ sites: Indices and statistical inference. Ecology 90: 3566--3574.
 De Caceres M, Legendre P, and Moretti M (2010) Improving indicator species
 analysis by combining groups of sites. Oikos 119: 1674--1684.
 
-SANDER GREENLAND AND HAL MORGENSTERN 1989. 
+SANDER GREENLAND AND HAL MORGENSTERN 1989.
 Ecological Bias, Confounding, and Effect Modification.
 International Journal of Epidemiology, 18: 269--274.
 
@@ -450,12 +359,33 @@ SOCIOLOGICAL METHODS & RESEARCH, 33: 261--304
 Wildi, O. 1989. A new numerical solution to traditional phytosociological
 tabular classification. Vegetatio 81: 95-106.
 
-McGeoch, M.A. and Chown, S.L.1998. 
-Scaling up the value of bioindicators. 
+McGeoch, M.A. and Chown, S.L.1998.
+Scaling up the value of bioindicators.
 Trends Ecol. Evol. 13: 46-47.
 
-Jancey, R.C. 1979. Species ordering on a variance criterion. 
+Jancey, R.C. 1979. Species ordering on a variance criterion.
 Vegetatio 39: 59--63.
 
 
+```{r}
+library(opticut)
+h <- as.factor(rep(letters[1:4], each=3))
+y <- c(0,0,0, 0,0,1, 1,0,2, 3,2,1)
+table(h, y)
+ma <- opticut(y ~ 1, strata = h, comb = "all")
+mr <- opticut(y ~ 1, strata = h, comb = "rank")
+rc <- rankComb(y, matrix(1L, length(y), 1L), Z=h)
 
+y
+h
+print(ma$species[[1]], cut=-Inf)
+print(mr$species[[1]], cut=-Inf)
+bestpart(ma)
+bestpart(mr)
+rc
+round(attr(rc, "est"), 4)
+allComb(h)
+
+uc <- uncertainty(mr, type="multi", B=99)
+uc$uncertainty
+```
