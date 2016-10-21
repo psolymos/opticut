@@ -1,6 +1,8 @@
 rankComb <-
 function(Y, X, Z, dist="gaussian", collapse, ...)
 {
+    if (missing(X))
+        X <- matrix(1L, length(Y), 1L)
     if (!is.factor(Z))
         stop("Z must be a factor")
     if (missing(collapse))
