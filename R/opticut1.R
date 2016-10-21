@@ -5,7 +5,7 @@ opticut1 <-
 function(Y, X, Z, dist="gaussian", sset=NULL, ...)
 {
     if (missing(X))
-        X <- matrix(1, length(Y), 1)
+        X <- matrix(1L, length(Y), 1L)
     X <- data.matrix(X)
     if (is.null(rownames(X)))
         rownames(X) <- seq_len(nrow(X))
@@ -37,7 +37,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         Z <- Z[sset,,drop=FALSE]
     }
     res0 <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
-    cf <- matrix(0, N, length(res0$coef)+1)
+    cf <- matrix(0, N, length(res0$coef) + 1L)
     rownames(cf) <- colnames(Z)
     ll <- numeric(N)
     names(ll) <- colnames(Z)
