@@ -224,9 +224,25 @@ flag issues when the formula-to-model-matrix translation is side-stepped
 as \code{X} argument in \code{opticut1}).
 }
 \value{
-\code{opticut1} returns an object of class opticut1.
+\code{opticut1} returns an object of class opticut1, that is a modified
+data frame with additional attributes.
 
-\code{opticut} returns an object of class opticut.
+\code{opticut} returns an object of class opticut, that is a list
+with the following components:
+\describe{
+\item{\code{"call"}}{the function call.}
+\item{\code{"species"}}{a list of species specific opticut1 objects.}
+\item{\code{"X"}}{modifying variables as model matrix.}
+\item{\code{"Y"}}{response, single species vector or matrix.}
+\item{\code{"strata"}}{defines the partitions.}
+\item{\code{"nobs"}}{sample size.}
+\item{\code{"sset"}}{subset, if specified.}
+\item{\code{"nsplit"}}{number of binary splits considered.}
+\item{\code{"dist"}}{distribution.}
+\item{\code{"comb"}}{combination type.}
+\item{\code{"failed"}}{IDs for failed species models.}
+\item{\code{"collapse"}}{character used for combining partition labels.}
+}
 
 \code{fix_levels} returns a factor with modified levels.
 

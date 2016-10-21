@@ -3,7 +3,7 @@
 \docType{data}
 \title{
 A comprehensive and micro-scale land snail data set from 16 dolines of the
-Aggtelek Karst Area, Hungary.
+Aggtelek Karst Area, Hungary
 }
 \description{
 Data set containing land snail counts as described in Kemecei et al. 2014.
