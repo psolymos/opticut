@@ -4,6 +4,8 @@ export("opticut", "optilevels", "opticut1",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "uncertainty", "wplot",
     "fix_levels")
+S3method("opticut", "default")
+S3method("opticut", "formula")
 S3method("bestmodel", "opticut")
 S3method("bestmodel", "optilevels")
 S3method("bestpart", "opticut")
