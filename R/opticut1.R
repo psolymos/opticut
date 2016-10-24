@@ -25,7 +25,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     if (is.null(colnames(Z)))
         colnames(Z) <- paste0("split.", seq_len(ncol(Z)))
     if (getOption("ocoptions")$check_comb && !checkComb(Z))
-        stop("Guess what! Complementary design variables found:\nuse 'checkComb'")
+        stop("Guess what! Complementary design variables found: use 'checkComb'")
     if (length(unique(c(length(Y), nrow(X), nrow(Z)))) > 1)
         stop("Khm ... dimension mismatch: check you input.")
     if (is.null(rownames(Z))) {
