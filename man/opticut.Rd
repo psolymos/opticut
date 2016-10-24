@@ -226,12 +226,12 @@ This case can lead to an error when specifying the \code{strata} argument,
 and the \code{fix_levels} can help.
 }
 \section{Warning}{
-The use of the \code{opticut1} function is generally discouraged.
-Use the \code{opticut} function instead with a single species in the left-hand
-side of the formula. Some of the internal checks are not guaranteed to
+The use of the \code{opticut1} function is generally discouraged:
+some of the internal checks are not guaranteed to
 flag issues when the formula-to-model-matrix translation is side-stepped
 (this is what is happening when the modifier variables are supplied
 as \code{X} argument in \code{opticut1}).
+Use the \code{opticut} with a single species instead.
 }
 \value{
 \code{opticut1} returns an object of class opticut1, that is a modified
