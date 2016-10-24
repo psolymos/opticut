@@ -14,6 +14,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         Est <- attr(Z, "est")
         Comb <- "rank"
     } else {
+            stop("Pssst ... Z must have 0 and 1 values only!")
         Est <- NA
         Comb <- attr(Z, "comb")
         if (is.null(Comb))
@@ -25,9 +26,9 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     if (getOption("ocoptions")$check_comb && !checkComb(Z))
         stop("Guess what! Complementary design variables found:\nuse 'checkComb'")
     if (length(unique(c(length(Y), nrow(X), nrow(Z)))) > 1)
-        stop("Dimension mismatch: check you input.")
+        stop("Khm ... dimension mismatch: check you input.")
     if (is.null(rownames(Z))) {
-        warning("Row names added to binary split matrix Z (it was NULL). You are welcome.")
+        #warning("Row names added to binary split matrix Z (it was NULL).\nYou are welcome.")
         rownames(Z) <- apply(Z, 1, paste, collapse="")
     }
     N <- ncol(Z)
