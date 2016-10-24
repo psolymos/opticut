@@ -149,7 +149,7 @@ see \code{\link{par}}.
 numeric, number of significant digits in output.
 }
   \item{which}{
-numeric, character (can be a vector) defining
+numeric or character (can be a vector) defining
 a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
 }

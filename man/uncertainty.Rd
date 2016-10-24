@@ -33,14 +33,13 @@ fitted model object from \code{\link{opticut}} (or an output from
 \code{uncertainty} for the \code{summary} method).
 }
   \item{which}{
-numeric, character (can be a vector) defining
+numeric or character (can be a vector) defining
 a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
 }
   \item{type}{
 character, describing the type of uncertainty calculation for
-indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}
-(\code{I = 1 - min(mu0, mu1) / max(mu0, mu1)}).
+indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}.
 \code{"asymp"}: asymptotic distribution is based on best partition
 found for the input object.
 \code{"boot"}: non-parametric bootstrap distribution
@@ -86,6 +85,13 @@ selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
 reliability) and conficence interval for I (based on \code{level}).
 }
+\section{Warning}{
+Resampling methods can lead to complete exclusion of certain strata
+when sample size is small. Try revising the stratification of the
+input object, or provide custom resampling indices via the \code{B}
+argument using stratified (block) bootstrap, jackknife (leave-one-out),
+or similar techniques.
+}
 \author{
 Peter Solymos <solymos@ualberta.ca>
 }
@@ -129,6 +135,17 @@ heatmap(bestpart(uc3), scale="none", col=occolors()(25))
 ## individual species results
 uc3$uncertainty
 bestpart(uc3$uncertainty[[1]])
+
+## block bootstrap
+block_fun <- function()
+    unlist(lapply(unique(x0), function(z) if (sum(x0==z) < 2)
+        which(x0==z) else sample(which(x0==z), sum(x0==z), replace=TRUE)))
+B <- replicate(25, block_fun())
+summary(uncertainty(oc, type="multi", B=B))
+
+## jackknife
+B <- sapply(1:n, function(i) which((1:n) != i))
+summary(uncertainty(oc, type="multi", B=B))
 
 \dontrun{
 ## dolina example
