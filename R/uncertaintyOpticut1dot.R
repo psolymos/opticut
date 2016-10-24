@@ -40,6 +40,9 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             BB <- B
             niter <- ncol(B)
         }
+        ## check here min sample size for each strata
+        ## stop with meaningful error msg
+        ## (should be possible for rank based)
     }
     if (type == "boot") {
         cf <- if (pb) {
