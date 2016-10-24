@@ -14,6 +14,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         Est <- attr(Z, "est")
         Comb <- "rank"
     } else {
+        if (!all(Z %in% c(0, 1)))
             stop("Pssst ... Z must have 0 and 1 values only!")
         Est <- NA
         Comb <- attr(Z, "comb")
