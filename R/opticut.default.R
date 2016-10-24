@@ -45,21 +45,9 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
             c("gaussian","poisson","binomial","negbin",
             "beta","zip","zinb","ordered", "rsf", "rspf",
             "zip2", "zinb2"))
-        ## sanity check for rsf/rspf
-        if (Dist %in% c("rsf", "rspf")) {
-            if (ncol(Y) > 1L)
-                stop("rsf/rspf is only available for single species in RHS")
-            if (identical(as.character(ff[[2]]), "1"))
-                stop("invalid formula, no covariates")
-            factonly <- all(unique(sapply(mf, .MFclass)[-1]) %in% c("ordered", "factor"))
-            if (factonly && dist == "rspf")
-                stop("provide at least 1 continuous covariate for RSPF")
-        }
-        ## sanity check for rsf/rspf
-        if (Dist == "ordered") {
-            if (ncol(Y) > 1L)
-                stop("ordered is only available for single species in RHS")
-        }
+        ## sanity check for ordered/rsf/rspf
+        if (Dist %in% c("ordered", "rsf", "rspf") && ncol(Y) > 1L)
+            stop("'", dist, "' is only available for single species in RHS")
     }
 
     if (ncol(Y) < 2L) {
