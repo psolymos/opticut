@@ -15,11 +15,6 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     mf <- eval(mf, parent.frame())
     Y <- model.response(mf, "numeric")
     Y <- data.matrix(Y)
-    if (is.null(colnames(Y)))
-        colnames(Y) <- paste("Species", seq_len(ncol(Y)))
-    if (any(duplicated(colnames(Y))))
-        warning("Duplicate column names found and renamed in LHS.")
-    colnames(Y) <- make.names(colnames(Y))
     ff <- formula
     ff[[2]] <- NULL
     mt <- terms(ff, data = data)

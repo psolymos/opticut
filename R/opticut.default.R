@@ -6,6 +6,12 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     if (missing(strata))
         stop("It looks like that strata is missing.")
     Y <- data.matrix(Y)
+    if (is.null(colnames(Y)))
+        colnames(Y) <- paste("Sp", seq_len(ncol(Y)))
+    if (any(duplicated(colnames(Y)))) {
+        warning("Duplicate column names found and renamed in LHS.")
+        colnames(Y) <- make.names(colnames(Y), unique = TRUE)
+    }
     if (missing(X)) {
         X <- matrix(1, nrow(Y), 1L)
         rownames(X) <- rownames(Y)
@@ -47,7 +53,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
             "zip2", "zinb2"))
         ## sanity check for ordered/rsf/rspf
         if (Dist %in% c("ordered", "rsf", "rspf") && ncol(Y) > 1L)
-            stop("'", dist, "' is only available for single species in RHS")
+            stop("'", Dist, "' is only available for single species in RHS")
     }
 
     if (ncol(Y) < 2L) {
