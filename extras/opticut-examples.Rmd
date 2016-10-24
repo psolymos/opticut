@@ -272,6 +272,24 @@ try(opticut1(Y, Z=Z))
 oc <- ocoptions(check_comb=FALSE, cut=-Inf) # relax the checks
 opticut1(Y, Z=Z) # identical results for complementary partitions
 ocoptions(oc) # restore defaults
+
+print(opticut1(Y, Z=allComb(z)), cut=-Inf)
+print(opticut1(Y, Z=as.factor(z)), cut=-Inf)
+```
+
+```{r}
+## figure example
+y <- cbind(
+    Spp1=c(4,6,3,5,5,6,3,4,4,1,3,2),
+    Spp2=c(0,0,0,0,1,0,0,1,4,2,3,4),
+    Spp3=c(0,0,3,0,2,3,0,5,5,6,3,4))
+g <- rep(1:3, each=4)
+x <- c(0.1,-0.2,1,0,-0.5,-1,0,0.5,0,0.8,-0.3,0.1)
+m <- opticut(formula = y ~ 1, strata = g, dist = "poisson")
+print(summary(m), cut=-Inf)
+plot(m, ylab="", cut=-Inf, sort=FALSE, show_I=FALSE, show_S=FALSE)
+u <- uncertainty(m, type = "multi")
+bestpart(u)
 ```
 
 BCI data
