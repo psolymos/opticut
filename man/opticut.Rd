@@ -53,16 +53,23 @@ two sided model formula, response species data (matrix,
 or possible a vector for single species case) in the left-hand side,
 model terms for modifying effects in the right-hand side
 (its structure depending on the underlying functions).
+For example, in the most basic Gaussian case it can be
+\code{y ~ 1} (mo modifying variables) or \code{y ~ x}
+(with modifying variables).
 Centering the modifying terms (or choosing the origin wisely)
 is generally recommended (especially for Gaussian distribution
 where linear predictors are additive on the response scale)
 because the relative abundance contrast is estimated at the origin (0).
+Alternatively, \code{formula} can be defined by providing only
+the left hand side (\code{y}, a vector or a matrix, which is equivalent
+to \code{y ~ 1}). see Examples.
 }
   \item{data}{
 an optional data frame, list or environment containing the variables
 in the model. If not found in data, the variables are taken from
 \code{parent.frame()}, typically the environment
 from which \code{opticut} is called.
+Ignored when \code{formula} argument is not a formula.
 }
   \item{strata}{
 vector, unique values define partitions.
@@ -294,9 +301,11 @@ spp
 
 ## all partitions
 summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
+summary(opticut(spp, strata=gr, dist="gaussian", comb="all")) # alternative
 
 ## rank based partitions
 summary(ocrank <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="rank"))
+summary(opticut(spp, strata=gr, dist="gaussian", comb="rank")) # alternative
 
 ## --- Binomial
 ## simulated binary data
