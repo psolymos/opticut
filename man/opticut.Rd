@@ -1,5 +1,7 @@
 \name{opticut}
 \alias{opticut}
+\alias{opticut.default}
+\alias{opticut.formula}
 \alias{opticut1}
 \alias{plot.opticut}
 \alias{wplot}
@@ -22,7 +24,11 @@ variables. The general algorithm is described in Kemencei et al. 2014.
 }
 \usage{
 opticut1(Y, X, Z, dist = "gaussian", sset=NULL, ...)
-opticut(formula, data, strata, dist = "gaussian",
+
+opticut(...)
+\method{opticut}{default}(Y, X, strata, dist = "gaussian",
+    comb = c("rank", "all"), sset=NULL, cl = NULL, ...)
+\method{opticut}{formula}(formula, data, strata, dist = "gaussian",
     comb = c("rank", "all"), sset=NULL, cl = NULL, ...)
 
 fix_levels(x, sep = "_")
@@ -60,16 +66,12 @@ Centering the modifying terms (or choosing the origin wisely)
 is generally recommended (especially for Gaussian distribution
 where linear predictors are additive on the response scale)
 because the relative abundance contrast is estimated at the origin (0).
-Alternatively, \code{formula} can be defined by providing only
-the left hand side (\code{y}, a vector or a matrix, which is equivalent
-to \code{y ~ 1}). see Examples.
 }
   \item{data}{
 an optional data frame, list or environment containing the variables
 in the model. If not found in data, the variables are taken from
 \code{parent.frame()}, typically the environment
 from which \code{opticut} is called.
-Ignored when \code{formula} argument is not a formula.
 }
   \item{strata}{
 vector, unique values define partitions.
@@ -95,7 +97,8 @@ a cluster object, or an integer for multiple cores in parallel computations
 (this does nothing on Windows).
 }
   \item{Y}{
-numeric, vector of observations.
+numeric vector of observations for \code{opticut1},
+vector or community matrix for \code{opticut.default}.
 }
   \item{X}{
 numeric, design matrix. Can be missing, in which case an intercept-only model
