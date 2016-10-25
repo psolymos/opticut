@@ -288,14 +288,16 @@ x <- c(0.1,-0.2,1,0,-0.5,-1,0,0.5,0,0.8,-0.3,0.1)
 m <- opticut(formula = y ~ 1, strata = g, dist = "poisson")
 print(summary(m), cut=-Inf)
 plot(m, ylab="", cut=-Inf, sort=FALSE, show_I=FALSE, show_S=FALSE)
-## !!! FIXME !!!
-## bootstrap can lead to complementary Z matrix
-## options need to be relaxed and reset on exit
-## or block bootstrap by stratum ???
-## (blocking as option???)
-set.seed(1) # this breaks
-set.seed(2) # this does not
-u <- uncertainty(m, type = "multi")
+## this breaks
+set.seed(1)
+try(u <- uncertainty(m, type = "multi"))
+## see uncertainty examples
+## for more sophisticated ways of dealing with this issue:
+## e.g. jackknife
+B <- sapply(1:length(g), function(i) which((1:length(g)) != i))
+check_strata(m, B) # check representation
+u <- uncertainty(m, type="multi", B=B)
+summary(u)
 bestpart(u)
 ```
 
