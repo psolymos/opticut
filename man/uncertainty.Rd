@@ -7,6 +7,7 @@
 \alias{summary.uncertainty}
 \alias{bestpart.uncertainty}
 \alias{bestpart.uncertainty1}
+\alias{check_strata}
 \title{
 Quantifying uncertainty for fitted objects
 }
@@ -18,6 +19,8 @@ uncertainty(object, ...)
 \method{uncertainty}{opticut}(object,
     which = NULL, type = c("asymp", "boot", "multi"),
     B = 99, cl = NULL, ...)
+
+check_strata(x, mat)
 
 \method{bestpart}{uncertainty}(object, ...)
 \method{bestpart}{uncertainty1}(object, ...)
@@ -68,6 +71,9 @@ the confidence level required.
   \item{digits}{
 numeric, number of significant digits in output.
 }
+  \item{mat}{
+a matrix with resampling indices (rows as samples, columns as iterations).
+}
 \item{\dots}{
 other arguments passed to the underlying functions.
 }
@@ -80,6 +86,11 @@ Each 'uncertainty1' output is a data frame with 4 columns:
 \code{best} partition, indicator value \code{I},
 and expected values \code{mu0}, and \code{mu1}.
 
+\code{check_strata} returns a logical vector checking if
+all original strata from the input object are represented
+by resampling indices. Number of strata are attached as attributes
+for further diagnostics.
+
 The summary method prints the name of the best supported split,
 selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
@@ -90,7 +101,8 @@ Resampling methods can lead to complete exclusion of certain strata
 when sample size is small. Try revising the stratification of the
 input object, or provide custom resampling indices via the \code{B}
 argument using stratified (block) bootstrap, jackknife (leave-one-out),
-or similar techniques.
+or similar techniques. Sometimes finding a suitable random seed
+via \code{\link{set.seed}} can resolve the issue.
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

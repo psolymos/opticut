@@ -3,7 +3,7 @@ export("opticut", "optilevels", "opticut1",
     "ocoptions", "occolors",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "uncertainty", "wplot",
-    "fix_levels", "strata")
+    "fix_levels", "strata", "check_strata")
 S3method("opticut", "default")
 S3method("opticut", "formula")
 S3method("bestmodel", "opticut")
