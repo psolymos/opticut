@@ -15,8 +15,10 @@ The DESCRIPTION file:
 
 The main user interface is the \code{\link{opticut}} function
 to find the optimal binary partitioning.
+Make sure to evaluate \code{\link{uncertainty}}.
 
-\code{\link{optilevels}} finds the optimal number of factor levels.
+\code{\link{optilevels}} goes beyond
+binary partitions and finds the optimal number of factor levels.
 }
 \author{
 \packageAuthor{opticut}
@@ -40,9 +42,17 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
 spp
+
+## opticut fit and summary
 summary(oc <- opticut(spp ~ 1, strata=gr, comb="all"))
+
+## explore via plot
 plot(oc)
 
+## quantify uncertainty
+summary(uncertainty(oc, type="asymp", B=999))
+
+## go beyond binary partitions
 ol <- optilevels(spp[,"Species3"], as.factor(gr))
 ol[c("delta", "coef", "rank", "levels")]
 }

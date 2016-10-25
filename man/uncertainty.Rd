@@ -136,6 +136,7 @@ summary(uc2)
 ## use user-supplied indices
 ## multi-model bootstrap based uncertainties
 B <- replicate(25, sample.int(n, replace=TRUE))
+check_strata(oc, B) # check representation
 uc3 <- uncertainty(oc, type="multi", B=B)
 summary(uc3)
 
@@ -153,10 +154,12 @@ block_fun <- function()
     unlist(lapply(unique(x0), function(z) if (sum(x0==z) < 2)
         which(x0==z) else sample(which(x0==z), sum(x0==z), replace=TRUE)))
 B <- replicate(25, block_fun())
+check_strata(oc, B) # check representation
 summary(uncertainty(oc, type="multi", B=B))
 
 ## jackknife
 B <- sapply(1:n, function(i) which((1:n) != i))
+check_strata(oc, B) # check representation
 summary(uncertainty(oc, type="multi", B=B))
 
 \dontrun{
