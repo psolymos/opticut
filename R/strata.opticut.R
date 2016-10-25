@@ -4,5 +4,5 @@ function (object, ...) {
         return(object$strata)
     if (!is.na(object$comb) && !is.factor(object$strata))
         return(as.factor(rownames(object$strata)))
-    apply(object$strata, 1, paste, collapse="")
+    as.factor(apply(object$strata, 1, paste, collapse=""))
 }
