@@ -40,9 +40,9 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             BB <- B
             niter <- ncol(B)
         }
-        ## check here min sample size for each strata
-        ## stop with meaningful error msg
-        ## (should be possible for rank based)
+        nstr <- check_strata(object, BB)
+        if (!all(nstr))
+            stop("Not all strata represented in resampling")
     }
     if (type == "boot") {
         cf <- if (pb) {
