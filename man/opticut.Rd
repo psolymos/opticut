@@ -6,6 +6,8 @@
 \alias{plot.opticut}
 \alias{wplot}
 \alias{fix_levels}
+\alias{strata}
+\alias{strata.opticut}
 \alias{wplot.opticut}
 \alias{wplot.opticut1}
 \alias{print.opticut}
@@ -32,6 +34,8 @@ opticut(...)
     comb = c("rank", "all"), sset=NULL, cl = NULL, ...)
 
 fix_levels(x, sep = "_")
+strata(object, ...)
+\method{strata}{opticut}(object, ...)
 
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, ...)
@@ -255,6 +259,10 @@ with the following components:
 }
 
 \code{fix_levels} returns a factor with modified levels.
+
+The \code{strata} method extracts the \code{strata} argument
+as factor. The method finds unique row combinations
+when custom matrix is supplied for \code{strata}.
 
 The \code{print} and \code{summary} methods are called for their side effects.
 
