@@ -27,7 +27,7 @@ Maintainer: \packageMaintainer{opticut}
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
-E. & Solymos, P. (2014): Microhabitat associations of land snails in
+E. & Solymos, P., 2014. Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
 }

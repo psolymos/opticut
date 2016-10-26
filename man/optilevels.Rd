@@ -2,10 +2,11 @@
 \alias{optilevels}
 \alias{bestmodel.optilevels}
 \title{
-Optimal number of factor levels.
+Optimal number of factor levels
 }
 \description{
-Finds the optimal number of factor levels given the data and a model.
+Finds the optimal number of factor levels given the data and a model
+using a likelihood-based agglomerative algorithm.
 }
 \usage{
 optilevels(y, x, z = NULL, alpha = 0, dist = "gaussian", ...)

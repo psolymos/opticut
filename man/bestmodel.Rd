@@ -2,7 +2,7 @@
 \alias{bestmodel}
 \alias{bestpart}
 \title{
-Accessing best model and partition from fitted object
+Best model and partition
 }
 \description{
 Accessing best model and partition from fitted object.

@@ -2,10 +2,11 @@
 \alias{dolina}
 \docType{data}
 \title{
-A comprehensive and micro-scale land snail data set from 16 dolines of the
-Aggtelek Karst Area, Hungary
+Land snail data set
 }
 \description{
+A comprehensive and micro-scale land snail data set from 16 dolines of the
+Aggtelek Karst Area, Hungary.
 Data set containing land snail counts as described in Kemecei et al. 2014.
 }
 \usage{data("dolina")}
@@ -60,11 +61,11 @@ Solymos et al. 2016 and Kemencei et al. 2014.
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
-E. & Solymos, P. (2014): Microhabitat associations of land snails in
+E. & Solymos, P., 2014. Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
 
-Solymos, P., Kemencei, Z. Pall-Gergely, B., Farkas, R., Vilisics, F., Nagy, A., Kisfali, M. & Hornung, E. (2016): Public data from the dolina project. Version 1.0. Zenodo, DOI: 10.5281/zenodo.53080
+Solymos, P., Kemencei, Z. Pall-Gergely, B., Farkas, R., Vilisics, F., Nagy, A., Kisfali, M. & Hornung, E., 2016. Public data from the dolina project. Version 1.0. Zenodo, DOI: 10.5281/zenodo.53080
 }
 \examples{
 data(dolina)

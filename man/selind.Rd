@@ -2,10 +2,10 @@
 \alias{wrsi}
 \alias{selind}
 \title{
-Weighted relative suitability index
+Weighted relative selection index
 }
 \description{
-Calculates weighted relative suitability index.
+Calculates weighted relative selection index.
 }
 \usage{
 selind(y, x)
@@ -24,7 +24,7 @@ consistent meaning across the columns, often through a unit sum constraint).
 \value{
 \code{wrsi} returns a data frame (class 'wrsi') with the following columns:
 \describe{
-\item{\code{WRSI}}{weighted relative suitability index, range (0- Inf).}
+\item{\code{WRSI}}{weighted relative selection index, range (0- Inf).}
 \item{\code{zWRSI}}{log of \code{WRSI} (z-transformed), range (-Inf, Inf).}
 \item{\code{rWRSI}}{inverse Fisher z-transformed \code{zWRSI}, range (-1, 1).}
 \item{\code{Pused} and \code{Pavail}}{total proportion of used (\code{y > 0})
@@ -37,6 +37,14 @@ for each feature (column) in \code{x}.}
 \code{selind} returns a data frame (class 'selind') with
 one column for each species, and one row for each feature (column) in \code{x}.
 Cell values are inverse Fisher z-transformed (\code{zWRSI}) indices.
+}
+\references{
+Authors
+Lele, S. R., Merrill, E. H., Keim, J., Boyce, M. S., 2013.
+Selection, use, choice and occupancy:
+clarifying concepts in resource selection studies.
+Journal of Animal Ecology 82:1183-1191.
+
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
