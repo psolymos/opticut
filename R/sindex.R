@@ -1,4 +1,4 @@
-selind <-
+sindex <-
 function(y, x)
 {
     Y <- ifelse(as.matrix(y) > 0, 1L, 0L)
@@ -13,6 +13,6 @@ function(y, x)
         .wrsi(y, X=X)[,"rWRSI"]))
     rownames(res) <- colnames(X)
     colnames(res) <- colnames(Y)
-    class(res) <- c("selind", "data.frame")
+    class(res) <- c("sindex", "data.frame")
     res
 }

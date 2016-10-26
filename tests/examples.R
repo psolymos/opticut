@@ -2,7 +2,7 @@ library(opticut)
 
 help_pages <- c("opticut-package",
     "dolina",
-    "opticut", "optilevels", "selind",
+    "opticut", "optilevels", "sindex",
     "allComb", "rankComb",
     "bestmodel", "uncertainty",
     "occolors", "ocoptions")

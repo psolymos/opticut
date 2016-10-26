@@ -1,19 +1,19 @@
-\name{selind}
+\name{sindex}
 \alias{wrsi}
-\alias{selind}
+\alias{sindex}
 \title{
-Weighted relative selection index
+Weighted relative suitability index
 }
 \description{
-Calculates weighted relative selection index.
+Calculates weighted relative suitability index.
 }
 \usage{
-selind(y, x)
+sindex(y, x)
 wrsi(y, x)
 }
 \arguments{
   \item{y}{
-matrix of observations for \code{selind},
+matrix of observations for \code{sindex},
 vector of observations for \code{wrsi}.
 }
   \item{x}{
@@ -24,7 +24,7 @@ consistent meaning across the columns, often through a unit sum constraint).
 \value{
 \code{wrsi} returns a data frame (class 'wrsi') with the following columns:
 \describe{
-\item{\code{WRSI}}{weighted relative selection index, range (0- Inf).}
+\item{\code{WRSI}}{weighted relative suitability index, range (0- Inf).}
 \item{\code{zWRSI}}{log of \code{WRSI} (z-transformed), range (-Inf, Inf).}
 \item{\code{rWRSI}}{inverse Fisher z-transformed \code{zWRSI}, range (-1, 1).}
 \item{\code{Pused} and \code{Pavail}}{total proportion of used (\code{y > 0})
@@ -34,17 +34,9 @@ and available of each feature (column) in \code{x}.}
 for each feature (column) in \code{x}.}
 }
 
-\code{selind} returns a data frame (class 'selind') with
+\code{sindex} returns a data frame (class 'sindex') with
 one column for each species, and one row for each feature (column) in \code{x}.
 Cell values are inverse Fisher z-transformed (\code{zWRSI}) indices.
-}
-\references{
-Authors
-Lele, S. R., Merrill, E. H., Keim, J., Boyce, M. S., 2013.
-Selection, use, choice and occupancy:
-clarifying concepts in resource selection studies.
-Journal of Animal Ecology 82:1183-1191.
-
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
@@ -88,9 +80,9 @@ plot(lam, w$rWRSI, type="b")
 abline(h=0, lty=2)
 par(op)
 
-## --- selind calculations for multiple species
+## --- sindex calculations for multiple species
 y2 <- cbind(Spp1=y, Spp2=rev(y), Spp3=sample(y))
-(w2 <- selind(y2, x))
+(w2 <- sindex(y2, x))
 heatmap(as.matrix(w2), scale="none", col=occolors()(25))
 }
 \keyword{ models }

@@ -115,7 +115,7 @@ Peter Solymos <solymos@ualberta.ca>
 \seealso{
 \code{\link{opticut}} for finding best binary partitions.
 
-\code{\link{selind}} and \code{\link{wrsi}}
+\code{\link{sindex}} and \code{\link{wrsi}}
 for weighted relative suitability index.
 }
 \examples{

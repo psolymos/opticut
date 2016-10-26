@@ -1,5 +1,5 @@
 export("opticut", "optilevels", "opticut1",
-    "wrsi", "selind",
+    "wrsi", "sindex",
     "ocoptions", "occolors",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "uncertainty", "wplot",
