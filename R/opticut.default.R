@@ -4,13 +4,17 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
 {
     comb <- match.arg(comb)
     if (missing(strata))
-        stop("It looks like that strata is missing.")
+        stop("It looks like that strata is missing")
     Y <- data.matrix(Y)
     if (is.null(colnames(Y)))
         colnames(Y) <- paste("Sp", seq_len(ncol(Y)))
     if (any(duplicated(colnames(Y)))) {
-        warning("Duplicate column names found and renamed in LHS.")
+        warning("Duplicate column names found and renamed in LHS")
         colnames(Y) <- make.names(colnames(Y), unique = TRUE)
+    }
+    if (!all(colSums(abs(Y)) > 0)) {
+        stop("Empty columns in Y were dropped")
+        Y <- Y[,colSums(abs(Y)) > 0,drop=FALSE]
     }
     if (missing(X)) {
         X <- matrix(1, nrow(Y), 1L)
@@ -30,7 +34,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         #levels(strata) <- make.names(levels(strata), unique = TRUE)
         ## make sure that collapse is not in levels
         if (any(grepl(getOption('ocoptions')$collapse, levels(strata), fixed=TRUE)))
-            stop("Collapse value found in levels.")
+            stop("Collapse value found in levels")
         if (comb == "rank") {
             Z <- strata
         }
