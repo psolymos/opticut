@@ -2,7 +2,7 @@ plot.opticut <-
 function(x, which = NULL, cut, sort,
 las=1, ylab="Relative abundance", xlab="Strata",
 show_I=TRUE, show_S=TRUE, hr=TRUE,
-theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", ...)
+theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", lower=0, ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
@@ -54,10 +54,14 @@ theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", ...)
     Cols <- occolors(theme)(100)
     if (hr)
         abline(h=1:n-0.5, col=Cols[1L])
+    lower <- min(max(lower, 0), 1)
     for (i in seq_len(n)) {
         for (j in seq_len(p)) {
             h <- if (bp[i,j] == 1)
                 0.5*xx$I[i]+0.5 else 0.5*(1-xx$I[i])
+            ## need to tweak the 50/50 to be higher than 0
+            ## which is rare for logLR > 2 species
+            h <- h * c(1 - lower) + lower
             ColID <- as.integer(pmin(pmax(1, floor(h * 100) + 1), 100))
             polygon(c(0,1,1,0)+j-1, 0.45*c(-h,-h,h,h)+i-0.5,
                 col=Cols[ColID], border=NA)
