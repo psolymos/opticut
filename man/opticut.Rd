@@ -50,7 +50,7 @@ wplot(x, ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
     las = 1, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
-    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", lower = 0.1, ...)
+    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", lower = 0, ...)
 
 \method{print}{opticut1}(x, cut, sort, digits, ...)
 \method{print}{opticut}(x, digits, ...)
