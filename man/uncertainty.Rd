@@ -176,7 +176,7 @@ dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
 ## parallel computing for uncertainty
 library(parallel)
 cl <- makeCluster(2)
-ucdol <- uncertainty(dol, type="multi", B=25)
+ucdol <- uncertainty(dol, type="multi", B=25, cl=cl)
 stopCluster(cl)
 
 bestpart(ucdol)
