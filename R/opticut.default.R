@@ -25,11 +25,15 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     if (is.null(dim(strata))) {
         if (nchar(getOption("ocoptions")$collapse) < 1)
             stop("nchar(getOption('ocoptions')$collapse) must be > 0")
+        ## ordered treated as factor
         if (is.ordered(strata)) {
             warning("ordering in strata ignored")
             class(strata) <- "factor"
         }
-        strata <- droplevels(as.factor(strata)) # factor
+        ## factors are not coerced (level ordering remains intact)
+        if (!is.factor(strata))
+            strata <- as.factor(strata) # coerce to factor
+        strata <- droplevels(strata) # drop unused levels
         ## make syntactically valid names
         #levels(strata) <- make.names(levels(strata), unique = TRUE)
         ## make sure that collapse is not in levels
