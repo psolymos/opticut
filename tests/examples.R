@@ -32,10 +32,8 @@ Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 uc <- uncertainty(oc, type="asymp", B=999)
 
-#as.matrix(oc)
-#as.matrix(summary(oc))
-#as.data.frame(oc)
-#as.data.frame(summary(oc))
+as.data.frame(oc)
+as.data.frame(summary(oc))
 
 as.matrix(uc)
 as.matrix(summary(uc))
