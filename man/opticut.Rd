@@ -294,6 +294,8 @@ partitions for each species (species as columns).
 
 \code{bestmodel} returns the best supported model for further
 manipulation (e.g. prediction).
+
+The coercion method \code{\link{as.data.frame}} return a data frame.
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,

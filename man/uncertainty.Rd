@@ -120,6 +120,9 @@ The summary method prints the name of the best supported split,
 selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
 reliability) and conficence interval for I (based on \code{level}).
+
+The coercion methods \code{\link{as.matrix}} and \code{\link{as.data.frame}}
+return a matrix or a data frame, respectively.
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata
