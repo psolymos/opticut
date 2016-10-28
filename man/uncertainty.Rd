@@ -11,7 +11,7 @@
 \alias{as.matrix.uncertainty}
 \alias{as.matrix.summary.uncertainty}
 \alias{as.data.frame.uncertainty}
-\alias{as.data.frame.uncertainty}
+\alias{as.data.frame.summary.uncertainty}
 \title{
 Quantifying uncertainty for fitted objects
 }
