@@ -15,7 +15,7 @@ for (i in help_pages) {
         ", package = 'opticut', run.dontrun = TRUE)")))
 }
 
-## testing coercion methods
+## testing methods
 
 set.seed(2345)
 n <- 50

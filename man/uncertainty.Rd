@@ -150,17 +150,17 @@ Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
 ## asymptotic confidence intervals
-uc1 <- uncertainty(oc, type="asymp", B=999)
+(uc1 <- uncertainty(oc, type="asymp", B=999))
 summary(uc1)
 ## bootstrap-based confidence intervals
-uc2 <- uncertainty(oc, type="boot", B=19)
+(uc2 <- uncertainty(oc, type="boot", B=19))
 summary(uc2)
 
 ## use user-supplied indices
 ## multi-model bootstrap based uncertainties
 B <- replicate(25, sample.int(n, replace=TRUE))
 check_strata(oc, B) # check representation
-uc3 <- uncertainty(oc, type="multi", B=B)
+(uc3 <- uncertainty(oc, type="multi", B=B))
 summary(uc3)
 
 ## best partitions:

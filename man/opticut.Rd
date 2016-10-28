@@ -363,14 +363,17 @@ opticut1(Y1, X, Z, dist="binomial")
 opticut1(Y1, X, as.factor(x0), dist="binomial")
 
 ## all partitions, multiple species
-m1 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
+(m1 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
 summary(m1)
 ## show all species
 summary(m1, cut=0)
-## model weights
-wplot(m1)
-## associations
+## plot best partitions and indicator values
 plot(m1)
+## model weights for all species
+wplot(m1)
+## different ways of plotting weights for single species
+wplot(m1$species[[1]])
+wplot(m1, which = 1)
 
 ## rank based partitions, multiple species
 summary(m2 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
