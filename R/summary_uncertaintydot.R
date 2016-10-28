@@ -2,6 +2,6 @@
 {
     uct <- x$uctab
     if (sort)
-        uct[order(uct$split, -uct$R, -uct$I),]
+        uct <- uct[order(uct$split, -uct$R, -uct$I),]
     uct
 }
