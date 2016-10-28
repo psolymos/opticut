@@ -95,6 +95,9 @@ The summary method prints the name of the best supported split,
 selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
 reliability) and conficence interval for I (based on \code{level}).
+
+\code{\link{bestpart}} finds the selection frequencies for
+strata as best partitions (number of strata times number of species).
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata
@@ -176,7 +179,7 @@ dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
 ## parallel computing for uncertainty
 library(parallel)
 cl <- makeCluster(2)
-ucdol <- uncertainty(dol, type="multi", B=25)
+ucdol <- uncertainty(dol, type="multi", B=25, cl=cl)
 stopCluster(cl)
 
 bestpart(ucdol)
