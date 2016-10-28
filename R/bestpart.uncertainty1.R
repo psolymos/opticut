@@ -13,5 +13,6 @@ function (object, ...)
             attr(object, "collapse"), fixed=TRUE)[[1L]]
         mat[j,i] <- 1L
     }
-    mat[order(rownames(mat)),]
+#    mat[order(rownames(mat)),]
+    mat
 }
