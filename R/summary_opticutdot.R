@@ -1,4 +1,4 @@
-.summary_opticut <- function(x, cut=2, sortTRUE) {
+.summary_opticut <- function(x, cut=2, sort=TRUE) {
 
     sort <- if (is.logical(sort))
         sort[1L] else 1 %in% sort
