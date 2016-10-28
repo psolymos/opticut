@@ -8,8 +8,6 @@
 \alias{bestpart.uncertainty}
 \alias{bestpart.uncertainty1}
 \alias{check_strata}
-\alias{as.matrix.uncertainty}
-\alias{as.matrix.summary.uncertainty}
 \alias{as.data.frame.uncertainty}
 \alias{as.data.frame.summary.uncertainty}
 \title{
@@ -34,8 +32,6 @@ check_strata(x, mat)
 \method{print}{summary.uncertainty}(x, sort, digits, ...)
 \method{summary}{uncertainty}(object, level = 0.95, ...)
 
-\method{as.matrix}{uncertainty}(x, sort, ...)
-\method{as.matrix}{summary.uncertainty}(x, sort, ...)
 \method{as.data.frame}{uncertainty}(x,
     row.names = NULL, optional = FALSE, sort, ...)
 \method{as.data.frame}{summary.uncertainty}(x,
@@ -121,8 +117,7 @@ selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
 reliability) and conficence interval for I (based on \code{level}).
 
-The coercion methods \code{\link{as.matrix}} and \code{\link{as.data.frame}}
-return a matrix or a data frame, respectively.
+The coercion method \code{\link{as.data.frame}} returns a data frame.
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata

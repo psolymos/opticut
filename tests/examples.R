@@ -34,8 +34,5 @@ uc <- uncertainty(oc, type="asymp", B=999)
 
 as.data.frame(oc)
 as.data.frame(summary(oc))
-
-as.matrix(uc)
-as.matrix(summary(uc))
 as.data.frame(uc)
 as.data.frame(summary(uc))

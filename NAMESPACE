@@ -25,8 +25,6 @@ S3method("summary", "opticut")
 S3method("summary", "uncertainty")
 S3method("uncertainty", "opticut")
 
-S3method("as.matrix", "uncertainty")
-S3method("as.matrix", "summary.uncertainty")
 S3method("as.data.frame", "opticut")
 S3method("as.data.frame", "summary.opticut")
 S3method("as.data.frame", "uncertainty")
