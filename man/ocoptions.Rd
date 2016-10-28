@@ -39,6 +39,9 @@ Tags are the following:
   \item{try_error}{if \code{\link{opticut}} should \code{\link{try}} to exclude
   species where the models failed (\code{TRUE}), the default
   is to stop when an error is encountered (\code{FALSE}).}
+  \item{scale}{the scaling factor used to calculate indicator value (I)
+  based on the estimated coefficient (b): I = abs(tanh(b*scale)),
+  the default is 0.5.}
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

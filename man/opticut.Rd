@@ -284,6 +284,10 @@ as factor. The method finds unique row combinations
 when custom matrix is supplied for \code{strata}.
 
 The \code{print} and \code{summary} methods are called for their side effects.
+The summary shows the following information:
+best supported split, strength and sign of association,
+indicator value (I), expected values (mu0, mu1), log likelihood ratio (logLR),
+and model weights(w).
 
 The \code{plot} method presents the contrasts by species and strata.
 
@@ -309,6 +313,8 @@ Peter Solymos <solymos@ualberta.ca>
 \seealso{
 \code{\link{allComb}}, and \code{\link{rankComb}}
 for partitioning algorithms.
+
+\code{\link{beta2i}} for indicator value (I) calculations in summaries.
 
 \code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
 for manipulating fitted objects.
