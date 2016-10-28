@@ -60,9 +60,9 @@ theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", ...)
             plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0),
                 type="n", axes=FALSE, ann=FALSE, ...)
             title(ylab=ylab, xlab=xlab)
-            axis(2, at=1:ncol(ww)-0.5,
+            axis(2, at=1:ncol(ww)-0.5, lwd=0, lwd.ticks=1,
                 labels=colnames(ww), tick=TRUE, ...)
-            axis(1, at=1:nrow(ww)-0.5,
+            axis(1, at=1:nrow(ww)-0.5, lwd=0, lwd.ticks=1,
                 labels=rownames(ww), tick=TRUE, ...)
             abline(h=1:ncol(ww)-0.5)
             abline(v=0:nrow(ww), col="lightgrey")
