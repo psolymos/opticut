@@ -9,7 +9,8 @@
             sort=TRUE,
             theme="br",
             check_comb=TRUE,
-            try_error=FALSE))
+            try_error=FALSE,
+            scale=0.5))
     options("pboptions" = list(
         type = if (interactive()) "timer" else "none",
         char = "[=-]",

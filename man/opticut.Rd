@@ -16,6 +16,8 @@
 \alias{print.summary.opticut}
 \alias{bestmodel.opticut}
 \alias{bestpart.opticut}
+\alias{as.data.frame.opticut}
+\alias{as.data.frame.summary.opticut}
 \title{
 Likelihood based optimal partitioning for indicator species analysis
 }
@@ -41,12 +43,12 @@ strata(object, ...)
 \method{bestpart}{opticut}(object, ...)
 
 wplot(x, ...)
-\method{wplot}{opticut1}(x, cut,
-    ylim = c(-1, 1), las=1, ylab = "Model weight * Association",
-    xlab = "Partitions", theme, ...)
+\method{wplot}{opticut1}(x, cut, ylim = c(-1, 1),
+    las=1, ylab = "Model weight * Association", xlab = "Partitions",
+    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 \method{wplot}{opticut}(x, which = NULL, cut, sort,
-    las = 1, ylab = "Model weight * Association",
-    xlab = "Partitions", theme, ...)
+    las = 1, ylab = "Model weight * Association", xlab = "Partitions",
+    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
     las = 1, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
@@ -56,6 +58,11 @@ wplot(x, ...)
 \method{print}{opticut}(x, digits, ...)
 \method{print}{summary.opticut}(x, cut, sort, digits, ...)
 \method{summary}{opticut}(object, ...)
+
+\method{as.data.frame}{opticut}(x,
+    row.names = NULL, optional = FALSE, cut, sort, ...)
+\method{as.data.frame}{summary.opticut}(x,
+    row.names = NULL, optional = FALSE, cut, sort, ...)
 }
 \arguments{
   \item{formula}{
@@ -163,6 +170,15 @@ or or \code{NULL} (all species, default).
   \item{sep}{
 a character string to separate the sub-strings in factor levels.
 }
+\item{row.names}{
+\code{NULL} or a character vector giving the row names for the data frame.
+Missing values are not allowed. See \code{\link{as.data.frame}}.
+}
+\item{optional}{
+logical. If \code{TRUE}, setting row names and converting column names
+(to syntactic names: see \code{\link{make.names}}) is optional.
+See \code{\link{as.data.frame}}.
+}
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
@@ -268,6 +284,10 @@ as factor. The method finds unique row combinations
 when custom matrix is supplied for \code{strata}.
 
 The \code{print} and \code{summary} methods are called for their side effects.
+The summary shows the following information:
+best supported split, strength and sign of association,
+indicator value (I), expected values (mu0, mu1), log likelihood ratio (logLR),
+and model weights(w).
 
 The \code{plot} method presents the contrasts by species and strata.
 
@@ -278,6 +298,8 @@ partitions for each species (species as columns).
 
 \code{\link{bestmodel}} returns the best supported model for further
 manipulation (e.g. prediction).
+
+The coercion method \code{\link{as.data.frame}} return a data frame.
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
@@ -291,6 +313,8 @@ Peter Solymos <solymos@ualberta.ca>
 \seealso{
 \code{\link{allComb}}, and \code{\link{rankComb}}
 for partitioning algorithms.
+
+\code{\link{beta2i}} for indicator value (I) calculations in summaries.
 
 \code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
 for manipulating fitted objects.
@@ -345,14 +369,17 @@ opticut1(Y1, X, Z, dist="binomial")
 opticut1(Y1, X, as.factor(x0), dist="binomial")
 
 ## all partitions, multiple species
-m1 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
+(m1 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
 summary(m1)
 ## show all species
 summary(m1, cut=0)
-## model weights
-wplot(m1)
-## associations
+## plot best partitions and indicator values
 plot(m1)
+## model weights for all species
+wplot(m1)
+## different ways of plotting weights for single species
+wplot(m1$species[[1]])
+wplot(m1, which = 1)
 
 ## rank based partitions, multiple species
 summary(m2 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))

@@ -8,6 +8,8 @@
 \alias{bestpart.uncertainty}
 \alias{bestpart.uncertainty1}
 \alias{check_strata}
+\alias{as.data.frame.uncertainty}
+\alias{as.data.frame.summary.uncertainty}
 \title{
 Quantifying uncertainty for fitted objects
 }
@@ -27,8 +29,13 @@ check_strata(x, mat)
 
 \method{print}{uncertainty1}(x, ...)
 \method{print}{uncertainty}(x, ...)
-\method{print}{summary.uncertainty}(x, digits, ...)
+\method{print}{summary.uncertainty}(x, sort, digits, ...)
 \method{summary}{uncertainty}(object, level = 0.95, ...)
+
+\method{as.data.frame}{uncertainty}(x,
+    row.names = NULL, optional = FALSE, sort, ...)
+\method{as.data.frame}{summary.uncertainty}(x,
+    row.names = NULL, optional = FALSE, sort, ...)
 }
 \arguments{
   \item{object}{
@@ -68,11 +75,25 @@ an object to be printed.
   \item{level}{
 the confidence level required.
 }
+  \item{sort}{
+logical value indicating if species
+should be meaningfully sorted, the default is \code{TRUE}.
+}
   \item{digits}{
 numeric, number of significant digits in output.
 }
   \item{mat}{
 a matrix with resampling indices (rows as samples, columns as iterations).
+}
+
+\item{row.names}{
+\code{NULL} or a character vector giving the row names for the data frame.
+Missing values are not allowed. See \code{\link{as.data.frame}}.
+}
+\item{optional}{
+logical. If \code{TRUE}, setting row names and converting column names
+(to syntactic names: see \code{\link{make.names}}) is optional.
+See \code{\link{as.data.frame}}.
 }
 \item{\dots}{
 other arguments passed to the underlying functions.
@@ -98,6 +119,8 @@ reliability) and conficence interval for I (based on \code{level}).
 
 \code{\link{bestpart}} finds the selection frequencies for
 strata as best partitions (number of strata times number of species).
+
+The coercion method \code{\link{as.data.frame}} returns a data frame.
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata
@@ -130,17 +153,17 @@ Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 
 ## asymptotic confidence intervals
-uc1 <- uncertainty(oc, type="asymp", B=999)
+(uc1 <- uncertainty(oc, type="asymp", B=999))
 summary(uc1)
 ## bootstrap-based confidence intervals
-uc2 <- uncertainty(oc, type="boot", B=19)
+(uc2 <- uncertainty(oc, type="boot", B=19))
 summary(uc2)
 
 ## use user-supplied indices
 ## multi-model bootstrap based uncertainties
 B <- replicate(25, sample.int(n, replace=TRUE))
 check_strata(oc, B) # check representation
-uc3 <- uncertainty(oc, type="multi", B=B)
+(uc3 <- uncertainty(oc, type="multi", B=B))
 summary(uc3)
 
 ## best partitions:
@@ -183,7 +206,7 @@ ucdol <- uncertainty(dol, type="multi", B=25, cl=cl)
 stopCluster(cl)
 
 bestpart(ucdol)
-heatmap(bestpart(ucdol), scale="none", col=occolors()(25),
+heatmap(t(bestpart(ucdol)), scale="none", col=occolors()(25),
     distfun=function(x) dist(x, "manhattan"))
 }
 }

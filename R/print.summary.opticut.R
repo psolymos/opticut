@@ -5,13 +5,9 @@ print.summary.opticut <- function(x, cut, sort, digits, ...) {
         digits <- max(3L, getOption("digits") - 3L)
     if (missing(sort))
         sort <- getOption("ocoptions")$sort
-    sort <- if (is.logical(sort))
-        sort[1L] else 1 %in% sort
-    xx <- x$summary[, c("split", "assoc", "I", "mu0", "mu1", "logLR", "w")]
-    if (sort) {
-        xx <- xx[attr(x$bestpart, "row.order"),]
-    }
-    xx <- xx[xx$logLR >= cut, , drop=FALSE]
+
+    xx <- .summary_opticut(x, cut=cut, sort=sort)
+
     Missing <- nrow(x$summary) - nrow(xx)
     tmp <- if (nrow(xx) > 1L)
         "Best supported models" else "Best supported model"

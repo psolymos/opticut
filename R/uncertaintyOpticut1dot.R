@@ -30,7 +30,8 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         cf <- rbind(coef(m1)[c(1L, 2L)], cf)
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
-        I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+        #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+        I <- abs(tanh(cf[,2L] * getOption("ocoptions")$scale))
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
     } else {
         if (length(B) == 1) {

@@ -3,7 +3,7 @@ export("opticut", "optilevels", "opticut1",
     "ocoptions", "occolors",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "uncertainty", "wplot",
-    "fix_levels", "strata", "check_strata")
+    "fix_levels", "strata", "check_strata", "beta2i")
 S3method("opticut", "default")
 S3method("opticut", "formula")
 S3method("bestmodel", "opticut")
@@ -24,6 +24,11 @@ S3method("strata", "opticut")
 S3method("summary", "opticut")
 S3method("summary", "uncertainty")
 S3method("uncertainty", "opticut")
+
+S3method("as.data.frame", "opticut")
+S3method("as.data.frame", "summary.opticut")
+S3method("as.data.frame", "uncertainty")
+S3method("as.data.frame", "summary.uncertainty")
 
 importFrom("mefa4", "groupSums", "nonDuplicated")
 importFrom("grDevices", "colorRampPalette")
