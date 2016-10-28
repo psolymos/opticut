@@ -82,7 +82,8 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
 #    I <- tanh(abs(cf[,2L]))
 
     out <- data.frame(assoc=h,
-        I=tanh(abs(cf[,2L])),
+        I=abs(tanh(cf[,2L] * getOption("ocoptions")$scale)),
+        #I=tanh(abs(cf[,2L])),
 #        I=2*(plogis(abs(cf[,2L]))-0.5),
         null=cfnull,
         mu0=cf0, mu1=cf1,
