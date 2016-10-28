@@ -8,6 +8,10 @@
 \alias{bestpart.uncertainty}
 \alias{bestpart.uncertainty1}
 \alias{check_strata}
+\alias{as.matrix.uncertainty}
+\alias{as.matrix.summary.uncertainty}
+\alias{as.data.frame.uncertainty}
+\alias{as.data.frame.uncertainty}
 \title{
 Quantifying uncertainty for fitted objects
 }
@@ -27,8 +31,13 @@ check_strata(x, mat)
 
 \method{print}{uncertainty1}(x, ...)
 \method{print}{uncertainty}(x, ...)
-\method{print}{summary.uncertainty}(x, digits, ...)
+\method{print}{summary.uncertainty}(x, sort, digits, ...)
 \method{summary}{uncertainty}(object, level = 0.95, ...)
+
+\method{as.matrix}{uncertainty}(x, sort, ...)
+\method{as.matrix}{summary.uncertainty}(x, sort, ...)
+\method{as.data.frame}{uncertainty}(x, sort, ...)
+\method{as.data.frame}{summary.uncertainty}(x, sort, ...)
 }
 \arguments{
   \item{object}{

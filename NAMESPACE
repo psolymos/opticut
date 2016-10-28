@@ -25,6 +25,11 @@ S3method("summary", "opticut")
 S3method("summary", "uncertainty")
 S3method("uncertainty", "opticut")
 
+S3method("as.matrix", "uncertainty")
+S3method("as.matrix", "summary.uncertainty")
+S3method("as.data.frame", "uncertainty")
+S3method("as.data.frame", "summary.uncertainty")
+
 importFrom("mefa4", "groupSums", "nonDuplicated")
 importFrom("grDevices", "colorRampPalette")
 importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
