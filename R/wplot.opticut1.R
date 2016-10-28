@@ -1,7 +1,8 @@
 ## plotting model weights, single species
 wplot.opticut1 <-
 function(x, cut, ylim=c(-1,1), las=1,
-ylab="Model weight * Association", xlab="Partitions", theme, ...)
+ylab="Model weight * Association", xlab="Partitions",
+theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
@@ -21,7 +22,7 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
 #    COL <- c(colorRampPalette(c("red","yellow"))(10),
 #         colorRampPalette(c("yellow","green"))(10))
     br <- seq(-1, 1, 0.1)
-    op <- par(las=las)
+    op <- par(las=las, mar=mar)
     on.exit(par(op))
     barplot(rep(0, length(w)), width=1, space=0,
         col=COL[as.integer(base::cut(w, breaks=seq(-1, 1, 0.1)))],
@@ -31,6 +32,6 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
         col=COL[as.integer(base::cut(w, breaks=seq(-1, 1, 0.1)))],
         ylim=ylim, xlab="", ylab="", add=TRUE, ...)
     abline(0,0)
-    box()
+    box(col="grey", bty=bty)
     invisible(w)
 }

@@ -1,7 +1,8 @@
 ## plotting model weights, multi species
 wplot.opticut <-
 function(x, which=NULL, cut, sort, las=1,
-ylab="Model weight * Association", xlab="Partitions", theme, ...)
+ylab="Model weight * Association", xlab="Partitions",
+theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", ...)
 {
     if (missing(cut))
         cut <- getOption("ocoptions")$cut
@@ -38,7 +39,8 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
         xx <- xx[xx$logLR >= cut, , drop=FALSE]
         if (nrow(xx) < 2) {
             wplot.opticut1(x$species[[rownames(xx$summary)]],
-                cut=cut, las=las, ylab=ylab, xlab=xlab, theme=theme, ...)
+                cut=cut, las=las, ylab=ylab, xlab=xlab,
+                theme=theme, mar=mar, bty=bty, ...)
         } else {
             nsplit <- xx$nsplit
             nspp <- nrow(xx)
@@ -53,15 +55,15 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
             llr <- sapply(x$species[sppnam], "[[", "logLR")
             ww[llr < cut] <- 0
             ww <- ww[rowSums(ww) != 0,,drop=FALSE]
-            op <- par(las=las)
+            op <- par(las=las, mar=mar)
             on.exit(par(op))
             plot(0, xlim=c(0, nrow(ww)), ylim=c(ncol(ww),0),
                 type="n", axes=FALSE, ann=FALSE, ...)
             title(ylab=ylab, xlab=xlab)
             axis(2, at=1:ncol(ww)-0.5,
-                labels=colnames(ww), tick=TRUE)
+                labels=colnames(ww), tick=TRUE, ...)
             axis(1, at=1:nrow(ww)-0.5,
-                labels=rownames(ww), tick=TRUE)
+                labels=rownames(ww), tick=TRUE, ...)
             abline(h=1:ncol(ww)-0.5)
             abline(v=0:nrow(ww), col="lightgrey")
             for (i in 1:ncol(ww)) {
@@ -73,7 +75,7 @@ ylab="Model weight * Association", xlab="Partitions", theme, ...)
                         col=COL[as.integer(base::cut(-h, breaks=seq(-1, 1, 0.1)))])
                 }
             }
-            box(col="grey")
+            box(col="grey", bty=bty)
             invisible(ww)
         }
     }

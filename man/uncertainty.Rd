@@ -180,7 +180,7 @@ ucdol <- uncertainty(dol, type="multi", B=25, cl=cl)
 stopCluster(cl)
 
 bestpart(ucdol)
-heatmap(bestpart(ucdol), scale="none", col=occolors()(25),
+heatmap(t(bestpart(ucdol)), scale="none", col=occolors()(25),
     distfun=function(x) dist(x, "manhattan"))
 }
 }

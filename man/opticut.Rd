@@ -41,12 +41,12 @@ strata(object, ...)
 \method{bestpart}{opticut}(object, ...)
 
 wplot(x, ...)
-\method{wplot}{opticut1}(x, cut,
-    ylim = c(-1, 1), las=1, ylab = "Model weight * Association",
-    xlab = "Partitions", theme, ...)
+\method{wplot}{opticut1}(x, cut, ylim = c(-1, 1),
+    las=1, ylab = "Model weight * Association", xlab = "Partitions",
+    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 \method{wplot}{opticut}(x, which = NULL, cut, sort,
-    las = 1, ylab = "Model weight * Association",
-    xlab = "Partitions", theme, ...)
+    las = 1, ylab = "Model weight * Association", xlab = "Partitions",
+    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
     las = 1, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
