@@ -16,6 +16,8 @@
 \alias{print.summary.opticut}
 \alias{bestmodel.opticut}
 \alias{bestpart.opticut}
+\alias{as.data.frame.opticut}
+\alias{as.data.frame.summary.opticut}
 \title{
 Likelihood based optimal partitioning for indicator species analysis
 }
@@ -56,6 +58,11 @@ wplot(x, ...)
 \method{print}{opticut}(x, digits, ...)
 \method{print}{summary.opticut}(x, cut, sort, digits, ...)
 \method{summary}{opticut}(object, ...)
+
+\method{as.data.frame}{opticut}(x,
+    row.names = NULL, optional = FALSE, cut, sort, ...)
+\method{as.data.frame}{summary.opticut}(x,
+    row.names = NULL, optional = FALSE, cut, sort, ...)
 }
 \arguments{
   \item{formula}{
@@ -162,6 +169,15 @@ or or \code{NULL} (all species, default).
 }
   \item{sep}{
 a character string to separate the sub-strings in factor levels.
+}
+\item{row.names}{
+\code{NULL} or a character vector giving the row names for the data frame.
+Missing values are not allowed. See \code{\link{as.data.frame}}.
+}
+\item{optional}{
+logical. If \code{TRUE}, setting row names and converting column names
+(to syntactic names: see \code{\link{make.names}}) is optional.
+See \code{\link{as.data.frame}}.
 }
   \item{\dots}{
 other arguments passed to the underlying functions, see \code{\link{opticut}}.
