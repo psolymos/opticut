@@ -36,8 +36,10 @@ check_strata(x, mat)
 
 \method{as.matrix}{uncertainty}(x, sort, ...)
 \method{as.matrix}{summary.uncertainty}(x, sort, ...)
-\method{as.data.frame}{uncertainty}(x, sort, ...)
-\method{as.data.frame}{summary.uncertainty}(x, sort, ...)
+\method{as.data.frame}{uncertainty}(x,
+    row.names = NULL, optional = FALSE, sort, ...)
+\method{as.data.frame}{summary.uncertainty}(x,
+    row.names = NULL, optional = FALSE, sort, ...)
 }
 \arguments{
   \item{object}{
@@ -77,11 +79,25 @@ an object to be printed.
   \item{level}{
 the confidence level required.
 }
+  \item{sort}{
+logical value indicating if species
+should be meaningfully sorted, the default is \code{TRUE}.
+}
   \item{digits}{
 numeric, number of significant digits in output.
 }
   \item{mat}{
 a matrix with resampling indices (rows as samples, columns as iterations).
+}
+
+\item{row.names}{
+\code{NULL} or a character vector giving the row names for the data frame.
+Missing values are not allowed. See \code{\link{as.data.frame}}.
+}
+\item{optional}{
+logical. If \code{TRUE}, setting row names and converting column names
+(to syntactic names: see \code{\link{make.names}}) is optional.
+See \code{\link{as.data.frame}}.
 }
 \item{\dots}{
 other arguments passed to the underlying functions.
