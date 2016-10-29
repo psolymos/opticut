@@ -12,6 +12,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         X=object$X,
         Z1=NULL,
         dist=object$dist, ...)$linkinv
+    scale <- object$scale
     m1 <- .extractOpticut(object, which,
         boot=FALSE,
         internal=TRUE,
@@ -31,7 +32,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
         #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-        I <- abs(tanh(cf[,2L] * getOption("ocoptions")$scale))
+        I <- abs(tanh(cf[,2L] * scale)
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
     } else {
         if (length(B) == 1) {
@@ -66,7 +67,8 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         cf <- rbind(coef(m1)[c(1L, 2L)], cf)
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
-        I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+        #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
+        I <- abs(tanh(cf[,2L] * scale)
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
     }
     if (type == "multi") {
@@ -101,6 +103,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     class(out) <- c("uncertainty1", "data.frame")
     attr(out, "B") <- niter
     attr(out, "type") <- type
+    attr(out, "scale") <- scale
     attr(out, "collapse") <- object$collapse
     out
 }

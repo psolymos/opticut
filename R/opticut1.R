@@ -81,8 +81,9 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     ## thus comparable across species AND across studies
 #    I <- tanh(abs(cf[,2L]))
 
+    scale <- getOption("ocoptions")$scale
     out <- data.frame(assoc=h,
-        I=abs(tanh(cf[,2L] * getOption("ocoptions")$scale)),
+        I=abs(tanh(cf[,2L] * scale)),
         #I=tanh(abs(cf[,2L])),
 #        I=2*(plogis(abs(cf[,2L]))-0.5),
         null=cfnull,
@@ -97,6 +98,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         deparse(substitute(dist)) else dist
     attr(out, "comb") <- Comb
     attr(out, "est") <- Est
+    attr(out, "scale") <- scale
     class(out) <- c("opticut1", "data.frame")
     out
 }
