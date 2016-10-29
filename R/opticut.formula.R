@@ -20,6 +20,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     mt <- terms(ff, data = data)
     X <- model.matrix(mt, mf)
 
-    opticut.default(Y=Y, X=X, strata=strata, dist=dist,
+    out <- opticut.default(Y=Y, X=X, strata=strata, dist=dist,
         comb=comb, sset=sset, cl=cl, ...)
+    out$call <- match.call()
+    out
 }
