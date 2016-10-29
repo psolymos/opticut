@@ -13,7 +13,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         colnames(Y) <- make.names(colnames(Y), unique = TRUE)
     }
     if (!all(colSums(abs(Y)) > 0)) {
-        stop("Empty columns in Y were dropped")
+        warning("Empty columns in Y were dropped")
         Y <- Y[,colSums(abs(Y)) > 0,drop=FALSE]
     }
     if (missing(X)) {
