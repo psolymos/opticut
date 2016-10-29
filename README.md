@@ -5,7 +5,7 @@ Finding the best binary partition for each species based on
 model selection, possibly controlling for modifying/confounding
 variables as described in Kemencei et al. (2014).
 
-![](https://github.com/psolymos/opticut/raw/master/extras/oc-logo.png)
+![](https://github.com/psolymos/opticut/raw/master/extras/oc-logo.gif)
 
 ## Versions
 
