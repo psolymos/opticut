@@ -21,18 +21,22 @@ theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", lower=0, ...)
     ss <- summary(x)
     xx <- ss$summary
     bp <- ss$bestpart
-    if (sort_r) {
-        bp <- bp[attr(ss$bestpart, "row.order"),,drop=FALSE]
-        xx <- xx[attr(ss$bestpart, "row.order"),,drop=FALSE]
-    }
-    if (sort_c) {
-        bp <- bp[,attr(ss$bestpart, "col.order"),drop=FALSE]
-    }
     if (!any(xx$logLR >= cut)) {
         warning("All logLR < cut: cut ignored")
+        rkeep <- rep(TRUE, nrow(xx))
     } else {
-        bp <- bp[xx$logLR >= cut, , drop=FALSE]
-        xx <- xx[xx$logLR >= cut, , drop=FALSE]
+        rkeep <- xx$logLR >= cut
+        #bp <- bp[rkeep, , drop=FALSE]
+        #xx <- xx[rkeep, , drop=FALSE]
+    }
+    if (sort_r) {
+        bp <- bp[attr(ss$bestpart, "row.order")[rkeep],,drop=FALSE]
+        xx <- xx[attr(ss$bestpart, "row.order")[rkeep],,drop=FALSE]
+    }
+    if (sort_c) {
+        #bp <- bp[,attr(ss$bestpart, "col.order"),drop=FALSE]
+        corder <- order(-colSums(bp), colnames(bp))
+        bp <- bp[,corder,drop=FALSE]
     }
     n <- nrow(bp)
     p <- ncol(bp)

@@ -32,28 +32,28 @@ forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
 }
 \examples{
-## simple example from Legendre 2013
-## Indicator Species: Computation, in
-## Encyclopedia of Biodiversity, Volume 4
-## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
-gr <- as.factor(paste0("X", rep(1:5, each=5)))
-spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
-    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
-    Species3=rep(c(18,2,0,0,0), each=5))
-rownames(spp) <- gr
-spp
+## community data
+y <- cbind(
+    Sp1=c(4,6,3,5, 5,6,3,4, 4,1,3,2),
+    Sp2=c(0,0,0,0, 1,0,0,1, 4,2,3,4),
+    Sp3=c(0,0,3,0, 2,3,0,5, 5,6,3,4))
 
-## opticut fit and summary
-summary(oc <- opticut(spp ~ 1, strata=gr, comb="all"))
+## stratification
+g <-    c(1,1,1,1, 2,2,2,2, 3,3,3,3)
 
-## explore via plot
-plot(oc)
+## find optimal partitions for each species
+oc <- opticut(formula = y ~ 1, strata = g, dist = "poisson")
+summary(oc)
+
+## visualize the results
+plot(oc, cut = -Inf)
 
 ## quantify uncertainty
-summary(uncertainty(oc, type="asymp", B=999))
+uc <- uncertainty(oc, type = "asymp", B = 999)
+summary(uc)
 
 ## go beyond binary partitions
-ol <- optilevels(spp[,"Species3"], as.factor(gr))
+ol <- optilevels(y[,"Sp2"], as.factor(g))
 ol[c("delta", "coef", "rank", "levels")]
 }
 \keyword{ package }
