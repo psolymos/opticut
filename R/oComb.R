@@ -21,5 +21,5 @@ function(x, collapse)
             collapse = collapse)
     }
     attr(out, "rank") <- o
-    out[names(x),]
+    out[names(x),,drop=FALSE]
 }
