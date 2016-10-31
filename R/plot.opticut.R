@@ -34,8 +34,19 @@ theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", lower=0, ...)
         xx <- xx[attr(ss$bestpart, "row.order")[rkeep],,drop=FALSE]
     }
     if (sort_c) {
-        #bp <- bp[,attr(ss$bestpart, "col.order"),drop=FALSE]
-        corder <- order(-colSums(bp), colnames(bp))
+        ## richness based ordering
+        #corder <- order(-colSums(bp), colnames(bp))
+        ## similarity based ordering
+        ## (hard coding to avoid dependencies, not expecting too many columns)
+        dm <- diag(1, ncol(bp), ncol(bp))
+        for (i in seq_len(ncol(bp))) {
+            for (j in i:ncol(bp)) {
+                #dm[i,j] <- dm[j,i] <- sum(bp[,i] == bp[,j]) / nrow(bp) # (a + d) / n
+                dm[i,j] <- dm[j,i] <- sum(bp[,i] * bp[,j]) / nrow(bp) # a / n
+            }
+        }
+        corder <- hclust(as.dist(1 - dm), method = "ward.D2")$order
+
         bp <- bp[,corder,drop=FALSE]
     }
     n <- nrow(bp)
@@ -72,5 +83,5 @@ theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", lower=0, ...)
         }
     }
     box(col="grey", bty=bty)
-    invisible(xx)
+    invisible(list(summary=xx, bestpart=bp))
 }
