@@ -1,5 +1,11 @@
 # opticut: Likelihood Based Optimal Partitioning for Indicator Species Analysis
 
+[![CRAN version](http://www.r-pkg.org/badges/version/opticut)](http://cran.rstudio.com/web/packages/opticut/index.html)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/opticut)](http://cran.rstudio.com/web/packages/opticut/index.html)
+[![Linux build status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut)
+[![Windows build status](https://ci.appveyor.com/api/projects/status/g6k5txb3v3i4wres?svg=true)](https://ci.appveyor.com/project/psolymos/opticut)
+[![Code coverage status](https://codecov.io/gh/psolymos/opticut/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/opticut)
+
 Likelihood based optimal partitioning for indicator species analysis and more.
 Finding the best binary partition for each species based on
 model selection, possibly controlling for modifying/confounding
@@ -9,16 +15,14 @@ variables as described in Kemencei et al. (2014).
 
 ## Versions
 
-[![Build Status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut) [![codecov](https://codecov.io/gh/psolymos/opticut/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/opticut)
-
-User visible changes in the package are listed in the [NEWS](https://github.com/psolymos/opticut/blob/master/NEWS.md) file.
-
 Install development version from GitHub:
 
 ```
 library(devtools)
 install_github("psolymos/opticut")
 ```
+
+User visible changes in the package are listed in the [NEWS](https://github.com/psolymos/opticut/blob/master/NEWS.md) file.
 
 ## Report a problem
 
