@@ -1,30 +1,95 @@
 ---
 title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
-author: "Peter Solymos, Ermias T. Azeria"
-date: "November 17, 2015"
+author: "Peter Solymos and Ermias T. Azeria"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
   pdf_document:
     keep_tex: no
-    number_sections: yes
-    toc: yes
+    toc: true
+    toc_depth: 3
+    number_sections: false
+  word_document:
+    toc: true
+    toc_depth: 3
+documentclass: report
+fontsize: 12pt
+classoption: letterpaper
 ---
 
 # Introduction
 
-General problem: find where species abundances are high vs. low in
-a way which leads to optimal classification by maximizing the
-contrast between the partitions.
+Identification and monitoring of indicator species has long been thought 
+as useful and cost-effective to monitor changes in environmental conditions 
+or status of habitat for biota. Examples of indicator species application
+include: to characterize certain habitats or vegetation types, 
+to indicate naturalness or degradation of ecosystems, 
+to measure success of habitat restoration, 
+alerting about critical community thresholds, 
+aid in survey and monitoring design,
+or indicate the presence of cryptic or rare species. 
 
-Previous attempts: historical review, highlighting IndVal.
+A key attribute of indicator species (also referred also as character or
+differential) is that they have strong association with the environment 
+or any factor they are supposed to indicate. 
+Approaches to quantify the degree of environmental associations for species 
+or indicator value of species fall into three major types of algorithms: 
 
-Issues with previous attempts:
+1. contingency table based measures,
+2. analysis of variance (ANOVA) based measures, and 
+3. the widely used, non-parametric IndVal approach. 
 
-* summary statistics & Monte Carlo randomization with p-values, no model,
-* data types not always compatible with randomization (i.e. decimals),
-* confounding effects to classification can impact power,
-* assessing the ranking of partitions without inferential statements.
+While the different approaches have a strong appeal and applications, 
+they do not always meet the challenges ecological data present us. 
+Thus, ecological data come in different forms distribution types 
+(typically can be of binary, ordinal, abundance or presence only data) 
+whose distribution assumptions might not always be handled properly 
+by these methods. For example, the contingency table is based on binary
+(presence/absence data) or arbitrary categorization of abundance data; 
+this will effectively cause the loss of information when available abundance 
+data is binarized to meet the analysis framework.  
+In this regard, the ANOVA approach is better suited to handle abundance data;
+however, the parametric assumptions of the ANOVA imply normality and
+homoskedastic errors, which might not always be satisfied in most field
+situations (e.g. using 0/1, skewed biomass, or % cover data). 
+Non-parametric approach such as IndVal index that does not assume normality
+assumption could handle data of various distribution types. However, the
+randomization test which is used to test species-environment associations 
+might not always be meaningful for continuous (e.g. biomass, or % cover) 
+or for ordinal (scores for vegetation cover) response data. 
 
-Goals:
+Besides, none of these approaches are designed to deal with some other 
+aspects of field data, for example confounding variables, sample selection 
+bias (presence-only data), sampling effort differences, or imperfect detection.
+The issue of confounding variable could be particularly significant in 
+many field situations. in that if the effect other natural environmental
+gradients or regional factors are not controlled for, the assessment of
+indicative value of a species for a particular condition of interest 
+could be compromised. For example, the absence or low abundance of a 'good'
+indicator species from a given site might render the site in 'bad' condition;
+however, the species population status might be related to other naturally
+occurring variability rather than anthropogenic caused stressors. 
+Thus, having an option to control for putative confounding factors 
+can improve the assessment of indicator value of species. 
+
+In this paper we introduce opticut (Optimal Cut) an R-package developed 
+to addresses the most common limitations of currently available methods. 
+The limitation are (1) the absence of a common framework that can meet 
+the different distribution assumptions of field data and (2) the option 
+to control for putative confounding factors and evaluate how indicator 
+value of species might change under different conditions. The critical
+development in Opticut to address these limitations is the implementation 
+of a general and extensible likelihood-based framework and multi-model 
+inference for indicator species analysis. Moreover, the opticut R 
+extension package offers computationally efficient algorithms for 
+finding indicator species, and tools for exploring and visualizing the results.
+
+Likelihood based optimal partitioning for indicator
+species analysis. Finding the best binary partition for each species
+based on model selection, possibly controlling for modifying/confounding
+variables as described in Kemencei et al. (2014, Community Ecology 15:180--186).
+The package also implements various measures of uncertainty based on
+binary partitions, optimal multinomial partitioning, and exploratory
+selection indices, with native support for parallel computations.
 
 * describe a general and extensible approach that addresses the above limitations,
 * implement a computationally efficient algorithm,
