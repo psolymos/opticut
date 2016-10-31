@@ -45,7 +45,7 @@ theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", lower=0, ...)
                 dm[i,j] <- dm[j,i] <- sum(bp[,i] * bp[,j]) / nrow(bp) # a / n
             }
         }
-        corder <- hclust(as.dist(1 - dm), method = "ward.D2")$order
+        corder <- hclust(as.dist(1 - dm), method = "ward.D2")$order # R (>= 3.1.0)
 
         bp <- bp[,corder,drop=FALSE]
     }
