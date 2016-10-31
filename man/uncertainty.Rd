@@ -208,6 +208,10 @@ stopCluster(cl)
 bestpart(ucdol)
 heatmap(t(bestpart(ucdol)), scale="none", col=occolors()(25),
     distfun=function(x) dist(x, "manhattan"))
+
+## See how indicator value changes with different partitions
+with(ucdol$uncertainty[["pvic"]],
+    boxplot(I ~ best, col="gold", ylab="Indicator value"))
 }
 }
 \keyword{ manip }
