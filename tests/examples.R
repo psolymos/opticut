@@ -5,6 +5,7 @@ library(opticut)
 help_pages <- c("opticut-package",
     "dolina",
     "opticut", "optilevels", "sindex",
+    "beta2i",
     "allComb", "rankComb",
     "bestmodel", "uncertainty",
     "occolors", "ocoptions")
@@ -16,6 +17,8 @@ for (i in help_pages) {
 }
 
 ## testing methods
+
+ocoptions(try_error=TRUE)
 
 set.seed(2345)
 n <- 50
@@ -30,9 +33,37 @@ Y2 <- rpois(n, lam2)
 Y3 <- rpois(n, exp(0))
 Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
+opticut:::.extractOpticut(oc)
 uc <- uncertainty(oc, type="asymp", B=999)
 
 as.data.frame(oc)
 as.data.frame(summary(oc))
 as.data.frame(uc)
 as.data.frame(summary(uc))
+
+## testing distributions
+
+#### negbin
+
+summary(opticut(Y ~ x2, strata=x0, dist="negbin", comb="rank"))
+
+#### beta
+
+Y2 <- Y / rowSums(Y)
+Y2[Y2 == 0] <- 0.01
+Y2[Y2 == 1] <- 0.99
+summary(opticut(Y2 ~ x2, strata=x0, dist="beta", comb="rank"))
+
+#### zip2, zinb2
+
+summary(opticut(Y ~ x2, strata=x0, dist="zip2", comb="rank"))
+summary(opticut(Y ~ x2, strata=x0, dist="zinb2", comb="rank"))
+
+#### ordered
+
+summary(opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")$species
+
+#### rsf, rspf
+
+opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0, dist="rspf", comb="rank",
+    m=0, B=0)$species
