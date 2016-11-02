@@ -3,7 +3,7 @@ bestpart.opticut <-
 function (object, ...)
 {
     out <- list()
-    if (object$comb == "rank") {
+    if (!is.na(object$comb) && object$comb == "rank") {
         for (spp in names(object$species)) {
             obj <- object$species[[spp]]
             i <- rownames(obj)[which.max(obj$logLR)]
