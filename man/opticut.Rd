@@ -50,7 +50,7 @@ wplot(x, ...)
     las = 1, ylab = "Model weight * Association", xlab = "Partitions",
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
-    las = 1, ylab = "Relative abundance", xlab = "Strata",
+    las, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
     lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
@@ -152,6 +152,8 @@ numeric, graphical parameters for plot margin \code{\link{par}}.
 }
   \item{ylab, xlab, las, ylim}{
 graphical arguments, see \code{\link{plot}}.
+By default, \code{las} is 1 when \code{horizontal = TRUE} and
+2 when \code{horizontal = FALSE}.
 }
   \item{bty}{
 Character, determines the type of box which is drawn about plots,
