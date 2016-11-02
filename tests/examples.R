@@ -33,6 +33,7 @@ Y2 <- rpois(n, lam2)
 Y3 <- rpois(n, exp(0))
 Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
+oca <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
 opticut:::.extractOpticut(oc)
 uc <- uncertainty(oc, type="asymp", B=999)
 
@@ -40,6 +41,19 @@ as.data.frame(oc)
 as.data.frame(summary(oc))
 as.data.frame(uc)
 as.data.frame(summary(uc))
+
+fun <- function(Y, X, linkinv, ...) {
+    mod <- stats::glm(Y ~ .-1, data=X, family="poisson", ...)
+    list(coef=coef(mod),
+        logLik=logLik(mod),
+        linkinv=family(mod)$linkinv)
+}
+comb <- allComb(x0)
+ocfun <- opticut(Y ~ x2, strata=comb, dist=fun)
+
+strata(oc)
+strata(oca)
+strata(ocfun)
 
 ## testing distributions
 
