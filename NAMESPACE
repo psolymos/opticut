@@ -36,6 +36,7 @@ importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
            "par", "plot", "polygon", "title")
 importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
-           "vcov", "density", "quantile", ".MFclass", "nobs")
+           "vcov", "density", "quantile", ".MFclass", "nobs",
+           "as.dist", "hclust")
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")
