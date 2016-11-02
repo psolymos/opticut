@@ -1,7 +1,7 @@
 plot.opticut <-
 function(x, which = NULL, cut, sort,
 las, ylab="Relative abundance", xlab="Strata",
-show_I=TRUE, show_S=TRUE, hr=TRUE,
+show_I=TRUE, show_S=TRUE, hr=TRUE, tick=TRUE,
 theme, mar=c(5, 4, 4, 4) + 0.1, bty="o",
 lower=0, upper=1, pos=0, horizontal=TRUE, ...)
 {
@@ -68,9 +68,9 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
             type="n", axes=FALSE, ann=FALSE, ...)
         title(ylab=ylab, xlab=xlab)
         axis(1, at=seq_len(p)-0.5, lwd=0, lwd.ticks=1,
-            labels=colnames(bp), tick=TRUE, ...)
+            labels=colnames(bp), tick=tick, ...)
         axis(2, at=seq_len(n)-0.5, lwd=0, lwd.ticks=1,
-            labels=rownames(bp), tick=TRUE, ...)
+            labels=rownames(bp), tick=tick, ...)
         if (show_S)
             axis(3, at=seq_len(ncol(bp))-0.5,
                 labels=colSums(bp), tick=FALSE, ...)
@@ -84,9 +84,9 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
             type="n", axes=FALSE, ann=FALSE, ...)
         title(ylab=xlab, xlab=ylab)
         axis(2, at=seq_len(p)-0.5, lwd=0, lwd.ticks=1,
-            labels=colnames(bp), tick=TRUE, ...)
+            labels=colnames(bp), tick=tick, ...)
         axis(1, at=seq_len(n)-0.5, lwd=0, lwd.ticks=1,
-            labels=rownames(bp), tick=TRUE, ...)
+            labels=rownames(bp), tick=tick, ...)
         if (show_S)
             axis(4, at=seq_len(ncol(bp))-0.5,
                 labels=colSums(bp), tick=FALSE, ...)

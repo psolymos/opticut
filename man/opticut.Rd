@@ -51,7 +51,7 @@ wplot(x, ...)
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
     las, ylab = "Relative abundance", xlab = "Strata",
-    show_I = TRUE, show_S = TRUE, hr = TRUE,
+    show_I = TRUE, show_S = TRUE, hr = TRUE, tick = TRUE,
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
     lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
 
@@ -141,8 +141,10 @@ logical, if indicator values should be shown.
   \item{show_S}{
 logical, if number of indicator species should be shown.
 }
-  \item{hr}{
-logical, if horizontal rules should be added.
+  \item{hr, tick}{
+logical, if horizontal rules (\code{hr})
+and ticks to the axis legends (\code{tick}) should be added.
+Default is \code{TRUE} for both.
 }
   \item{theme}{
 color theme as defined by \code{\link{occolors}}.
