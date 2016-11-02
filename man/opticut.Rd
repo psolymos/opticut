@@ -86,7 +86,9 @@ in the model. If not found in data, the variables are taken from
 from which \code{opticut} is called.
 }
   \item{strata}{
-vector, unique values define partitions.
+vector (usually a factor), unique values define partitions.
+It can also be a matrix with rows as observations and
+binary partitions as columns.
 }
   \item{dist}{
 character or function, a distribution to fit.
