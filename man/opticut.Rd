@@ -53,7 +53,7 @@ wplot(x, ...)
     las = 1, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
-    lower = 0, upper = 1, pos = 0, ...)
+    lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
 
 \method{print}{opticut1}(x, cut, sort, digits, ...)
 \method{print}{opticut}(x, digits, ...)
@@ -165,6 +165,10 @@ Both need to be in [0, 1] and \code{higher} cannot be smaller than \code{lower}.
   \item{pos}{
 numeric, position of rectangles in the plot relative to the baseline.
 Value must be in the [-1, 1] range (below vs. above baseline).
+}
+  \item{horizontal}{
+logical, plot orientation: species as rows (\code{TRUE})
+or as columns (\code{FALSE}).
 }
   \item{digits}{
 numeric, number of significant digits in output.
@@ -413,7 +417,8 @@ Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
 dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist="zinb:cloglog")
 summary(dol)
-plot(dol)
+## vertical plot orientation
+plot(dol, horizontal=FALSE, pos=1, upper=0.8)
 
 ## parallel computing comparisons
 library(parallel)
