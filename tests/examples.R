@@ -35,25 +35,47 @@ Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 oc <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 oca <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="all")
 opticut:::.extractOpticut(oc)
-uc <- uncertainty(oc, type="asymp", B=999)
-
-as.data.frame(oc)
-as.data.frame(summary(oc))
-as.data.frame(uc)
-as.data.frame(summary(uc))
-
 fun <- function(Y, X, linkinv, ...) {
     mod <- stats::glm(Y ~ .-1, data=X, family="poisson", ...)
     list(coef=coef(mod),
         logLik=logLik(mod),
         linkinv=family(mod)$linkinv)
 }
-comb <- allComb(x0)
+comb <- allComb(x0)[,1:6]
+attr(comb, "collapse") <- NULL
+attr(comb, "comb") <- NULL
+colnames(comb) <- letters[1:6]
 ocfun <- opticut(Y ~ x2, strata=comb, dist=fun)
+str(ocfun$strata)
+
+uc <- uncertainty(oc, type="asymp", B=999)
+uca <- uncertainty(oca, type="asymp", B=999)
+#ucfun <- uncertainty(ocfun, type="asymp", B=999)
 
 strata(oc)
 strata(oca)
 strata(ocfun)
+
+bestmodel(oc)
+bestmodel(oca)
+#bestmodel(ocfun)
+
+str(bestpart(oc))
+str(bestpart(oca))
+str(bestpart(ocfun))
+
+summary(oc)
+summary(oca)
+summary(ocfun)
+
+print(oc)
+print(oca)
+print(ocfun)
+
+as.data.frame(oc)
+as.data.frame(summary(oc))
+as.data.frame(uc)
+as.data.frame(summary(uc))
 
 ## testing distributions
 
