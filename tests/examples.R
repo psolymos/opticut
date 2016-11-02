@@ -61,9 +61,9 @@ summary(opticut(Y ~ x2, strata=x0, dist="zinb2", comb="rank"))
 
 #### ordered
 
-summary(opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")$species
+opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")$species
 
 #### rsf, rspf
 
-opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0, dist="rspf", comb="rank",
-    m=0, B=0)$species
+opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
+    dist="rspf", comb="rank", m=0)$species
