@@ -50,9 +50,10 @@ wplot(x, ...)
     las = 1, ylab = "Model weight * Association", xlab = "Partitions",
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", ...)
 \method{plot}{opticut}(x, which = NULL, cut, sort,
-    las = 1, ylab = "Relative abundance", xlab = "Strata",
+    las, ylab = "Relative abundance", xlab = "Strata",
     show_I = TRUE, show_S = TRUE, hr = TRUE,
-    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o", lower = 0, ...)
+    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
+    lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
 
 \method{print}{opticut1}(x, cut, sort, digits, ...)
 \method{print}{opticut}(x, digits, ...)
@@ -151,13 +152,25 @@ numeric, graphical parameters for plot margin \code{\link{par}}.
 }
   \item{ylab, xlab, las, ylim}{
 graphical arguments, see \code{\link{plot}}.
+By default, \code{las} is 1 when \code{horizontal = TRUE} and
+2 when \code{horizontal = FALSE}.
 }
   \item{bty}{
 Character, determines the type of box which is drawn about plots,
 see \code{\link{par}}.
 }
-  \item{lower}{
-numeric (between 0 and 1), minimum threshold for equally thick lines in the plot.
+  \item{lower, upper}{
+numeric (between 0 and 1), \code{lower} is the minimum and
+\code{upper} is the maximum height for rectangles drawn in the plot.
+Both need to be in [0, 1] and \code{higher} cannot be smaller than \code{lower}.
+}
+  \item{pos}{
+numeric, position of rectangles in the plot relative to the baseline.
+Value must be in the [-1, 1] range (below vs. above baseline).
+}
+  \item{horizontal}{
+logical, plot orientation: species as rows (\code{TRUE})
+or as columns (\code{FALSE}).
 }
   \item{digits}{
 numeric, number of significant digits in output.
@@ -406,7 +419,8 @@ Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
 dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist="zinb:cloglog")
 summary(dol)
-plot(dol)
+## vertical plot orientation
+plot(dol, horizontal=FALSE, pos=1, upper=0.8)
 
 ## parallel computing comparisons
 library(parallel)
