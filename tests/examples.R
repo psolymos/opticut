@@ -25,11 +25,12 @@ x0 <- sample(1:4, n, TRUE)
 x1 <- ifelse(x0 %in% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 x3 <- ifelse(x0 %in% 2:4, 1, 0)
-lam1 <- exp(0.5 + 1*x1 + -0.2*x2)
-Y1 <- rpois(n, lam1)
-lam2 <- exp(1 + 0.5*x3)
-Y2 <- rpois(n, lam2)
-Y3 <- rpois(n, exp(0))
+mu1 <- 0.5 + 1*x1 + -0.2*x2
+mu2 <- 1 + 0.5*x3
+mu3 <- rep(0, n)
+Y1 <- rpois(n, exp(mu1))
+Y2 <- rpois(n, exp(mu2))
+Y3 <- rpois(n, exp(mu3))
 Y <- cbind(Spp1=Y1, Spp2=Y2, Spp3=Y3)
 comb <- allComb(x0)[,1:6]
 attr(comb, "collapse") <- NULL
@@ -123,55 +124,98 @@ ocoptions(cut=-Inf)
 
 #### gaussian
 
-summary(opticut(Y ~ x2, strata=x0, dist="gaussian"))
+summary(o <- opticut(Y ~ x2, strata=x0, dist="gaussian"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
 
 #### poisson
 
-summary(opticut(Y ~ x2, strata=x0, dist="poisson"))
+summary(o <- opticut(Y ~ x2, strata=x0, dist="poisson"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
 
 #### binomial
 
 Y1 <- ifelse(Y > 0, 1, 0)
-summary(opticut(Y1 ~ x2, strata=x0, dist="binomial"))
+summary(o <- opticut(Y1 ~ x2, strata=x0, dist="binomial"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
 
 #### negbin
 
-summary(opticut(Y ~ x2, strata=x0, dist="negbin"))
+summary(o <- opticut(Y ~ x2, strata=x0, dist="negbin"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
 
 #### beta
 
 Y2 <- Y / rowSums(Y)
 Y2[Y2 == 0] <- 0.01
 Y2[Y2 == 1] <- 0.99
-summary(opticut(Y2 ~ x2, strata=x0, dist="beta"))
+summary(o <- opticut(Y2 ~ x2, strata=x0, dist="beta"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
 
 #### zip
 
-summary(opticut(Y ~ x2, strata=x0, dist="zip"))
+Yzi <- Y
+Yzi[1,] <- 0
+B <- replicate(2, sample.int(n, replace=TRUE))
+B[1,] <- 1
+summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zip"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=B)
+u <- uncertainty(o, type="multi", B=B)
 
 #### zinb
 
-summary(opticut(Y ~ x2, strata=x0, dist="zinb"))
+summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zinb"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=B)
+u <- uncertainty(o, type="multi", B=B)
 
 #### zip2
 
-summary(opticut(Y ~ x2, strata=x0, dist="zip2"))
+summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zip2"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=B)
+u <- uncertainty(o, type="multi", B=B)
 
 #### zinb2
 
-summary(opticut(Y ~ x2, strata=x0, dist="zinb2"))
+summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zinb2"))
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=B)
+u <- uncertainty(o, type="multi", B=B)
 
 #### ordered
 
-opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")$species
+o <- opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")
+o$species
+#u <- uncertainty(o, type="asymp", B=9) # ???
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
 
 #### rsf
 
-opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
-    dist="rsf", comb="rank", m=0)$species
+o <- opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
+    dist="rsf", comb="rank", m=0)
+o$species
+#u <- uncertainty(o, type="asymp", B=9) # 'm' must be provided
+#u <- uncertainty(o, type="boot", B=2)
+#u <- uncertainty(o, type="multi", B=2)
 
 #### rspf
 
-opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
-    dist="rspf", comb="rank", m=0)$species
+o <- opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
+    dist="rspf", comb="rank", m=0)
+o$species
+#u <- uncertainty(o, type="asymp", B=9) # ???
+#u <- uncertainty(o, type="boot", B=2)
+#u <- uncertainty(o, type="multi", B=2)
 
