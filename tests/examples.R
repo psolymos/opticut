@@ -119,27 +119,59 @@ as.data.frame(summary(u1a))
 
 ## testing distributions
 
+ocoptions(cut=-Inf)
+
+#### gaussian
+
+summary(opticut(Y ~ x2, strata=x0, dist="gaussian"))
+
+#### poisson
+
+summary(opticut(Y ~ x2, strata=x0, dist="poisson"))
+
+#### binomial
+
+Y1 <- ifelse(Y > 0, 1, 0)
+summary(opticut(Y1 ~ x2, strata=x0, dist="binomial"))
+
 #### negbin
 
-summary(m_nb <- opticut(Y ~ x2, strata=x0, dist="negbin", comb="rank"))
+summary(opticut(Y ~ x2, strata=x0, dist="negbin"))
 
 #### beta
 
 Y2 <- Y / rowSums(Y)
 Y2[Y2 == 0] <- 0.01
 Y2[Y2 == 1] <- 0.99
-summary(opticut(Y2 ~ x2, strata=x0, dist="beta", comb="rank"))
+summary(opticut(Y2 ~ x2, strata=x0, dist="beta"))
 
-#### zip2, zinb2
+#### zip
 
-summary(opticut(Y ~ x2, strata=x0, dist="zip2", comb="rank"))
-summary(opticut(Y ~ x2, strata=x0, dist="zinb2", comb="rank"))
+summary(opticut(Y ~ x2, strata=x0, dist="zip"))
+
+#### zinb
+
+summary(opticut(Y ~ x2, strata=x0, dist="zinb"))
+
+#### zip2
+
+summary(opticut(Y ~ x2, strata=x0, dist="zip2"))
+
+#### zinb2
+
+summary(opticut(Y ~ x2, strata=x0, dist="zinb2"))
 
 #### ordered
 
 opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")$species
 
-#### rsf, rspf
+#### rsf
+
+opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
+    dist="rsf", comb="rank", m=0)$species
+
+#### rspf
 
 opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
     dist="rspf", comb="rank", m=0)$species
+
