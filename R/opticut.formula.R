@@ -23,5 +23,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     out <- opticut.default(Y=Y, X=X, strata=strata, dist=dist,
         comb=comb, sset=sset, cl=cl, ...)
     out$call <- match.call()
+    if (is.function(dist))
+        out$dist <- deparse(substitute(dist))
     out
 }

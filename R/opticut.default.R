@@ -100,6 +100,12 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         failed <- character(0)
     }
 
+    ## loop over spec results to replace dist attribute when dist=fun
+    if (is.function(dist)) {
+        for (i in which(!Failed)) {
+            attr(res[[i]], "dist") <- deparse(substitute(dist))
+        }
+    }
     NOBS <- if (is.null(sset))
         NROW(Y) else NROW(data.matrix(Y)[sset,,drop=FALSE])
     out <- list(call=match.call(),
