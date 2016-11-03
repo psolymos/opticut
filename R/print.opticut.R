@@ -1,7 +1,8 @@
 print.opticut <- function(x, digits, ...) {
     if (missing(digits))
         digits <- max(3L, getOption("digits") - 3L)
-    cat("Multivariate opticut results, comb = ", x$comb, ", dist = ", x$dist,
+    cat("Multivariate opticut results, comb = ", x$comb, ", dist = ",
+        if (is.function(x$dist)) attr(x$dist, "dist") else x$dist,
         "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", sep = "")
@@ -10,3 +11,4 @@ print.opticut <- function(x, digits, ...) {
     cat("\n")
     invisible(x)
 }
+

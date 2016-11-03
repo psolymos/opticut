@@ -100,12 +100,6 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         failed <- character(0)
     }
 
-    ## loop over spec results to replace dist attribute when dist=fun
-    if (is.function(dist)) {
-        for (i in which(!Failed)) {
-            attr(res[[i]], "dist") <- deparse(substitute(dist))
-        }
-    }
     NOBS <- if (is.null(sset))
         NROW(Y) else NROW(data.matrix(Y)[sset,,drop=FALSE])
     out <- list(call=match.call(),
@@ -117,12 +111,17 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         sset=sset,
         nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
             (nlevels(Z) - 1L) else ncol(Z),
-        dist=if (is.function(dist))
-            deparse(substitute(dist)) else dist,
+        dist=dist,
         comb=comb,
         scale=getOption("ocoptions")$scale,
         failed=failed,
         collapse=getOption("ocoptions")$collapse)
+    if (is.function(dist)) {
+        attr(out$dist, "dist") <- deparse(substitute(dist))
+        for (i in which(!Failed)) {
+            attr(res[[i]], "dist") <- deparse(substitute(dist))
+        }
+    }
     class(out) <- "opticut"
     out
 }

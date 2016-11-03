@@ -13,7 +13,8 @@ print.summary.opticut <- function(x, cut, sort, digits, ...) {
         "Best supported models" else "Best supported model"
     TXT <- paste0(tmp, " with logLR >= ",
         format(cut, digits = digits), ":")
-    cat("Multivariate opticut results, comb = ", x$comb, ", dist = ", x$dist,
+    cat("Multivariate opticut results, comb = ", x$comb, ", dist = ",
+        if (is.function(x$dist)) attr(x$dist, "dist") else x$dist,
         "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", TXT, "\n", sep = "")

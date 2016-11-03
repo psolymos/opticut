@@ -24,8 +24,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         comb=comb, sset=sset, cl=cl, ...)
     out$call <- match.call()
     if (is.function(dist)) {
-        out$dist <- deparse(substitute(dist))
-        ## loop over spec results to replace dist attribute when dist=fun
+        attr(out$dist, "dist") <- deparse(substitute(dist))
         for (i in seq_len(length(out$species))) {
             attr(out$species[[i]], "dist") <- deparse(substitute(dist))
         }
