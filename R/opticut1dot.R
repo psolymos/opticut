@@ -114,26 +114,23 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             ## formula interface used (rsf, rspf, and not rspf.fit)
             ## thus sanity checks are made in ResourceSelection
             ## regarding covariates/identifiability.
-            m <- list(...)$m
+            ## Note: m=0 is provided, otherwise resampling is difficult,
+            ## leave m not 0 cases to customization (dist=fun)
             if (dist == "rsf") {
-                if (is.null(m))
-                    stop("'m' must be provided, have you checked help('rsf') ?")
                 if (!is.null(link) && link != "log")
                     warning("link argument ignored for dist='rsf' (log link used by default)")
                 link <- "log" # this is needed for linkinv below
                 ## note: the call uses link='log', no need to provide link=link here!
                 mod <- ResourceSelection::rsf(Y ~ .,
-                    data=XX[,-1,drop=FALSE], B=0, ...)
+                    data=XX[,-1,drop=FALSE], m=0, B=0, ...)
                 ## intercept is not reported by rsf
                 ## and this can cause problems in X %*% theta
                 cf <- c(0, mod$coefficients)
             } else {
-                if (is.null(m))
-                    stop("'m' must be provided, have you checked help('rspf') ?")
                 if (is.null(link))
                     link <- "logit" # this is needed for linkinv below
                 mod <- ResourceSelection::rspf(Y ~ ., data=XX[,-1,drop=FALSE],
-                    link=link, B=0, ...)
+                    link=link, m=0, B=0, ...)
                 cf <- mod$coefficients
             }
             ll <- as.numeric(mod$loglik)
