@@ -38,7 +38,15 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     } else {
         if (length(B) == 1) {
             niter <- B
-            BB <- replicate(niter, sample.int(n, replace=TRUE))
+            ## RSF/RSPF requires only used points to be resampled
+            if (!is.function(object$dist) && object$dist %in% c("rsf", "rspf")) {
+                avail <- which(object$Y[,1]==0)
+                used <- which(object$Y[,1]==1)
+                nused <- length(used)
+                BB <- replicate(niter, c(sample(used, nused, replace=TRUE), avail))
+            } else {
+                BB <- replicate(niter, sample.int(n, replace=TRUE))
+            }
         } else {
             BB <- B
             niter <- ncol(B)
