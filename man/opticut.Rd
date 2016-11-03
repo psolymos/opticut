@@ -314,7 +314,11 @@ The \code{wplot} (weight plot) shows model weights for partitions.
 partitions for each species (species as columns).
 
 \code{\link{bestmodel}} returns the best supported model for further
-manipulation (e.g. prediction).
+manipulation (e.g. prediction). Note: custom distribution
+functions are designed to return only point estimates,
+thus the best model cannot be returned. In this case,
+use the best partition returned by \code{bestpart} to refit
+the model.
 
 The coercion method \code{\link{as.data.frame}} return a data frame.
 }

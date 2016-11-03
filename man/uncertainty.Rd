@@ -51,7 +51,8 @@ or or \code{NULL} (all species, default).
 character, describing the type of uncertainty calculation for
 indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}.
 \code{"asymp"}: asymptotic distribution is based on best partition
-found for the input object.
+found for the input object (this option
+is unavailable for custom distribution functions).
 \code{"boot"}: non-parametric bootstrap distribution
 based on best partition found for the input object.
 \code{"multi"}: non-parametric bootstrap distribution
