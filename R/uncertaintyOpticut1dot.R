@@ -3,6 +3,7 @@
 function (object, which=NULL,
 type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
 {
+    type <- match.arg(type)
     if (missing(which))
         stop("specify which argument")
     if (!length(which))
@@ -13,16 +14,16 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         Z1=NULL,
         dist=object$dist, ...)$linkinv
     scale <- object$scale
-    m1 <- .extractOpticut(object, which,
-        boot=FALSE,
-        internal=TRUE,
-        full_model=TRUE,
-        best=TRUE, ...)[[1L]]
     obj <- object$species[[which]]
     k <- which.max(obj$logLR)
     bm <- rownames(obj)[k]
     n <- nobs(object)
     if (type == "asymp") {
+        m1 <- .extractOpticut(object, which,
+            boot=FALSE,
+            internal=TRUE,
+            full_model=TRUE,
+            best=TRUE, ...)[[1L]]
         if (length(B) > 1)
             stop("Provide single integer for B.")
         niter <- B
@@ -47,6 +48,11 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             stop("Not all strata represented in resampling")
     }
     if (type == "boot") {
+        m1 <- .extractOpticut(object, which,
+            boot=FALSE,
+            internal=TRUE,
+            full_model=FALSE,
+            best=TRUE, ...)[[1L]]
         cf <- if (pb) {
             t(pbapply::pbapply(BB, 2, function(z, ...) {
                 .extractOpticut(object, which,
@@ -64,7 +70,8 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                     best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
             }))
         }
-        cf <- rbind(coef(m1)[c(1L, 2L)], cf)
+        #cf <- rbind(coef(m1)[c(1L, 2L)], cf)
+        cf <- rbind(m1$coef[c(1L, 2L)], cf)
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
         #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
