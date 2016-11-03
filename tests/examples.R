@@ -1,6 +1,6 @@
 library(opticut)
 
-## run examples, even \dontrun sections
+## --- run examples with \dontrun sections ---
 
 help_pages <- c("opticut-package",
     "dolina",
@@ -16,7 +16,7 @@ for (i in help_pages) {
         ", package = 'opticut', run.dontrun = TRUE)")))
 }
 
-## testing methods
+## --- testing methods ---
 
 ocoptions(try_error=TRUE)
 set.seed(2345)
@@ -118,25 +118,25 @@ as.data.frame(summary(m1))
 as.data.frame(u1a)
 as.data.frame(summary(u1a))
 
-## testing distributions
+## --- testing distributions ---
 
 ocoptions(cut=-Inf)
 
-#### gaussian
+## gaussian
 
 summary(o <- opticut(Y ~ x2, strata=x0, dist="gaussian"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
-#### poisson
+## poisson
 
 summary(o <- opticut(Y ~ x2, strata=x0, dist="poisson"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
-#### binomial
+## binomial
 
 Y1 <- ifelse(Y > 0, 1, 0)
 summary(o <- opticut(Y1 ~ x2, strata=x0, dist="binomial"))
@@ -144,14 +144,14 @@ u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
-#### negbin
+## negbin
 
 summary(o <- opticut(Y ~ x2, strata=x0, dist="negbin"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
-#### beta
+## beta
 
 Y2 <- Y / rowSums(Y)
 Y2[Y2 == 0] <- 0.01
@@ -161,7 +161,7 @@ u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
-#### zip
+## zip
 
 Yzi <- Y
 Yzi[1,] <- 0
@@ -172,50 +172,103 @@ u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
 
-#### zinb
+## zinb
 
 summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zinb"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
 
-#### zip2
+## zip2
 
 summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zip2"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
 
-#### zinb2
+## zinb2
 
 summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zinb2"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
 
-#### ordered
+## ordered
 
 o <- opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")
 o$species
 #u <- uncertainty(o, type="asymp", B=9) # ???
+## Error in data.frame(XX[, -1, drop = FALSE]) : object 'XX' not found
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
-#### rsf
+## rsf
 
-o <- opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
-    dist="rsf", comb="rank", m=0)
-o$species
-#u <- uncertainty(o, type="asymp", B=9) # 'm' must be provided
-#u <- uncertainty(o, type="boot", B=2)
-#u <- uncertainty(o, type="multi", B=2)
+library(ResourceSelection)
+n.used <- 1000
+m <- 1
+n <- n.used * m
+set.seed(1234)
+x <- data.frame(x0=as.factor(sample(1:3, n, replace=TRUE)),
+    x1=rnorm(n), x2=runif(n))
+cfs <- c(1, -0.5, 0.1, -1, 0.5)
+dd <- simulateUsedAvail(x, cfs, n.used, m, link="logit")
 
-#### rspf
+Y <- dd$status
+X <- model.matrix(~ x1 + x2, dd)
 
-o <- opticut(ifelse(Y[,3] > 0, 1, 0) ~ x2, strata=x0,
-    dist="rspf", comb="rank", m=0)
+o <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rsf")
 o$species
 #u <- uncertainty(o, type="asymp", B=9) # ???
-#u <- uncertainty(o, type="boot", B=2)
-#u <- uncertainty(o, type="multi", B=2)
+## Error in rval[1:np, 1:np] <- solve(h) :
+##   number of items to replace is not a multiple of replacement length
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
+
+## rspf
+
+o <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rspf")
+o$species
+u <- uncertainty(o, type="asymp", B=9) # ???
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
+
+## --- offset example to test if ... args are passed properly ---
+
+if (FALSE) {
+set.seed(1234)
+n <- 50
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+lam <- exp(0.5 + 1*x1 + -0.2*x2)
+A <- ifelse(x0 %in% c(1,3), 1, 2)
+Y <- rpois(n, lam*A)
+
+if (FALSE) {
+op <- par(mfrow=c(1,2))
+boxplot((lam*A) ~ x0, ylab="lam*A", xlab="x0")
+boxplot(lam ~ x0, ylab="lam", xlab="x0")
+par(op)
+}
+
+## no offset: incorrect
+no <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
+## with offsets: log Area
+wo <- opticut(Y ~ x2, strata=x0, dist="poisson", offset=log(A), comb="rank")
+no$species[[1]]
+wo$species[[1]]
+
+nu1 <- uncertainty(no, type="asymp", B=9) # ???
+nu2 <- uncertainty(no, type="boot", B=2)
+nu3 <- uncertainty(no, type="multi", B=2)
+
+wu1 <- uncertainty(wo, type="asymp", B=9) # ???
+wu2 <- uncertainty(wo, type="boot", B=2)
+wu3 <- uncertainty(wo, type="multi", B=2)
+
+as.data.frame(nu1$uncertainty[[1]])
+as.data.frame(wu1$uncertainty[[1]])
+
+}
 
