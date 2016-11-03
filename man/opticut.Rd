@@ -241,7 +241,7 @@ uses \code{\link[MASS]{polr}} of the MASS package.}
 
 \item{\code{"rsf"}}{presence-only data using resource selection
 functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
-in the ResourceSelection package.
+in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rsf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
@@ -250,7 +250,7 @@ Intercept only model is accepted for \code{"rsf"}.}
 \item{\code{"rspf"}}{presence-only data using resource selection
 probability functions (RSPF)
 as explained in \code{\link[ResourceSelection]{rspf}}
-in the ResourceSelection package.
+in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
