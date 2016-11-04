@@ -93,3 +93,34 @@ classoption: letterpaper
 ## Dynamic documents
 
 
+```{r}
+library(opticut)
+ocoptions(try_error=TRUE)
+library(optpart)
+
+data(shoshsite)
+data(shoshveg)
+sveg <- as.matrix(shoshveg)
+table(sveg)
+sveg[sveg==0] <- 0.001
+sveg[sveg==0.1] <- 0.01
+sveg[sveg==0.5] <- 0.05
+sveg[sveg==1] <- 0.15
+sveg[sveg==2] <- 0.25
+sveg[sveg==3] <- 0.35
+sveg[sveg==4] <- 0.45
+sveg[sveg==5] <- 0.55
+sveg[sveg==6] <- 0.65
+sveg[sveg==7] <- 0.75
+sveg[sveg==8] <- 0.8
+table(sveg)
+
+elev <- cut(shoshsite$elevation, breaks=c(0, 7200, 8000, 9000, 20000))
+levels(elev) <- c("low","mid1","mid2", "high")
+
+sveg <- as.matrix(shoshveg)
+sveg[sveg > 0] <- 1
+o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
+plot(o, sort=1)
+# put here zi-beta with full ML estimation: zib
+```
