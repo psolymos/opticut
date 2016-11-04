@@ -79,6 +79,10 @@ summary(uc)
 ##  Sp2     3 1 0.8274 0.51229 0.9680
 ```
 
+## Dynamic documents with opticut
+
+Here is a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knit-ed [pdf](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
+
 ## References
 
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
