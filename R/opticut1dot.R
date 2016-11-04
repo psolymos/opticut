@@ -114,11 +114,11 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             linv <- binomial("logit")$linkinv
         }
         if (dist %in% c("rsf", "rspf")) {
-            ## formula interface used (rsf, rspf, and not rspf.fit)
+            ## formula interface used (rsf, rspf, and not rsf.fit)
             ## thus sanity checks are made in ResourceSelection
             ## regarding covariates/identifiability.
             ## Note: m=0 is provided, otherwise resampling is difficult,
-            ## leave m not 0 cases to customization (dist=fun)
+            ## leave m != 0 cases to customization (dist=fun)
             if (dist == "rsf") {
                 if (!is.null(link) && link != "log")
                     warning("link argument ignored for dist='rsf' (log link used by default)")
