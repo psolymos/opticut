@@ -222,9 +222,11 @@ X <- model.matrix(~ x1 + x2, dd)
 
 o <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rsf")
 o$species
-u <- uncertainty(o, type="asymp", B=9) # ???
+#u <- uncertainty(o, type="asymp", B=9) # ???
 ## Error in rval[1:np, 1:np] <- solve(h) :
 ##   number of items to replace is not a multiple of replacement length
+## ---
+## this needs new bugfix release of ResourceSelection
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
@@ -259,4 +261,3 @@ nu <- uncertainty(no, type="multi", B=2)
 ## passing ... is not enough for resampling, treated as user error
 wu <- try(uncertainty(wo, type="multi", B=2), silent=TRUE)
 stopifnot(inherits(wu, "try-error"))
-

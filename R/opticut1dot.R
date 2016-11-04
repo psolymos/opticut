@@ -103,7 +103,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                         Hess=full_model, ...)
                 } else {
                     mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
-                        method="logistic", ...)
+                        Hess=full_model, method="logistic", ...)
                 }
                 cf <- c(mod$zeta[1], coef(mod))
             } else {
