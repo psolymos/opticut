@@ -68,13 +68,58 @@ classoption: letterpaper
 
 ## Beta
 
+Use shoshveg
+
 ## Poisson and Negative Binomial
 
 ## Zero-inflated distributions
 
 ## Ordinal data
 
+Use shoshveg
+
 ## Presence-only (use-availability) data
+
+```{r}
+library(opticut)
+library(ResourceSelection)
+slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
+table(slp, goats$STATUS)
+o <- opticut(STATUS ~ ELEVATION, data=goats, strata=slp, dist="rsf")
+o <- opticut(goats$STATUS, strata=slp, dist="rsf")
+## Null model implies intercept only, which is dropped -- thus cannot be estimated. Use glm?
+## RSPF condition implies at least one covariate, it is thus not an issue
+
+
+goats$exp.HLI <- exp(goats$HLI)
+goats$sin.SLOPE <- sin(pi * goats$SLOPE / 180)
+goats$ELEVATION <- scale(goats$ELEVATION)
+goats$ET <- scale(goats$ET)
+goats$TASP <- scale(goats$TASP)
+m1 <- rsf(STATUS ~ TASP + sin.SLOPE + ELEVATION, goats, m=0, B = 0)
+m2 <- glm(STATUS ~ TASP + sin.SLOPE + ELEVATION, goats, family=binomial("logit"))
+c1 <- c(0, coef(m1))
+c2 <- coef(m2)
+cbind(weighted=c1, glm=c2)
+
+## settings
+n.used <- 1000
+m <- 10
+n <- n.used * m
+set.seed(1234)
+x <- data.frame(x1=rnorm(n), x2=runif(n))
+cfs <- c(1.5,-1,0.5)
+## fitting Exponential RSF model
+dat1 <- simulateUsedAvail(x, cfs, n.used, m, link="log")
+m1 <- rsf(status ~ .-status, dat1, m=0, B=0)
+m2 <- glm(status ~ .-status, dat1, family=binomial("logit"))
+## https://web.stanford.edu/~hastie/Papers/IPP.pdf
+m3 <- glm(status ~ .-status, dat1, family=binomial("logit"), weights=1E3^(1-dat1$status))
+c1 <- c(0, coef(m1))
+c2 <- coef(m2)
+c3 <- coef(m3)
+cbind(weighted=c1, glm=c2, inf=c3)
+```
 
 ## Mixed-effects models (LMM, GLMM)
 
