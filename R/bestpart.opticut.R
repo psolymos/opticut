@@ -14,7 +14,6 @@ function (object, ...)
                 strsplit(i, object$collapse, fixed=TRUE)[[1L]], 1L, 0L)
         }
         out <- do.call(cbind, out)
-        rownames(out) <- object$strata
     } else {
         for (spp in names(object$species)) {
             obj <- object$species[[spp]]
@@ -23,5 +22,6 @@ function (object, ...)
         }
         out <- do.call(cbind, out)
     }
+    rownames(out) <- strata(object)
     out
 }
