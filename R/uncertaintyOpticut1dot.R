@@ -3,6 +3,10 @@
 function (object, which=NULL,
 type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
 {
+    dots <- setdiff(names(object$call)[-1L],
+        c("X", "Y", "formula", "data", "strata", "dist", "comb", "sset", "cl"))
+    if (length(dots) > 0)
+        stop("Extra arguments detected in opticut call (...)")
     type <- match.arg(type)
     if (missing(which))
         stop("specify which argument")
