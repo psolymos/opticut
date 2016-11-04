@@ -97,7 +97,10 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 if (ncol(XX)==1) {
                     if (!is.null(list(...)$data))
                         stop("Note: data argument should not be provided as part of ...")
-                    mod <- MASS::polr(Y ~ 1, method="logistic", ...)
+                    ## Hess needed for uncertainty(type=asymp):
+                    ## that is when full_model is needed
+                    mod <- MASS::polr(Y ~ 1, method="logistic",
+                        Hess=full_model, ...)
                 } else {
                     mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
                         method="logistic", ...)
