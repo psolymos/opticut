@@ -23,6 +23,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     bm <- rownames(obj)[k]
     n <- nobs(object)
     if (type == "asymp") {
+        ## full model cannot be returned for dist=fun
         m1 <- .extractOpticut(object, which,
             boot=FALSE,
             internal=TRUE,
@@ -32,8 +33,19 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             stop("Provide single integer for B.")
         niter <- B
         bm <- rownames(obj)[k]
-        cf <- MASS::mvrnorm(niter, coef(m1), vcov(m1))[,c(1L, 2L)]
-        cf <- rbind(coef(m1)[c(1L, 2L)], cf)
+        if (object$dist %in% c("rsf", "rspf", "ordered")) {
+            if (object$dist == "ordered") {
+                xcoef <- c(m1$coefficients, m1$zeta)
+                cf <- MASS::mvrnorm(niter, xcoef, vcov(m1))
+                cf <- cf[,c(length(m1$coefficients)+1, 1L),drop=FALSE]
+            } else {
+                stop("not yet implemented for rsf/rspf")
+                ## need to check vcov.rsf issue
+            }
+        } else {
+            cf <- MASS::mvrnorm(niter, coef(m1), vcov(m1))[,c(1L, 2L),drop=FALSE]
+            cf <- rbind(coef(m1)[c(1L, 2L)], cf)
+        }
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
         #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
