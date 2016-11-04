@@ -39,8 +39,9 @@ check_strata(x, mat)
 }
 \arguments{
   \item{object}{
-fitted model object from \code{\link{opticut}} (or an output from
-\code{uncertainty} for the \code{summary} method).
+fitted model object from \code{\link{opticut}}
+which does not contain extra arguments as part of \code{...}
+(or an output from \code{uncertainty} for the \code{summary} method).
 }
   \item{which}{
 numeric or character (can be a vector) defining
