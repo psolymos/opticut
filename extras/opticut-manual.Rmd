@@ -1,0 +1,95 @@
+---
+title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
+author: "Peter Solymos and Ermias T. Azeria"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    keep_tex: no
+    toc: true
+    toc_depth: 3
+    number_sections: false
+  word_document:
+    toc: true
+    toc_depth: 3
+documentclass: report
+fontsize: 11pt
+classoption: letterpaper
+---
+
+# Introduction
+
+## Install
+
+## License
+
+## Issues
+
+# Partitioning for single species
+
+## All combinations
+
+* explain all comb, wplot, plot
+* explain object structure
+* use Gaussian toy data
+* fixlevels, summary, plot, beta2i
+
+## User defined combinations
+
+* show user defined strata matrix
+
+## Rank based combinations
+
+* plot, summary
+
+# Partitioning for multiple species
+
+* interface, object structure
+* bestpart, bestmodel, summary, print
+* wplot, plot, all/rank comb (custom strata)
+
+# Quantifying uncertainty
+
+* anymp/boot/multi
+* explain object structure (toy data)
+* bestpart, summary
+* jackknife, check_strata, heatmap etc.
+* custom dist: cannot return bestmodel, use bestpart to refit
+* custom dist: can do boot & multi, but not asymp, show how to get I
+
+# Distributions
+
+* dolina data set: use wherever possible
+* modification
+* offsets
+
+## Gaussian
+
+## Binomial
+
+## Beta
+
+## Poisson and Negative Binomial
+
+## Zero-inflated distributions
+
+## Ordinal data
+
+## Presence-only (use-availability) data
+
+## Mixed-effects models (LMM, GLMM)
+
+## Generalized additive models (GAM)
+
+## N-mixture models
+
+# Package options
+
+## High performance computing
+
+## Global options
+
+## Color themes
+
+## Dynamic documents
+
+
