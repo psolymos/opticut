@@ -81,7 +81,7 @@ summary(uc)
 
 ## Dynamic documents with opticut
 
-Here is a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [pdf](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
+Here is a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
 
 ## References
 
