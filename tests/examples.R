@@ -229,46 +229,31 @@ u <- uncertainty(o, type="multi", B=2)
 
 o <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rspf")
 o$species
-u <- uncertainty(o, type="asymp", B=9) # ???
+u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
-## --- offset example to test if ... args are passed properly ---
+## --- ... in uncertainty should produce an error ---
 
-if (FALSE) {
 set.seed(1234)
 n <- 50
 x0 <- sample(1:4, n, TRUE)
 x1 <- ifelse(x0 %in% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 lam <- exp(0.5 + 1*x1 + -0.2*x2)
-A <- ifelse(x0 %in% c(1,3), 1, 2)
+A <- ifelse(x0 %in% c(1,3), 1, 10)
 Y <- rpois(n, lam*A)
-
-if (FALSE) {
-op <- par(mfrow=c(1,2))
-boxplot((lam*A) ~ x0, ylab="lam*A", xlab="x0")
-boxplot(lam ~ x0, ylab="lam", xlab="x0")
-par(op)
-}
 
 ## no offset: incorrect
 no <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank")
 ## with offsets: log Area
-wo <- opticut(Y ~ x2, strata=x0, dist="poisson", offset=log(A), comb="rank")
+wo <- opticut(Y ~ x2, strata=x0, dist="poisson",
+    offset=log(A), weights=rep(1,n), comb="rank")
 no$species[[1]]
 wo$species[[1]]
 
-nu1 <- uncertainty(no, type="asymp", B=9) # ???
-nu2 <- uncertainty(no, type="boot", B=2)
-nu3 <- uncertainty(no, type="multi", B=2)
-
-wu1 <- uncertainty(wo, type="asymp", B=9) # ???
-wu2 <- uncertainty(wo, type="boot", B=2)
-wu3 <- uncertainty(wo, type="multi", B=2)
-
-as.data.frame(nu1$uncertainty[[1]])
-as.data.frame(wu1$uncertainty[[1]])
-
-}
+nu <- uncertainty(no, type="multi", B=2)
+## passing ... is not enough for resampling, treated as user error
+wu <- try(uncertainty(wo, type="multi", B=2), silent=TRUE)
+stopifnot(inherits(wu, "try-error"))
 
