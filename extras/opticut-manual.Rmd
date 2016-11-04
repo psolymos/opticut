@@ -100,7 +100,18 @@ library(optpart)
 
 data(shoshsite)
 data(shoshveg)
+
+elev <- cut(shoshsite$elevation, breaks=c(0, 7200, 8000, 9000, 20000))
+levels(elev) <- c("low","mid1","mid2", "high")
+
 sveg <- as.matrix(shoshveg)
+sveg[sveg > 0] <- 1
+o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
+plot(o, sort=1)
+
+
+sveg <- as.matrix(shoshveg)
+sveg <- sveg[,colSums(sveg>0) >= 50]
 table(sveg)
 sveg[sveg==0] <- 0.001
 sveg[sveg==0.1] <- 0.01
@@ -114,13 +125,23 @@ sveg[sveg==6] <- 0.65
 sveg[sveg==7] <- 0.75
 sveg[sveg==8] <- 0.8
 table(sveg)
+o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
+plot(o2, sort=1)
 
-elev <- cut(shoshsite$elevation, breaks=c(0, 7200, 8000, 9000, 20000))
-levels(elev) <- c("low","mid1","mid2", "high")
+sveg2 <- as.matrix(shoshveg)
+sveg2[sveg2 > 0] <- 1
+sveg2 <- sveg2[,colnames(sveg)]
+o3 <- opticut(sveg2 ~ 1, strata=elev, dist="binomial")
+plot(o3, sort=1)
 
-sveg <- as.matrix(shoshveg)
-sveg[sveg > 0] <- 1
-o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
-plot(o, sort=1)
-# put here zi-beta with full ML estimation: zib
+sveg2 <- as.matrix(shoshveg)
+sveg2[sveg2 > 0] <- 1
+sveg2 <- sveg2[,colnames(sveg)]
+
+Y <- shoshveg$ASTMIS
+table(Y)
+o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
+o4$species
+
+## check for modifier variable
 ```
