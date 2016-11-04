@@ -12,7 +12,7 @@ summary.opticut <- function(object, ...)
     bp <- bestpart(object)
     #bp <- mefa4::nonDuplicated(bp, rownames(bp), TRUE)
     bp <- bp[!duplicated(rownames(bp)),,drop=FALSE]
-    bp <- bp[levels(strata(object)),]
+    bp <- bp[levels(strata(object)),,drop=FALSE]
     sgn <- sign(c(-3, -2, -1, 0, 1, 2, 3)[as.integer(res$assoc)])
     lab1 <- character(ncol(bp))
     lab0 <- character(ncol(bp))
