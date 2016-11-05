@@ -124,19 +124,28 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                     warning("link argument ignored for dist='rsf' (log link used by default)")
                 link <- "log" # this is needed for linkinv below
                 ## note: the call uses link='log', no need to provide link=link here!
-                mod <- ResourceSelection::rsf(Y ~ .,
-                    data=XX[,-1,drop=FALSE], m=0, B=0, ...)
+#                mod <- ResourceSelection::rsf(Y ~ .,
+#                    data=XX[,-1,drop=FALSE], m=0, B=0, ...)
                 ## intercept is not reported by rsf
                 ## and this can cause problems in X %*% theta
-                cf <- c(0, mod$coefficients)
+#                cf <- c(0, mod$coefficients)
+#                ll <- as.numeric(mod$loglik)
+#                linv <- binomial(link)$linkinv
+                ## can be used for null model as well
+                mod <- stats::glm(Y ~ .-1, data=XX,
+                    family=binomial("logit"), ...)
+                #cf <- c(0, coef(mod)[-1L])
+                cf <- coef(mod)
+                ll <- as.numeric(logLik(mod))
+                ## link is still log !!!
             } else {
                 if (is.null(link))
                     link <- "logit" # this is needed for linkinv below
                 mod <- ResourceSelection::rspf(Y ~ ., data=XX[,-1,drop=FALSE],
                     link=link, m=0, B=0, ...)
                 cf <- mod$coefficients
+                ll <- as.numeric(mod$loglik)
             }
-            ll <- as.numeric(mod$loglik)
             linv <- binomial(link)$linkinv
         }
         if (!linkinv)
