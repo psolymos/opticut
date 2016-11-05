@@ -33,21 +33,12 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             stop("Provide single integer for B.")
         niter <- B
         bm <- rownames(obj)[k]
-        if (object$dist %in% c("rsf", "ordered")) {
-            if (object$dist == "ordered") {
-                xcoef <- c(m1$coefficients, m1$zeta)
-                xid <- c(length(m1$coefficients)+1, 1L)
-                cf <- MASS::mvrnorm(niter, xcoef, vcov(m1))
-                cf <- cf[,xid,drop=FALSE]
-                cf <- rbind(xcoef[xid], cf)
-            } else {
-                stop("not yet implemented for rsf/rspf")
-                ## need to check vcov.rsf issue
-                ## intercept is set to 0
-                cf <- MASS::mvrnorm(niter, m1$coefficients[-1L], vcov(m1))
-                cf <- cbind(0, cf)
-                cf <- rbind(coef(m1)[c(1L, 2L)], cf)
-            }
+        if (object$dist == "ordered") {
+            xcoef <- c(m1$coefficients, m1$zeta)
+            xid <- c(length(m1$coefficients)+1, 1L)
+            cf <- MASS::mvrnorm(niter, xcoef, vcov(m1))
+            cf <- cf[,xid,drop=FALSE]
+            cf <- rbind(xcoef[xid], cf)
         } else {
             cf <- MASS::mvrnorm(niter, coef(m1), vcov(m1))[,c(1L, 2L),drop=FALSE]
             cf <- rbind(coef(m1)[c(1L, 2L)], cf)
