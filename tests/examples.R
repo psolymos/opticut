@@ -199,9 +199,6 @@ u <- uncertainty(o, type="multi", B=B)
 o <- opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")
 o$species
 u <- uncertainty(o, type="asymp", B=9)
-## Error in data.frame(XX[, -1, drop = FALSE]) : object 'XX' not found
-## ---
-## mvrnorm fails because of m1$coef, m1$zeta are needed to match vcov
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
@@ -220,13 +217,16 @@ dd <- simulateUsedAvail(x, cfs, n.used, m, link="logit")
 Y <- dd$status
 X <- model.matrix(~ x1 + x2, dd)
 
+## intercept + partition + covariates
 o <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rsf")
 o$species
-#u <- uncertainty(o, type="asymp", B=9) # ???
-## Error in rval[1:np, 1:np] <- solve(h) :
-##   number of items to replace is not a multiple of replacement length
-## ---
-## this needs new bugfix release of ResourceSelection
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="multi", B=2)
+## intercept + partition
+o <- opticut(Y ~ 1, dd, strata=x0, dist="rsf")
+o$species
+u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 
