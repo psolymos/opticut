@@ -64,15 +64,21 @@ classoption: letterpaper
 
 ## Gaussian
 
+## Poisson and Negative Binomial
+
+Dolina, cover offsets here
+
+## Zero-inflated distributions
+
+Dolina
+
 ## Binomial
 
 ## Beta
 
 Use shoshveg
 
-## Poisson and Negative Binomial
-
-## Zero-inflated distributions
+Custom distr: ZI-Beta
 
 ## Ordinal data
 
@@ -87,6 +93,8 @@ slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
 table(slp, goats$STATUS)
 o <- opticut(STATUS ~ ELEVATION, data=goats, strata=slp, dist="rsf")
 o <- opticut(goats$STATUS, strata=slp, dist="rsf")
+o$species
+plot(o, sort=FALSE)
 ## Null model implies intercept only, which is dropped -- thus cannot be estimated. Use glm?
 ## RSPF condition implies at least one covariate, it is thus not an issue
 
@@ -136,6 +144,8 @@ cbind(weighted=c1, glm=c2, inf=c3)
 ## Color themes
 
 ## Dynamic documents
+
+# References
 
 
 ```{r}
