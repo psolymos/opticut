@@ -17,7 +17,7 @@ variables as described in Kemencei et al. (2014).
 
 Install development version from GitHub:
 
-```
+```R
 library(devtools)
 install_github("psolymos/opticut")
 ```
@@ -35,7 +35,7 @@ to report a problem.
 
 ## Typical workflow
 
-```
+```R
 library(opticut)
 
 ## --- community data ---
@@ -50,18 +50,17 @@ g <-      c(1,1,1,1, 2,2,2,2, 3,3,3,3)
 ## --- find optimal partitions for each species ---
 oc <- opticut(y, strata = g, dist = "poisson")
 summary(oc)
-
-##  Multivariate opticut results, comb = rank, dist = poisson
-##
-##  Call:
-##  opticut.default(Y = y, strata = g, dist = "poisson")
-##
-##  Best supported models with logLR >= 2:
-##      split assoc      I  mu0  mu1 logLR      w
-##  Sp3   2 3    ++ 0.6471 0.75 3.50 4.793 0.6962
-##  Sp2     3   +++ 0.8571 0.25 3.25 9.203 0.9577
-##  2 binary splits
-##  1 species not shown
+#  Multivariate opticut results, comb = rank, dist = poisson
+#
+#  Call:
+#  opticut.default(Y = y, strata = g, dist = "poisson")
+#
+#  Best supported models with logLR >= 2:
+#      split assoc      I  mu0  mu1 logLR      w
+#  Sp3   2 3    ++ 0.6471 0.75 3.50 4.793 0.6962
+#  Sp2     3   +++ 0.8571 0.25 3.25 9.203 0.9577
+#  2 binary splits
+#  1 species not shown
 
 ## --- visualize the results ---
 plot(oc, cut = -Inf)
@@ -69,14 +68,13 @@ plot(oc, cut = -Inf)
 ## --- quantify uncertainty ---
 uc <- uncertainty(oc, type = "asymp", B = 999)
 summary(uc)
-
-##  Multivariate opticut uncertainty results
-##  type = asymp, B = 999, level = 0.95
-##
-##      split R      I   Lower  Upper
-##  Sp1   1 2 1 0.2860 0.02341 0.5668
-##  Sp3   2 3 1 0.6218 0.21456 0.8813
-##  Sp2     3 1 0.8274 0.51229 0.9680
+#  Multivariate opticut uncertainty results
+#  type = asymp, B = 999, level = 0.95
+#
+#      split R      I   Lower  Upper
+#  Sp1   1 2 1 0.2860 0.02341 0.5668
+#  Sp3   2 3 1 0.6218 0.21456 0.8813
+#  Sp2     3 1 0.8274 0.51229 0.9680
 ```
 
 ## Dynamic documents with opticut
