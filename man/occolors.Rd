@@ -4,16 +4,16 @@
 Color palettes for the opticut package
 }
 \description{
-A convenient way of settings color palettes for the opticut package.
+A convenient way of setting color palettes for the opticut package.
 }
 \usage{
 occolors(theme)
 }
 \arguments{
   \item{theme}{
-character value, character vector, or a function used to interpolate the colors,
+character value, character vector, or a function used to interpolate the colors.
 The built-in values are \code{"br"} (blue-red divergent palette, colorblind safe),
-\code{"br"} (green-red divergent palette), \code{"bw"} (black and white).
+\code{"gr"} (green-red divergent palette), \code{"bw"} (black and white).
 See \code{\link{colorRampPalette}} and the Examples.
 }
 }
