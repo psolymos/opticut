@@ -12,17 +12,49 @@ output:
     toc: true
     toc_depth: 3
 documentclass: report
-fontsize: 11pt
+fontsize: 12pt
 classoption: letterpaper
 ---
 
 # Introduction
 
+Identifying and monitoring indicator species has long been considered a cost-effective way of tracking environmental change or the status of the biota. Examples include the characterization of vegetation types (Chytry et al. 2002), degradation of ecosystems (McGeoch & Chown 1988), or signalling cryptic or rare species (Halme et al. 2009). Throughout these examples, a key attribute of indicator species (also referred to as character or differential species) is that they have strong associations with the environmental variables that they are supposed to indicate.
+
+Approaches to quantify the degree of environmental associations for species (indicator value) traditionally falls into three major types of approaches: (1) contingency table based measures (De Caceres & Legendre 2009); (2) analysis of variance (ANOVA; Wildi & Feldmeyer-Christe 2013); and (3) the widely used non-parametric IndVal method (Dufrene & Legendre 1997). While the different approaches have strong appeal and applications, they do not always meet the challenges presented by ecological data. 
+
+Ecological data come in different forms: binary, ordinal, count, abundance, or presence only data. Some of these data types are suitable for a particular approach, while some formats need ‘tweaking’. For example, binarizing abundance or count data for contingency tables leads to information loss. ANOVA, on the other hand, implies normality and homoscedastic errors, which might not always be satisfied by 0/1, ordinal, skewed, or % cover data. Finally, randomization test for the IndVal approach requires count data, which renders hypothesis testing difficult if not impossible for continuous or ordinal data.
+
+Another staple of observation field studies is the presence of modifying or confounding variables, or the presence of systematic biases (variable sampling effort, imperfect detectability, sample selection bias). Ignoring these effects can lead to erroneous indicator species analysis (Zettler et al. 2013). Controlling for these effects can improve the assessment of species-environment relationships, thus lead to better evaluation of indicator species. 
+
+To address these limitations, Kemencei et al. (2014) proposed a model-based indicator species analysis that accounted for the effects of modifying variables, and non-independence in the data due to paired sampling design. This model-based approach has been generalized and made available in the opticut R extension package. The opticut package offers computationally efficient and extensible algorithms for finding indicator species, tools for exploring and visualizing the results, and quantifying uncertainties. This manual showcases the functionality of the package.
+
 ## Install
+
+Install development version from GitHub (CRAN version not yet available at the time of writing):
+
+```{r eval=FALSE}
+library(devtools)
+install_github("psolymos/opticut")
+```
+
+User visible changes in the package are listed in the [NEWS](https://github.com/psolymos/opticut/blob/master/NEWS.md) file.
+
+## Report a problem
+
+Use the [issue tracker](https://github.com/psolymos/opticut/issues)
+to report a problem.
 
 ## License
 
-## Issues
+[GPL-2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+
+## Loading the package
+
+To get started, open R and load tha **opticut** package as:
+
+```{r}
+library(opticut)
+```
 
 # Partitioning for single species
 
@@ -86,7 +118,7 @@ Use shoshveg
 
 ## Presence-only (use-availability) data
 
-```{r}
+```{r eval=FALSE}
 library(opticut)
 library(ResourceSelection)
 slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
@@ -141,14 +173,132 @@ cbind(weighted=c1, glm=c2, inf=c3)
 
 ## Global options
 
+The `ocoptions` function provides a convenient way of handling options 
+related to the **opticut** package.
+The function takes arguments in `<tag> = <value>` form, or a list of tagged values.
+The tags must come from the parameters described below.
+When parameters are set by `ocoptions`, their former values are
+returned in an invisible named list. Such a list can be passed as an
+argument to `ocoptions` to restore the parameter values.
+Tags are the following:
+
+* `collapse`: character value to be used when merging factor levels,
+  the default is `" "`.
+* `cut`: log likelihood ratio value, model/species with lower
+  values are excluded from summaries and plots,
+  the default is `2`.
+* `sort`: logical value indicating if species/partitions
+  should be meaningfully sorted, the default is `TRUE`.
+  It can take numeric value when only species (`1`)
+  or partitions (`2`) are to be sorted (`1:2` is equivalent to
+  `TRUE`, wile any other numeric value is equivalent to `FALSE`).
+* `theme`: the color theme to be used based on `occolors`,
+  the default is `"br"`.
+* `check_comb`: check the design matrices for complementary partitions
+  using `checkComb`,
+  the default is `TRUE`.
+* `try_error`: if `opticut` should `try` to exclude
+  species where the models failed (`TRUE`), the default
+  is to stop when an error is encountered (`FALSE`).
+* `scale`: the scaling factor used to calculate indicator value (`I`)
+  based on the estimated coefficient (b): `I = abs(tanh(b*scale))`,
+  the default is `0.5`.
+
+```{r}
+## simple example from Legendre 2013
+## Indicator Species: Computation, in
+## Encyclopedia of Biodiversity, Volume 4
+## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
+gr <- as.factor(paste0("X", rep(1:5, each=5)))
+spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
+    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
+    Species3=rep(c(18,2,0,0,0), each=5))
+rownames(spp) <- gr
+
+## current settings
+print(unlist(ocoptions())) # these give identical answers
+unlist(getOption("ocoptions"))
+summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
+
+## resetting pboptions and checking new settings
+ocop <- ocoptions(collapse="+", sort=FALSE)
+unlist(getOption("ocoptions"))
+## running again with new settings
+summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
+
+## resetting original
+ocoptions(ocop)
+unlist(getOption("ocoptions"))
+```
+
 ## Color themes
+
+The **opticut** package uses color themes for plotting and 
+provides a convenient way of setting color palettes via the `occolors` function.
+The function takes a single `theme` argument and returns a function as
+in `colorRampPalette`.
+
+The `theme` argument can be a character value, character vector, or a function used to interpolate the colors. The built-in values are `"br"` (blue-red divergent palette, colorblind safe),
+`"gr"` (green-red divergent palette), `"bw"` (black and white).
+Hexadecimal values for the built-in palettes are taken from [http://colorbrewer2.org](http://colorbrewer2.org/).
+
+```{r}
+plot(1:100, rep(2, 100), pch = 15,
+    ylim = c(0, 21), axes = FALSE, ann = FALSE,
+    col = occolors()(100)) # default 'bg'
+text(50, 1, "theme = 'br'")
+points(1:100, rep(5, 100), pch = 15,
+    col=occolors("gr")(100))
+text(50, 4, "theme = 'gr'")
+points(1:100, rep(8, 100), pch = 15,
+    col=occolors("bw")(100))
+text(50, 7, "theme = 'bw'")
+points(1:100, rep(11, 100), pch = 15,
+    col=occolors(terrain.colors)(100))
+text(50, 10, "theme = terrain.colors")
+points(1:100, rep(14, 100), pch = 15,
+    col=occolors(c("purple", "pink", "orange"))(100))
+text(50, 13, "theme = c('purple', 'pink', 'orange')")
+points(1:100, rep(17, 100), pch = 15,
+    col=occolors(c("#a6611a", "#ffffbf", "#018571"))(100))
+text(50, 16, "theme = c('#a6611a', '#ffffbf', '#018571')")
+points(1:100, rep(20, 100), pch = 15,
+    col=occolors(c("#7b3294", "#ffffbf", "#008837"))(100))
+text(50, 19, "theme = c('#7b3294', '#ffffbf', '#008837')")
+```
+
 
 ## Dynamic documents
 
+**opticut** object summaries come with an `as.data.frame` method that can be used
+to turn the summary into a data frame, which is what for example the
+`kable` function from **knitr** package expects. This way, formatting the
+output isw much facilitated, and the user does not have to dig into the
+structure of the summary object.
+
+The GitHub repository has a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example do demonstrate how to format **opticut** objects for best effects: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
+
+# Summary
+
 # References
 
+McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. Trends in Ecology and Evolution 13: 46--47.
 
-```{r}
+Dufrene M and Legendre P (1997) Species assemblages and indicator species: The need for a flexible asymmetrical approach. Ecological Monographs 67: 345--366.
+
+De Caceres M and Legendre P (2009) Associations between species and groups of sites: Indices and statistical inference. Ecology 90: 3566--3574.
+
+O. Wildi and E. Feldmeyer-Christe 2013. Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data. COMMUNITY ECOLOGY 14(2): 139--143.
+
+Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002. Determination of diagnostic species with statistical fidelity measures. Journal of Vegetation Science 13: 79--90.
+
+Halme, P., Mönkkönen, M., Kotiaho, J. S, Ylisirniö, A-L. 2009. Quantifying the indicator power of an indicator species. Conservation Biology 23: 1008–1016.
+
+Zettler ML, Proffitt CE, Darr A, et al. On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. Thompson F, ed. PLoS ONE. 2013;8(10):e78219. doi:10.1371/journal.pone.0078219.
+
+Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014): Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. Community Ecology 15:180--186.
+
+```{r eval=FALSE}
 library(opticut)
 ocoptions(try_error=TRUE)
 library(optpart)
