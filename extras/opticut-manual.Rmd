@@ -171,6 +171,35 @@ cbind(weighted=c1, glm=c2, inf=c3)
 
 ## High performance computing
 
+```{r warning=FALSE}
+data(dolina)
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+Y <- ifelse(dolina$xtab > 0, 1, 0)
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial")
+
+## parallel computing comparisons
+library(parallel)
+cl <- makeCluster(2)
+
+## sequential, all combinations (2^(K-1) - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial", comb="all", cl=NULL))
+
+## sequential, rank based combinations (K - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial", comb="rank", cl=NULL))
+
+## parallel, all combinations (2^(K-1) - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial", comb="all", cl=cl))
+
+## parallel, rank based combinations (K - 1)
+system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial", comb="rank", cl=cl))
+stopCluster(cl)
+```
+
 ## Global options
 
 The `ocoptions` function provides a convenient way of handling options 
@@ -216,19 +245,19 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
 rownames(spp) <- gr
 
 ## current settings
-print(unlist(ocoptions())) # these give identical answers
-unlist(getOption("ocoptions"))
+str(ocoptions()) # these give identical answers
+str(getOption("ocoptions"))
 summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
 
 ## resetting pboptions and checking new settings
 ocop <- ocoptions(collapse="+", sort=FALSE)
-unlist(getOption("ocoptions"))
+str(ocoptions())
 ## running again with new settings
 summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
 
 ## resetting original
 ocoptions(ocop)
-unlist(getOption("ocoptions"))
+str(ocoptions())
 ```
 
 ## Color themes
@@ -267,6 +296,17 @@ points(1:100, rep(20, 100), pch = 15,
 text(50, 19, "theme = c('#7b3294', '#ffffbf', '#008837')")
 ```
 
+## Progress bar
+
+The expected completion time of extensive calculations and the
+progress is shown by the progress bar via the **pbapply** package.
+Default options with **opticut** are:
+
+```{r}
+str(pboptions())
+```
+
+See `?pboptions` for a description of these options. Use `pboptions(type = "none")` to turn off the probress bar in interactive R sessions. The progress bar is automatically turned off during non-interactive sessions.
 
 ## Dynamic documents
 
@@ -278,7 +318,29 @@ structure of the summary object.
 
 The GitHub repository has a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example do demonstrate how to format **opticut** objects for best effects: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
 
-# Summary
+```{r}
+library(knitr)
+
+y <- cbind(
+    Sp1=c(4,6,3,5, 5,6,3,4, 4,1,3,2),
+    Sp2=c(0,0,0,0, 1,0,0,1, 4,2,3,4),
+    Sp3=c(0,0,3,0, 2,3,0,5, 5,6,3,4))
+g <-    c(1,1,1,1, 2,2,2,2, 3,3,3,3)
+oc <- opticut(formula = y ~ 1, strata = g, dist = "poisson")
+uc <- uncertainty(oc, type = "asymp", B = 999)
+
+print(kable(as.data.frame(oc), digits=3))
+print(kable(oc$species[[1]][,c(1,2,4,5,8,9,10)], digits=3))
+print(kable(as.data.frame(uc), digits=3))
+```
+
+The `kable` output is rendered as nice tables (without the `print` part):
+
+```{r}
+kable(as.data.frame(oc), digits=3)
+kable(oc$species[[1]][,c(1,2,4,5,8,9,10)], digits=3)
+kable(as.data.frame(uc), digits=3)
+```
 
 # References
 
