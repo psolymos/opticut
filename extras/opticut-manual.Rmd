@@ -412,3 +412,80 @@ o4$species
 
 ## check for modifier variable
 ```
+
+
+# Calibration
+
+```{r}
+library(opticut)
+library(dclone)
+library(rjags)
+
+set.seed(234)
+n <- 50*4
+K <- 4
+g <- sample(1:K, n, replace=TRUE)
+x <- rnorm(n, 0, 1)
+z <- ifelse(g == 1, 1, 0)
+b0 <- 1
+b1 <- 1.5
+a <- 0.2
+mu <- b0 + z*b1 + x*a
+#p <- plogis(mu)
+#y <- rbinom(n, 1, p)
+lam <- exp(mu)
+y <- rpois(n, lam)
+table(y, g)
+boxplot(lam ~ g)
+
+df <- data.frame(y=y, x=x, g=g)
+df <- df[-(1:5),]
+#o <- opticut(y ~ x, data=df, strata=g, dist="binomial")
+o <- opticut(y ~ x, data=df, strata=g, dist="poisson")
+summary(o)
+
+mle <- getMLE(o, 1)
+mle
+summary(o)$bestpart
+
+dat <- list(
+    y=y[1:5],
+    x=matrix(x[1:5],5,1),
+    bp=drop(summary(o)$bestpart),
+    pi=rep(1/K, K),
+    n=5,
+    K=K,
+    p=1,
+    cf=mle$coef,
+    prec=solve(mle$vcov)
+)
+
+model <- custommodel("model {
+    for (i in 1:n) {
+#        y[i] ~ dbern(ilogit(mu[i]))
+        y[i] ~ dpois(exp(mu[i]))
+        mu[i] <- b0 + bp[k[i]]*b1 + inprod(x[i,], a)
+        k[i] ~ dcat(pi)
+    }
+    b0 <- theta[1]
+    b1 <- theta[2]
+    a <- theta[3:(2+p)]
+    theta[1:(2+p)] ~ dmnorm(cf[1:(2+p)], prec[1:(2+p),1:(2+p)])
+}")
+
+j <- jags.fit(dat, "k", model, n.iter=1000, n.chains=1)
+m <- as.matrix(j)
+head(m)
+g[1:5]
+y[1:5]
+f <- function(x, K) {
+    out <- numeric(K)
+    for (k in 1:K)
+        out[k] <- sum(x==k)
+    out
+}
+apply(as.matrix(j), 2, f, K=K)
+apply(apply(as.matrix(j), 2, f, K=K), 2, which.max)
+g[1:5]
+
+```
