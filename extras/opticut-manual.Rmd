@@ -485,7 +485,111 @@ f <- function(x, K) {
     out
 }
 apply(as.matrix(j), 2, f, K=K)
+apply(as.matrix(j), 2, f, K=K) / nrow(as.matrix(j))
 apply(apply(as.matrix(j), 2, f, K=K), 2, which.max)
 g[1:5]
 
 ```
+
+
+```{r}
+## multiple species
+set.seed(234)
+n <- 50*4
+K <- 4
+g <- sample(1:K, n, replace=TRUE)
+g[1:K] <- 1:K
+x <- rnorm(n, 0, 1)
+z <- ifelse(g %in% 1:2, 1, 0)
+b0 <- 1
+b1 <- 1.5
+a <- 0.2
+mu <- b0 + z*b1 + x*a
+lam <- exp(mu)
+y1 <- rpois(n, lam)
+
+z <- ifelse(g %in% 2:3, 1, 0)
+b0 <- 1
+b1 <- 1.5
+a <- 0.2
+mu <- b0 + z*b1 + x*a
+lam <- exp(mu)
+y2 <- rpois(n, lam)
+y <- cbind(y1=y1, y2=y2)
+
+df <- data.frame(x=x, g=g)
+df <- df[-(1:5),]
+yy <- y[-(1:5),]
+#o <- opticut(y ~ x, data=df, strata=g, dist="binomial")
+object <- opticut(yy ~ x, data=df, strata=g, dist="poisson")
+summary(object)
+
+## check colnames in Y and X
+ynew <- y[1:5,]
+xnew <- matrix(x[1:5],5,1)
+bp <- summary(object)$bestpart
+K <- ncol(bp)
+S <- nrow(bp)
+mle <- lapply(seq_len(S), function(i)
+    getMLE(object, i))
+cf <- sapply(mle, "[[", "coef")
+prec <- array(sapply(mle, function(z) solve(z$vcov)),
+    dim = c(nrow(cf), nrow(cf), S))
+
+dat <- list(
+    y=ynew,
+    x=xnew,
+    bp=bp,
+    pi=rep(1/K, K),
+    n=NROW(ynew),
+    K=K,
+    S=S,
+    p=ncol(object$X) - 1L,
+    cf=cf,
+    prec=prec
+)
+
+model <- custommodel("model {
+    for (i in 1:n) {
+        for (j in 1:S) {
+#            y[i,j] ~ dbern(ilogit(mu[i,j]))
+            y[i,j] ~ dpois(exp(mu[i,j]))
+            mu[i,j] <- b0[j] + bp[j,k[i]]*b1[j] + inprod(x[i,], a[j,])
+        }
+        k[i] ~ dcat(pi)
+    }
+    for (j in 1:S) {
+        b0[j] <- theta[j,1]
+        b1[j] <- theta[j,2]
+        a[j,1:p] <- theta[j,3:(2+p)]
+        theta[j,1:(2+p)] ~ dmnorm(cf[1:(2+p),j], prec[1:(2+p),1:(2+p),j])
+    }
+}")
+
+j <- jags.fit(dat, "k", model, n.iter=5000, n.chains=1)
+m <- as.matrix(j)
+head(m)
+g[1:5]
+y[1:5,]
+f <- function(x, K) {
+    out <- numeric(K)
+    for (k in 1:K)
+        out[k] <- sum(x==k)
+    out
+}
+apply(as.matrix(j), 2, f, K=K)
+apply(as.matrix(j), 2, f, K=K) / nrow(as.matrix(j))
+apply(apply(as.matrix(j), 2, f, K=K), 2, which.max)
+g[1:5]
+
+```
+
+
+Todo:
+- use notation: j=1...p & s=1...S, or q=1...p & j=1...S
+- implement test cases for lm/glm
+- write internal function (.calibrate)
+- implement user interface: calibrate, calibrate.opticut(object, ynew, xnew, ...)
+- add beta, ZI cases (ZI: inits!) [drop all the 1-species models!]
+
+
