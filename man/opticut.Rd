@@ -18,6 +18,7 @@
 \alias{bestpart.opticut}
 \alias{as.data.frame.opticut}
 \alias{as.data.frame.summary.opticut}
+\alias{getMLE.opticut}
 \title{
 Likelihood based optimal partitioning for indicator species analysis
 }
@@ -41,6 +42,7 @@ strata(object, ...)
 
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, ...)
+\method{getMLE}{opticut}(object, which, ...)
 
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut, ylim = c(-1, 1),
@@ -317,8 +319,12 @@ partitions for each species (species as columns).
 manipulation (e.g. prediction). Note: custom distribution
 functions are designed to return only point estimates,
 thus the best model cannot be returned. In this case,
-use the best partition returned by \code{bestpart} to refit
-the model.
+use the best partition returned by \code{bestpart} to refit the model.
+\code{getMLE} returns a named list corresponding to the best supported
+model. The list has the following elements:
+\code{coef} is the Maximum Likelihood Estimate (MLE),
+\code{vcov} is the variance-covariance matrix for the MLE,
+\code{dist} is the distribution inherited from input \code{object}.
 
 The coercion method \code{\link{as.data.frame}} return a data frame.
 }
