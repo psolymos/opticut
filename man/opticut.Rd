@@ -421,6 +421,9 @@ mods
 str(predict(mods[[1]]))
 confint(mods[[1]])
 
+## MLE and variance-covariance matrix (species 1)
+getMLE(m2, which = 1)
+
 \dontrun{
 ## --- Zero-inflated Negative Binomial
 ## dolina example
