@@ -416,7 +416,7 @@ o4$species
 
 # Calibration
 
-```{r}
+```{r eval=FALSE}
 library(opticut)
 library(dclone)
 library(rjags)
@@ -492,7 +492,7 @@ g[1:5]
 ```
 
 
-```{r}
+```{r eval=FALSE}
 ## multiple species
 set.seed(234)
 n <- 50*4
@@ -521,8 +521,10 @@ df <- data.frame(x=x, g=g)
 df <- df[-(1:5),]
 yy <- y[-(1:5),]
 #o <- opticut(y ~ x, data=df, strata=g, dist="binomial")
-object <- opticut(yy ~ x, data=df, strata=g, dist="poisson")
+object <- opticut(yy ~ x, data=df, strata=g, dist="poisson:log")
 summary(object)
+
+zz=calibrate(object, y[1:5,], df[1:5,])
 
 ## check colnames in Y and X
 ynew <- y[1:5,]
@@ -586,10 +588,62 @@ g[1:5]
 
 
 Todo:
-- use notation: j=1...p & s=1...S, or q=1...p & j=1...S
-- implement test cases for lm/glm
+OK - use notation: j=1...p & r=1...S
+OK - implement test cases for lm/glm
 - write internal function (.calibrate)
 - implement user interface: calibrate, calibrate.opticut(object, ynew, xnew, ...)
-- add beta, ZI cases (ZI: inits!) [drop all the 1-species models!]
+- add NB, beta, ZI cases (ZI: inits!) [drop all the 1-species models!]
+- gaussian needs sig^2
 
 
+```{r eval=FALSE}
+model <- custommodel(c(model="model {",
+    "  for (i in 1:n) {",
+    "    for (r in 1:S) {",
+    "      y[i,r] ~ dpois(exp(mu[i,r]))", # poisson
+#    "      y[i,r] ~ dbern(ilogit(mu[i,j]))", # binomial:logit
+#    "      y[i,r] ~ dbern(icloglog(mu[i,j]))", # binomial:cloglog
+#    "      y[i,r] ~ dbern(phi(mu[i,j]))", # binomial:probit
+#    "      y[i,r] ~ dnorm(mu[i,j])", # gaussian
+    "      mu[i,r] <- b0[r] + bp[r,k[i]]*b1[r] + inprod(x[i,], a[r,])",
+#    "      mu[i,r] <- b0[r] + bp[r,k[i]]*b1[r]",
+    "    }",
+    "    k[i] ~ dcat(pi)",
+    "  }",
+    "  for (r in 1:S) {",
+    "    b0[r] <- theta[r,1]",
+    "    b1[r] <- theta[r,2]",
+    "    a[r,1:p] <- theta[r,3:(2+p)]", # z & x
+    "    theta[r,1:(2+p)] ~ dmnorm(cf[1:(2+p),r], prec[1:(2+p),1:(2+p),r])",
+#    "    theta[r,1:2] ~ dmnorm(cf[1:2,r], prec[1:2,1:2,r])", # z only
+    "  }",
+    "}"))
+
+```
+
+Dolina and calibration
+
+```{r}
+data(dolina)
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+inew <- 1:nrow(dolina$samp) %in% sample(nrow(dolina$samp), 50)
+Y <- dolina$xtab
+Y <- Y[,colSums(Y[!inew,] > 0) >= 20]
+#Y <- ifelse(Y > 0, 1, 0)
+x <- dolina$samp[!inew,]
+xnew <- dolina$samp[inew,]
+y <- Y[!inew,]
+ynew <- Y[inew,]
+#o <- opticut(y ~ stratum + lmoist + method, data=x, strata=mhab, dist="binomial")
+o <- opticut(y ~ stratum + lmoist + method, data=x, strata=mhab, dist="poisson")
+
+cal <- calibrate(o, ynew, xnew)
+round(cal$pi,2)
+round(cor(cal$pi),2)
+cal$gnew
+dolina$samp[inew,"mhab"]
+cm <- table(pred=cal$gnew, true=dolina$samp[inew,"mhab"])
+cm <- cm[rownames(cm),rownames(cm)]
+cm
+sum(diag(cm)) / sum(cm)
+```
