@@ -626,24 +626,43 @@ Dolina and calibration
 ```{r}
 data(dolina)
 dolina$samp$stratum <- as.integer(dolina$samp$stratum)
-inew <- 1:nrow(dolina$samp) %in% sample(nrow(dolina$samp), 50)
-Y <- dolina$xtab
+Y <- dolina$xtab#[dolina$samp$method=="Q",]
+X <- dolina$samp#[dolina$samp$method=="Q",]
+inew <- 1:nrow(Y) %in% sample(nrow(Y), 10)
 Y <- Y[,colSums(Y[!inew,] > 0) >= 20]
 #Y <- ifelse(Y > 0, 1, 0)
-x <- dolina$samp[!inew,]
+x <- X[!inew,]
 xnew <- dolina$samp[inew,]
 y <- Y[!inew,]
 ynew <- Y[inew,]
-#o <- opticut(y ~ stratum + lmoist + method, data=x, strata=mhab, dist="binomial")
 o <- opticut(y ~ stratum + lmoist + method, data=x, strata=mhab, dist="poisson")
+#o <- opticut(y ~ 1, data=x, strata=mhab, dist="poisson")
 
+## binary calibration
 cal <- calibrate(o, ynew, xnew)
+#cal <- calibrate(o, ynew)
 round(cal$pi,2)
 round(cor(cal$pi),2)
 cal$gnew
 dolina$samp[inew,"mhab"]
-cm <- table(pred=cal$gnew, true=dolina$samp[inew,"mhab"])
+cm <- table(pred=cal$gnew, true=X[inew,"mhab"])
 cm <- cm[rownames(cm),rownames(cm)]
 cm
 sum(diag(cm)) / sum(cm)
+
+## multinomial calibration
+oo <- lapply(1:ncol(y), function(i) {
+    glm(y[,i] ~ mhab + stratum + lmoist + method, x, family=poisson)
+})
+xnew <- model.matrix(~ stratum + lmoist + method, xnew)
+cal <- calibrate(oo, ynew, xnew, K=4)
+round(cal$pi,2)
+round(cor(cal$pi),2)
+levels(x$mhab)[cal$gnew]
+dolina$samp[inew,"mhab"]
+cm <- table(pred=levels(x$mhab)[cal$gnew], true=X[inew,"mhab"])
+cm <- cm[rownames(cm),rownames(cm)]
+cm
+sum(diag(cm)) / sum(cm)
+
 ```
