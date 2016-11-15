@@ -14,15 +14,22 @@ output:
 documentclass: article
 fontsize: 12pt
 classoption: letterpaper
+urlcolor: blue
 ---
 
 # Introduction
 
 Identifying and monitoring indicator species has long been considered a cost-effective way of tracking environmental change or the status of the biota. Examples include the characterization of vegetation types (Chytry et al. 2002), degradation of ecosystems (McGeoch & Chown 1988), or signalling cryptic or rare species (Halme et al. 2009). Throughout these examples, a key attribute of indicator species (also referred to as character or differential species) is that they have strong associations with the environmental variables that they are supposed to indicate.
 
-Approaches to quantify the degree of environmental associations for species (indicator value) traditionally falls into three major types of approaches: (1) contingency table based measures (De Caceres & Legendre 2009); (2) analysis of variance (ANOVA; Wildi & Feldmeyer-Christe 2013); and (3) the widely used non-parametric IndVal method (Dufrene & Legendre 1997). While the different approaches have strong appeal and applications, they do not always meet the challenges presented by ecological data. 
+Approaches to quantify the degree of environmental associations for species (indicator value) traditionally falls into three major types of approaches:
 
-Ecological data come in different forms: binary, ordinal, count, abundance, or presence only data. Some of these data types are suitable for a particular approach, while some formats need ‘tweaking’. For example, binarizing abundance or count data for contingency tables leads to information loss. ANOVA, on the other hand, implies normality and homoscedastic errors, which might not always be satisfied by 0/1, ordinal, skewed, or % cover data. Finally, randomization test for the IndVal approach requires count data, which renders hypothesis testing difficult if not impossible for continuous or ordinal data.
+1. contingency table based measures (De Caceres & Legendre 2009); 
+2. analysis of variance (ANOVA; Wildi & Feldmeyer-Christe 2013); and 
+3. the widely used non-parametric IndVal method (Dufrene & Legendre 1997). 
+
+While the different approaches have strong appeal and applications, they do not always meet the challenges presented by ecological data. 
+
+Ecological data come in different forms: binary, ordinal, count, abundance, or presence only data. Some of these data types are suitable for a particular approach, while some formats need 'tweaking'. For example, binarizing abundance or count data for contingency tables leads to information loss. ANOVA, on the other hand, implies normality and homoscedastic errors, which might not always be satisfied by 0/1, ordinal, skewed, or percent cover data. Finally, randomization test for the IndVal approach requires count data, which renders hypothesis testing difficult if not impossible for continuous or ordinal data.
 
 Another staple of observation field studies is the presence of modifying or confounding variables, or the presence of systematic biases (variable sampling effort, imperfect detectability, sample selection bias). Ignoring these effects can lead to erroneous indicator species analysis (Zettler et al. 2013). Controlling for these effects can improve the assessment of species-environment relationships, thus lead to better evaluation of indicator species. 
 
@@ -30,13 +37,13 @@ To address these limitations, Kemencei et al. (2014) proposed a model-based indi
 
 ## Install
 
-Install from the Comprehensive R Archive Network (CRAN):
+The opticut R package can be installed from the Comprehensive R Archive Network (CRAN) as:
 
 ```{r eval=FALSE}
 install.packages("opticut")
 ```
 
-Install development version from GitHub ():
+Install development version from GitHub:
 
 ```{r eval=FALSE}
 library(devtools)
@@ -64,59 +71,453 @@ library(opticut)
 
 # Partitioning for single species
 
+Optimal partitioning (optimal cut, or in short: opticut) is found for each species independent of each other. We make observations ($y_i$) of possibly multiple species at $i=1,...,n$ sites. Now let us consider a discrete site descriptor ($g_i$) with $K$ levels or strata ($K>2$). This stratification might come from remotely sensed or other geospatial information, field measurements, or from multivariate clustering. We can use $g_i$ to create $m=1,...,M$ possible binary partitions based on coding one or more levels as 1s and the rest with 0s. We denote any such possible partition as $z^{(m)}$. The total number of binary partitions is $M=2^{K-1}-1$, not counting cases when 0s or 1s are completely missing (which is the null model). The opticut method, as opposed to for example IndVal method is invariant to the coding of 0s and 1s in $z^{(m)}$. This means that complementary cases, such as $z^{(m)}$ and $1-z^{(m)}$, are treated as interchangeable. The opticut package provides utility functions to create and check binary partitions from multi-level vectors (`kComb`, `allComb`, `checkComb`). 
+
+## Manipulating partitions
+
+Finding all combinations does not require a model or observed responses.
+It only takes a classification vector with $K > 1$ strata.
+The `kComb` function returns a 'contrast' matrix corresponding to
+all possible binary partitions of the factor with $K$ levels:
+
+```{r}
+kComb(k = 2)
+kComb(k = 3)
+kComb(k = 4)
+```
+
+`allComb` takes a classification vector with at least 2 levels
+and returns a model matrix with binary partitions. `checkComb`
+checks if combinations are unique and non-complementary
+(misfits are returned as attributes):
+
+```{r}
+(f <- rep(LETTERS[1:4], each=2))
+(mc <- allComb(f, collapse = "_"))
+checkComb(mc)
+mc2 <- cbind(z = 1 - mc[,1], mc[,c(1:ncol(mc), 1)])
+colnames(mc2) <- 1:ncol(mc2)
+mc2
+checkComb(mc2)
+```
+
+## Choosing a parametric model
+
+A suitable parametric (or semi-parametric) model can be chosen to describe the relationship between the observations for a single species and the site descriptors. The choice of the parametric model depends on the nature of the observations and the goals of the study. The systematic component of the model (also called the linear predictor), $f(\mu_i)=\beta_0^{(m)}+\beta_1^{(m)} z_i^{(m)}+\sum_{j=1}^p \alpha_j^{(m)} x_{ij}$  x_ij, is linked to the random component of the model through the link function $f$. The expected value is given by the inverse link function: $E[Y_i]=\mu_i=f^{-1}(\beta_0^{(m)}+\beta_1^{(m)} z_i^{(m)}+\sum_{j=1}^p \alpha_j^{(m)} x_{ij})$. Expected values can then be estimated for each partition. The symbol $x_{ij}$ denotes other site descriptors ($j=1,...,p$; number of predictors besides $g_i$) that can take discrete or continuous values. These variables might describe variation in the observations not fully explained by the partitions, e.g. due to spatially uneven distribution, differences in sampling effort, or environmental variables interfering with the observation process.
+
+We can estimate the parameters in the linear predictor (and possibly other "nuisance"" factors such as variance components in mixed effects models) and calculate expected values. The probability density function for the model $P(Y_i=y_i \mid z_i^{(m)},x_{ij},\theta)$ is used to find the maximum likelihood estimates (MLE) of the model parameters $\hat{\theta}^{(m)}=(\hat{\beta}_0^{(m)},\hat{\beta}_1^{(m)},\hat{\alpha}_1^{(m)},\ldots,\hat{\alpha}_p^{(m)})$ that jointly maximize the log-likelihood function. The log-likelihood function evaluated at the MLE is $l(\hat{\theta}^{(m)}; y)$. 
+
+The opticut package has several built-in distributions that can be specified though the `dist` argument. 
+Currently available distributions:
+
+* `"gaussian"`: real valued continuous observations, e.g. biomass;
+* `"poisson"`: Poisson count data;
+* `"binomial"`: presence-absence type data;
+* `"negbin"`: overdispersed Negative Binomial count data;
+* `"beta"`: continuous response in the unit interval, e.g. percent cover;
+* `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
+  `"zip"`, or in zero model: `"zip2"`);
+* `"zinb"`, `"zinb2"`: zero-inflated Negative Binomial counts (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`);
+* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover (only available for single species because ordinal levels often do not match actoss different species thus leading to different intercept terms);
+* `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection probability functions (only available for single species because used distribution is unique for all species thus multiple species cannot be combined in a single input matrix).
+
+Other distributions can be specified by user-defined functions as explained later in the manual.
+
 ## All combinations
 
-* explain all comb, wplot, plot
-* explain object structure
-* use Gaussian toy data
-* fixlevels, summary, plot, beta2i
+Fitting the model to all the M candidate binary partitions leads to a set of log-likelihood values. One can compare the log-likelihood values $l(\hat{\theta}^{(m)}; y)$) to the log-likelihood value based on the null model $l(\hat{\theta}^{(0)}; y)$. We define the null model the same way as the other $M$ models but without the binary partition: $\beta_1^{(m)}=0$. The log of the likelihood ratio between the M candidate models and the null model can be calculated as $l(\hat{\theta}^{(m)}; y)-l(\hat{\theta}^{(0)}; y)$).
+
+The best-supported model $m'$ and the corresponding binary partition $z^{(m')}$ is the model with the highest log-likelihood ratio value $l(\hat{\theta}^{(m')}; y)$. Model weights are calculated as $w_m=exp\{l(\hat{\theta}^{(m)}; y)-l(\hat{\theta}^{(m')}; y)\} / \sum_{m=1}^{M} exp\{l(\hat{\theta}^{(m)}; y)-l(\hat{\theta}^{(m')}; y)\}$. These weights sum to 1 and indicate asymptotic probabilities of finding the same best partition when the sampling is replicated. The concentration of asymptotic probabilities among the models can be expressed through the Simpson index $H=\sum_{m=1}^{M} w_{m}^2$. High values of $H$ indicate high concentration of the model weights for one or few model out of the total number of models compared (Kemencei et al. 2014).
+
+The opticut package provides the `opticut1` function to fit a chosen parametric model to a set of binary partitions and the summary returns the model output for each candidate partition with log likelihood ratios and model weights. 
+
+```{r}
+## stratification
+g <- c(1,1,1,1, 2,2,2,2, 3,3,3,3)
+## abundance
+y <- c(0,0,3,0, 2,3,0,5, 5,6,3,4)
+mods <- opticut1(Y = y, Z = allComb(g), dist = "gaussian")
+mods
+```
+
+Not all the models are printed, only the ones where the log likelihood ratio (`logLR`) value is $\geq2$ by default. We can change this by
+explicitly defining the `cut` argument in the `print` method (or by setting the `cut` global option via `ocoptions`, as explained later):
+
+```{r}
+print(mods, cut = -Inf)
+```
+
+Model support across the partitions can be visualized by the model weight plot (`wplot`):
+
+```{r}
+wplot(mods, cut = -Inf)
+```
+
+The `opticut` function can take matrices or a model formula as its input, and repeats the procedure done by opticut1 for multiple species in a community matrix. The summary shows the best-supported model for each species. It is the preferred way of specifying the model for single species as well.
+Single species results are part of the `$species` element of the output object:
+
+
+```{r}
+(oc <- opticut(y, strata = g, comb = "all", dist = "gaussian"))
+summary(oc)
+oc$species
+```
+
+The use of the `opticut1` function is generally discouraged: some of the internal checks are not guaranteed to flag issues when the formula-to-model-matrix translation is side-stepped (this is what is happening when the modifier variables are supplied as `X` argument in `opticut1`). Use the `opticut` with a single species instead, as shown above.
+
+## Indicator value
+
+Once a model is fit a to a given binary partition, we can quantify the indicator value for the species. The indicator value denoted by $I^{(m)}$ describes the contrast between the two subset of the data represented by the binary partition $z^{(m)}$. We define indicator value as a scaled version of the $\beta_1^{(m)}$ coefficient estimate: $I^{(m)}= \mid tanh(c\beta_1^{(m)}) \mid$, where $c=0.5$. The hyperbolic tangent function is used as an inverse Fisher transformation to scale real valued coefficients into the [-1,1] range. The absolute value then results in a [0, 1] range for the indicator value. 
+
+The $c$ is a scaling constant that modifies the shape of the function. We chose 0.5 as the default value that allows the indicator value to change more gradually according to our experience with real-world data sets. The $c=0.5$ setting is also identical to an inverse logistic function transformed into the [-1, 1] range. 
+
+The `beta2i` function is used internally to calculate the indicator value.
+Here we show the effect of the scaling constant $c$ on the shape of the
+function, the default $c=0.5$ is in green:
+
+```{r}
+beta <- seq(-5, 5, 0.1)
+Col <- occolors(c("red", "blue"))(10)
+Col[6] <- "#00FF00"
+plot(beta, beta2i(beta), type = "n")
+s <- seq(1, 0.1, -0.1)
+for (i in 1:10) {
+    lines(beta, beta2i(beta, scale = s[i]), col = Col[i])
+    text(1.5 - 0.2, beta2i(1.5, scale = s[i]), s[i], col = Col[i])
+}
+```
+
+An alternative way to define the indicator value would be taking the relative difference between the expected values for the 0 and 1 stratum in $z^{(m)}$. This, however, depends on the response scale and the baseline values chosen for possible modifying effects.
+
+Our definition of indicator value is on the linear predictor scale and is more readily compared across species without respect to their relative abundance and values of other modifying factors. Note however, that the meaning of the indicator value might be quite different for studies using different parametric models: it is a difference in the Gaussian case, multiplier in log-linear models, change in log-odds in logistic or ordinal regression. The indicator value given a binary partition is returned by the model summaries, and used in visualization:
+
+```{r}
+plot(oc)
+```
+
+Use the `ocoptions` function to change the default `scale` ($c$) setting.
 
 ## User defined combinations
 
-* show user defined strata matrix
+It is possible to
+
+```{r}
+comb <- cbind(
+    A = c(rep(1, 4), rep(0, 8)),
+    B = c(rep(0, 4), rep(1, 4), rep(0, 4)))
+comb
+print(opticut1(Y = y, Z = comb, dist = "gaussian"), cut = -Inf)
+```
+
+If the user happen to define complementary partitions, an error
+message is thrown:
+
+```{r}
+comb <- cbind(comb, 1-comb)
+colnames(comb) <- LETTERS[1:4]
+comb
+try(opticut1(Y = y, Z = comb, dist = "gaussian"))
+checkComb(comb)
+```
+
+The global option `check_comb` can be set to override this default behaviour,
+although there is no real point in duplicating reparametrized
+but otherwised identical models:
+
+```{r}
+op <- ocoptions(check_comb = FALSE, cut = -Inf)
+opticut1(Y = y, Z = comb, dist = "gaussian")
+ocoptions(op)
+```
 
 ## Rank based combinations
 
-* plot, summary
+The IndVal method requires the algorithm to evaluate $2^K-1$ binary partitions. Our opticut approach is parametrization invariant with respect to coding the levels in the binary partitions (it affects the intercept term but not the contrast or the log likelihood ratio). This effectively halves the number of partitions we need to compare ($2^{K-1}-1$, `comb = "all"` in opticut). Still, the number of partitions increases according to powers of 2. Here we propose an approach that increases linearly with $K$. This algorithm is based on sorting all the $K$ partitions in $g$ according to increasing order of the linear predictor estimates for $K$ coefficients (as opposed to estimating 2 coefficients for a binary partition). The logic follows from the fact that the optimal binary partitioning tries to find the best split in terms of likelihood ratio with lower estimates on one side, and higher estimates on the other side of the split. As a consequence, we only need to try $K-1$ binary partitions to find the optimal $z^{(m')}$. This algorithm is implemented in the rankComb function that is called by opticut with the argument `comb = "rank"`.
+
+The function `rankComb` evaluates a model with a $K$-level factor
+and returns a corresponding partitioning matrix. Attibutes
+hold the estimates for the $K$ levels:
+
+```{r}
+rankComb(Y = y, Z = as.factor(g), dist = "gaussian", collapse = "_")
+```
+
+The `collapse` argument can be important to make partitions more distinguishable.
+The global option is `" "` that can be modified via the `ocoptions` function.
+It can cause problems when the the `collapse` character is part
+of the factor levels used for $g$. The `fix_levels` function comes handy
+for fixing these levels. The function replaces the `collapse` character
+to something else:
+
+```{r}
+getOption("ocoptions")$collapse
+fix_levels(as.factor(c("A b", "C d")), sep=":")
+fix_levels(as.factor(c("A b", "C d")), sep="")
+```
+
+There is an overhead of fitting the model to calculate the ranking first. But computing efficiencies can be still high compared to all partitions. As a consequence of the ranking process, we do not have summaries for all the possible binary partitions, only for the top candidates. Moreover, the partitions produced for each species might not be identical. Therefore the model weights ($w$) and Simpson index ($H$) have different interpretation and cannot be that easily compared across species, unless the model weights are highly concentrated for the top models. In this case, the sum of weights for the missing models becomes negligible. Another consequence of the ranking process is that $\beta_1^{(m)}$ estimates are always positive. In the case of comparing all the partitions, the full set of partitions is fixed for all species, and some respond positively while others respond negatively to the same binary variable in terms of the $\beta_1^{(m)}$ values. Thus it is required to store the sign of the relationship as part of the summary. 
+
+The `comb = "rank"` is the defult setting in `opticut`. It is clear
+that the 2 approaches lead to identical best partitions.
+Only the model weights ($w$) are different:
+
+```{r}
+summary(opticut(y, strata = g, comb = "all", dist = "gaussian"))
+summary(opticut(y, strata = g, comb = "rank", dist = "gaussian"))
+```
 
 # Partitioning for multiple species
 
-* interface, object structure
-* bestpart, bestmodel, summary, print
-* wplot, plot, all/rank comb (custom strata)
+The `opticut` function can take matrices or a model formula as its input, and repeats the procedure done by `opticut1` for multiple species in a community matrix. The summary shows the best-supported model for each species,
+in this case based on a Poisson count model (`dist = "poisson"`). 
+The `plot` method uses the indicator value (`I` in the summary) to represent
+the contrast between the two strata of the best supported binary partition:
+
+```{r}
+## stratification
+g <-    c(1,1,1,1, 2,2,2,2, 3,3,3,3)
+
+## community matrix
+y <- cbind(
+    Sp1=c(4,6,3,5, 5,6,3,4, 4,1,3,2),
+    Sp2=c(0,0,0,0, 1,0,0,1, 4,2,3,4),
+    Sp3=c(0,0,3,0, 2,3,0,5, 5,6,3,4))
+
+oc <- opticut(formula = y ~ 1, strata = g, dist = "poisson", comb = "all")
+summary(oc)
+
+plot(oc, cut = -Inf)
+```
+
+Model support across the partitions can be visualized by the model weight plot (`wplot`). 
+
+```{r}
+wplot(oc, cut = -Inf)
+```
+
+Note that the `wplot`  uses 'splits' (binary partitions) 
+whereas `plot` uses the $K$ levels. Therefore, `wplot` does not work for multiple
+species when `comb = "rank"`. In this case the splits can be different 
+across the species, whereas `comb = "all"` uses the
+same pre-defined partitions across all species.
+
+The `bestmodel` method returns the best-supported model for further model diagnostics and prediction, the `getMLE` prints out the estimated
+coefficients and the variance-covariance matrix:
+
+```{r}
+mods <- bestmodel(oc)
+mods
+## explore further
+str(predict(mods[[1]]))
+confint(mods[[1]])
+
+## MLE and variance-covariance matrix (species 1)
+getMLE(oc, which = 1)
+```
+
+The `bestpart` method returns the binary partition for the best-supported model:
+
+```{r}
+bestpart(oc)
+```
+
+Compare the `"all"` and `"rank"` based combinations: same best partitions
+putting aside complementaryity
+
+```{r}
+op <- ocoptions(cut = -Inf)
+summary(opticut(formula = y ~ 1, strata = g, dist = "poisson", comb = "all"))
+summary(opticut(formula = y ~ 1, strata = g, dist = "poisson", comb = "rank"))
+ocoptions(op)
+```
 
 # Quantifying uncertainty
 
-* anymp/boot/multi
-* explain object structure (toy data)
-* bestpart, summary
-* jackknife, check_strata, heatmap etc.
-* custom dist: cannot return bestmodel, use bestpart to refit
-* custom dist: can do boot & multi, but not asymp, show how to get I
+Uncertainty in the estimated coefficients and uncertainty in the derived indicator value for the best-supported model ($I^{(m')}$) is quantified based on the estimate of the Hessian matrix assuming asymptotic normality of the MLE. The distribution of $I^{(m')}$ in this case is based on parametric bootstrap. This approach (`type = "asymp"` in `uncertainty`) is suitable when asymptotic normality assumption is reasonable, i.e. sample size is large. For small sample situations, a parametric bootstrap algorithm is implemented (`type = "boot"`) to estimate uncertainty in $I^{(m')}$. The summary contains lower and upper confidence limits (for a given error rate) representing the asymptotic or bootstrap distribution (based on $B$ number of iterations) given the fixed partition for the best model, $z^{(m')}$.
+
+The output is summarized, the `$uncertainty` component contains individual species results:
+
+```{r}
+g <-    c(1,1,1,1, 2,2,2,2, 3,3,3,3)
+
+y <- cbind(
+    Sp1=c(4,6,3,5, 5,6,3,4, 4,1,3,2),
+    Sp2=c(0,0,0,0, 1,0,0,1, 4,2,3,4),
+    Sp3=c(0,0,3,0, 2,3,0,5, 5,6,3,4))
+
+oc <- opticut(formula = y ~ 1, strata = g, dist = "poisson")
+
+uc <- uncertainty(oc, type = "asymp", B = 999)
+summary(uc)
+uc$uncertainty
+```
+
+The bootstrap can be difficult for small sample sizes, strata can go completely missing:
+
+```{r}
+try(uc <- uncertainty(oc, type = "boot", B = 99))
+```
+
+A general requirement for the bootstrap approach (`"boot"` and `"multi"`) is that the bootstrap samples contain observations from each stratum. We recommend having at least 5 observations per strata. Possible problems with missing partitions in small data sets can be remedied by supplying pre-defined indices for resampling, for example, based on jackknife (leave-one-out) approach. The resampling scheme can be customized for such needs. Use the `check_strata` function:
+
+```{r}
+B <- sapply(1:length(g), function(i) which((1:length(g)) != i))
+check_strata(oc, B) # check representation
+summary(uncertainty(oc, type = "boot", B = B))
+```
+
+The reliability of the best partition can also be assessed using the setting `type = "multi"` (as in *multi*ple models). In this case, the model partitions are re-evaluated for each bootstrap sample. Model uncertainty is assessed as the number of times a partition is supported out of the $B$ bootstrap runs. The reliability ($R$) metric in the summary is the proportion for the most frequently supported partition. The corresponding indicator value and confidence interval is conditional on this most commonly supported partition.
+
+```{r}
+summary(uncertainty(oc, type = "multi", B = B))
+```
 
 # Distributions
 
-* dolina data set: use wherever possible
-* modification
-* offsets
+For most distributions, we will use the `dolina` data set that is part of the **opticut** package. It is a comprehensive and micro-scale land snail data set from 16 dolines of the Aggtelek Karst Area, Hungary. Data set containing land snail counts as described in Kemecei et al. 2014.
+
+```{r}
+data(dolina)
+## stratum as ordinal
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+## filter species to speed up things a bit
+Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
+```
 
 ## Gaussian
 
+```{r}
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="gaussian")
+summary(dol)
+
+## vertical plot orientation
+plot(dol, horizontal=FALSE, pos=1, upper=0.8)
+```
+
 ## Poisson and Negative Binomial
 
-Dolina, cover offsets here
+```{r}
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="poisson")
+summary(dol)
+
+## horizontal plot orientation
+plot(dol)
+```
+
+Because `opticut` uses the `stats::glm` function to fit the Poisson model, it accepts other arguments, e.g. offsets. Let's subset the `dolina`
+data set for the litter sampling method (`"Q"`). Pool the abundances
+in each of the 16 dolines by microhabitat types. By doing this,
+we make sampling effort uneven. Litter microhabitat was sampled along
+a North-South transect (7 locations), whereas the other three strata 
+(rock, live trees, dead wood) were sampled at 3 random locations in each dolina.
+
+```{r}
+DQ <- dolina$samp[dolina$samp$method == "Q",]
+DQ$dol_mhab <- paste0(DQ$dolina, "_", DQ$mhab)
+head(DQ)
+YQ <- dolina$xtab[dolina$samp$method == "Q",]
+YQ <- YQ[,colSums(YQ > 0) >= 20]
+YQ <- mefa4::groupSums(YQ, 1, DQ$dol_mhab)
+DQ <- mefa4::nonDuplicated(DQ, dol_mhab, TRUE)
+```
+
+Let's compare the results of ignoring sampling effort differences
+with a casewhen we use sampling effort as offset.
+Offsets are defined as `log(7)` or `log(3)` representing
+the sampling volume differences (more debris searched leads to more smails found).
+Using offsets results in less species that is associated with litter:
+
+```{r}
+op <- ocoptions(collapse="_", sort=FALSE, cut=-Inf)
+dol0 <- opticut(YQ, strata=DQ$mhab, dist="poisson")
+off <- ifelse(DQ$mhab == "LI", log(7), log(3))
+dol1 <- opticut(YQ, strata=DQ$mhab, dist="poisson", offset=off)
+table(wo_offset=summary(dol0)$summary$split,
+    with_offset=summary(dol1)$summary$split)
+ocoptions(op)
+opar <- par(mfrow=c(1,2))
+plot(dol0, show_I=FALSE, show_S=FALSE)
+plot(dol1, show_I=FALSE, show_S=FALSE)
+par(opar)
+```
+
+The Negative Binomial model can be quite picky, as it gives an error
+somewhere in the middle of the process:
+
+```{r}
+try(dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="negbin"))
+```
+
+Changing the `try_error` global option will allow the process to go on
+after catching the error:
+
+```{r}
+op <- ocoptions(try_error = TRUE)
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="negbin")
+dol$failed
+ocoptions(op)
+```
+
+It failed for the `"mbor"` (*Macrogastra borealis*) species, which is now excluded from the output.
+
 
 ## Zero-inflated distributions
 
-Dolina
+The Zero-inflated Negative Binomial implementation in the **pscl** package
+seems more robust, no error messages. We use the `dist = "zinb2"` option
+so that we test for optimal partitioning in the zero-inflation (ZI) component.
+Using a mixture distribution can be important if 0s can occur no only
+as a result of the ZI component, but due to low abundance in the count distribution (Poisson or Negative Binomial). Differentiating among these different types of zeros is not possible by binarizing the data and using logistic regression.
 
-## Binomial
+In the case of `"zip2"` and `"zinb2"` distributions, the coefficients
+refer to the probability of non-zero, so that positive and negative effects are
+properly identified (as opposed to `"zip"` and `"zinb"` where the ZI 
+coefficients refer to probability of zero):
+
+```{r}
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb2")
+plot(dol)
+```
 
 ## Beta
+
+```{r}
+library(rioja)
+data(aber)
+strat.plot(aber$spec, aber$ages$Depth, scale.percent=TRUE, y.rev=TRUE)
+
+z <- as.factor(cut(aber$ages$Depth, 5))
+ab <- as.matrix(aber$spec) / 100
+ab[ab == 0] <- 0.0001
+ab <- ab[,apply(ab, 2, max) > 0.05]
+
+a <- opticut(ab, strata=z, comb="rank", dist="beta")
+summary(a)
+
+plot(a, sort=FALSE, horizontal=FALSE, pos=1, upper=0.8,
+    show_I=FALSE, show_S=FALSE, mar=c(6,6,1,1), xlab="", ylab="")
+
+bp <- bestpart(a)
+opar <- par(mfrow=c(3,4), mar=c(2,2,1,1))
+for (i in 1:12) {
+    plot(ab[,i], aber$ages$Depth, type="l", ann=FALSE)
+    segments(x0=rep(0, nrow(ab)), y0=aber$ages$Depth, x1=ab[,i],
+        col=ifelse(bp[,i] > 0, 2, 1))
+    title(main=colnames(ab)[i])
+}
+par(opar)
+```
 
 Use shoshveg
 
 Custom distr: ZI-Beta
+
+## Binomial
 
 ## Ordinal data
 
@@ -221,10 +622,113 @@ cbind(weighted=c1, glm=c2, inf=c3)
 
 ## Mixed-effects models (LMM, GLMM)
 
+Here is an example using mixed models and the package **lme4**:
+
+```{r}
+library(lme4)
+set.seed(1234)
+n <- 200
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+ee <- rnorm(n/5)
+g <- rep(1:5, each=n/5)
+lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2 + ee[g])
+Y1 <- rpois(n, lam1)
+
+X <- model.matrix(~x2)
+Z <- allComb(x0)
+
+lmefun <- function(Y, X, linkinv, gr, ...) {
+    X <- as.matrix(X)
+    m <- glmer(Y ~ X-1 + (1|gr), family=poisson("log"), ...)
+    list(coef=fixef(m),
+        logLik=logLik(m),
+        linkinv=family(m)$linkinv)
+}
+lmefun(Y1, X, gr=g)
+
+opticut1(Y1, X, Z, dist=lmefun, gr=g)
+```
+
 ## Generalized additive models (GAM)
+
+```{r}
+library(mgcv)
+library(detect)
+data(oven)
+oven$veg <- factor(NA, c("agr","open","decid","conif", "mix"))
+oven$veg[oven$pforest < 0.5] <- "open"
+oven$veg[oven$pagri > 0.5 & oven$pforest < 0.5] <- "agr"
+oven$veg[oven$pforest >= 0.5] <- "mix"
+oven$veg[oven$pforest >= 0.5 & oven$pdecid >= 0.8] <- "decid"
+oven$veg[oven$pforest >= 0.5 & oven$pdecid < 0.2] <- "conif"
+table(oven$veg, useNA="always")
+oven$xlat <- scale(oven$lat)
+oven$xlong <- scale(oven$long)
+gamfun <- function(Y, X, linkinv, Data, ...) {
+    X <- as.matrix(X)
+    m <- mgcv::gam(Y ~ X-1 + s(xlat) + s(xlong), Data, ...)
+    list(coef=coef(m),
+        logLik=logLik(m),
+        linkinv=family(m)$linkinv)
+}
+x <- ifelse(oven$veg=="agr",1,0)
+X <- model.matrix(~x)
+gamfun(oven$count, X, Data=oven, family=poisson)
+print(opticut1(oven$count, X=X[,1,drop=FALSE], oven$veg, dist=gamfun,
+    Data=oven, family=poisson), cut=-Inf)
+
+o <- opticut(count ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=poisson)
+summary(o)
+o <- opticut(count ~ 1, oven, strata=veg, dist="poisson")
+summary(o)
+oven$pa <- ifelse(oven$count > 0, 1, 0)
+o <- opticut(pa ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=binomial)
+summary(o)
+o <- opticut(pa ~ 1, oven, strata=veg, dist="binomial")
+summary(o)
+```
 
 ## N-mixture models
 
+A single-visit based N-mixture is an example where
+detection error is estimated. Let us compare results
+based on naive GLM and N-mixture:
+
+```{r}
+library(detect)
+set.seed(2345)
+n <- 500
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+x3 <- runif(n, 0, 1)
+lam <- exp(0.5 + 1*x1 + -0.2*x2)
+p <- plogis(2 + -2*x3)
+Y <- rpois(n, lam*p)
+
+X <- model.matrix(~x2)
+
+op <- par(mfrow=c(1,2))
+boxplot((lam*p) ~ x0, ylab="lam*p", xlab="x0")
+boxplot(lam ~ x0, ylab="lam", xlab="x0")
+par(op)
+
+svfun <- function(Y, X, linkinv, ...) {
+    X <- as.matrix(X)
+    m <- svabu(Y ~ X-1 | x3, ...)
+    list(coef=coef(m, "sta"),
+        logLik=logLik(m),
+        linkinv=poisson()$linkinv)
+}
+svfun(Y, X)
+
+## naive GLM
+print(opticut1(Y, X, as.factor(x0), dist="poisson"), cut=-Inf)
+## N-mixture
+print(opticut1(Y, X, as.factor(x0), dist=svfun), cut=-Inf)
+```
 # Package options
 
 ## High performance computing
@@ -255,6 +759,17 @@ system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
 ## parallel, rank based combinations (K - 1)
 system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist="binomial", comb="rank", cl=cl))
+
+## compare timings for uncertainty calculations
+system.time(uncertainty(dol, type="asymp", B=999))
+system.time(uncertainty(dol, type="asymp", B=999, cl=cl))
+
+system.time(uncertainty(dol, type="boot", B=4))
+system.time(uncertainty(dol, type="boot", B=4, cl=cl))
+
+system.time(uncertainty(dol, type="multi", B=4))
+system.time(uncertainty(dol, type="multi", B=4, cl=cl))
+
 stopCluster(cl)
 ```
 
@@ -400,6 +915,22 @@ kable(oc$species[[1]][,c(1,2,4,5,8,9,10)], digits=3)
 kable(as.data.frame(uc), digits=3)
 ```
 
+# Summary
+
+The likelihood-based optimal partitioning framework implemented in the opticut R package provides a compelling alternative to other available R packages (**indicspecies**, De Caceres & Legendre 2009; **labdsv** and **optpart**, Roberts 2016a, 2016b; **vegan**, Oksanen et al. 2016), especially when the type of data or the presence of modifying effects call for an alternative approach. 
+
+The package comes with many parametric models included for binary, count, abundance, percent cover, ordinal, and presence-only data, and the approach can be extended to more complex situations, such as mixed models, additive models. The opticut package leverages other R packages (**MASS**, Venables & Ripley 2002; **betareg**, Cribari-Neto & Zeileis 2010; **pscl**, Zeileis et al. 2008; **ResourceSelection**, Lele et al. 2016) for fitting parametric models. The approach can be extended to linear and generalized linear mixed models (LMM, GLMM; see Kemencei et al. 2014), generalized additive models, N-mixture models.
+
+Computing times are shortened by the application of efficient algorithms and through high performance computing options. The **opticut** package provides progress bars with estimated remaining time for long-running evaluations (through the **pbapply** package, Solymos & Zawadzki 2016), natively supports several parallel back-ends (multicore machines, computing clusters, forking; through the **parallel** package, R Core Team 2016) to speed calculations up, and provides options and methods for dynamic report generation (coercion methods and color themes). Functions in the package can be customized and extended to meet the needs under a wide range of real-world situations.
+
+Please cite the **opticut** package in scholarly publications as:
+
+Peter Solymos and Ermias T. Azeria (2016). opticut: Likelihood
+Based Optimal Partitioning for Indicator Species Analysis. R
+package version <insert appropriate version number here>. https://github.com/psolymos/opticut
+
+Use `citation("opticut")` for an up-to-date citation.
+
 # References
 
 McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. Trends in Ecology and Evolution 13: 46--47.
@@ -412,9 +943,47 @@ O. Wildi and E. Feldmeyer-Christe 2013. Indicator values (IndVal) mimic ranking 
 
 Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002. Determination of diagnostic species with statistical fidelity measures. Journal of Vegetation Science 13: 79--90.
 
-Halme, P., Mönkkönen, M., Kotiaho, J. S, Ylisirniö, A-L. 2009. Quantifying the indicator power of an indicator species. Conservation Biology 23: 1008–1016.
+Halme, P., Monkkonen, M., Kotiaho, J. S, Ylisirniö, A-L. 2009. Quantifying the indicator power of an indicator species. Conservation Biology 23: 1008–1016.
 
 Zettler ML, Proffitt CE, Darr A, et al. On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. Thompson F, ed. PLoS ONE. 2013;8(10):e78219. doi:10.1371/journal.pone.0078219.
 
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014): Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. Community Ecology 15:180--186.
 
+Jari Oksanen, F. Guillaume Blanchet, Michael Friendly, Roeland
+Kindt, Pierre Legendre, Dan McGlinn, Peter R. Minchin, R. B.
+O'Hara, Gavin L. Simpson, Peter Solymos, M. Henry H. Stevens,
+Eduard Szoecs and Helene Wagner (2016). vegan: Community Ecology
+Package. R package version 2.4-1.
+https://CRAN.R-project.org/package=vegan
+
+Achim Zeileis, Christian Kleiber, Simon Jackman (2008).
+Regression Models for Count Data in R. Journal of Statistical
+Software 27(8). URL http://www.jstatsoft.org/v27/i08/
+
+Francisco Cribari-Neto, Achim Zeileis (2010). Beta Regression in
+R. Journal of Statistical Software 34(2), 1-24. URL
+http://www.jstatsoft.org/v34/i02/.
+
+Venables, W. N. & Ripley, B. D. (2002) Modern Applied Statistics
+with S. Fourth Edition. Springer, New York. ISBN 0-387-95457-0
+
+David W. Roberts (2016a). labdsv: Ordination and Multivariate
+Analysis for Ecology. R package version 1.8-0.
+https://CRAN.R-project.org/package=labdsv
+
+David W. Roberts (2016b). optpart: Optimal Partitioning of
+Similarity Relations. R package version 2.3-0.
+https://CRAN.R-project.org/package=optpart
+
+Subhash R. Lele, Jonah L. Keim and Peter Solymos (2016).
+ResourceSelection: Resource Selection (Probability) Functions
+for Use-Availability Data. R package version 0.3-0.
+https://CRAN.R-project.org/package=ResourceSelection
+
+R Core Team (2016). R: A language and environment for
+statistical computing. R Foundation for Statistical Computing,
+Vienna, Austria. URL https://www.R-project.org/.
+
+Peter Solymos and Zygmunt Zawadzki (2016). pbapply: Adding
+Progress Bar to '*apply' Functions. R package version 1.3-2.
+https://github.com/psolymos/pbapply

@@ -554,7 +554,7 @@ ab <- ab[,apply(ab, 2, max) > 0.05]
 
 a <- opticut(ab ~ 1, strata=z, comb="rank", dist="beta")
 summary(a)
-plot(a, sort=FALSE)
+plot(a, sort=FALSE, horizontal=FALSE, pos=1)
 bp <- bestpart(a)
 
 op <- par(mfrow=c(3,4), mar=c(2,2,1,1))
