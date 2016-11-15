@@ -289,10 +289,16 @@ stopifnot(coef(bestmodel(o2, 1)[[1]], "zero")[2] < 0)
 ## uncertainty should show 1+ (mu0 < mu1)
 o1$species[[1]]
 o2$species[[1]]
-uncertainty(o1, type="asymp", B=9)$uncertainty[[1]]
-uncertainty(o2, type="asymp", B=9)$uncertainty[[1]]
+u <- uncertainty(o1, type="asymp", B=9)$uncertainty[[1]]
+stopifnot(all(u$mu0 < u$mu1))
+u <- uncertainty(o2, type="asymp", B=9)$uncertainty[[1]]
+stopifnot(all(u$mu0 < u$mu1))
 B <- sapply(2:10, function(i) which((1:length(g)) != i)) # jackknife
-uncertainty(o1, type="boot", B=B)$uncertainty[[1]]
-uncertainty(o2, type="boot", B=B)$uncertainty[[1]]
-uncertainty(o1, type="multi", B=B)$uncertainty[[1]]
-uncertainty(o2, type="multi", B=B)$uncertainty[[1]]
+u <- uncertainty(o1, type="boot", B=B)$uncertainty[[1]]
+stopifnot(all(u$mu0 < u$mu1))
+u <- uncertainty(o2, type="boot", B=B)$uncertainty[[1]]
+stopifnot(all(u$mu0 < u$mu1))
+u <- uncertainty(o1, type="multi", B=B)$uncertainty[[1]]
+stopifnot(all(u$mu0 < u$mu1))
+u <- uncertainty(o2, type="multi", B=B)$uncertainty[[1]]
+stopifnot(all(u$mu0 < u$mu1))
