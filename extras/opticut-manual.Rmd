@@ -118,7 +118,7 @@ Currently available distributions:
 * `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
   `"zip"`, or in zero model: `"zip2"`);
 * `"zinb"`, `"zinb2"`: zero-inflated Negative Binomial counts (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`);
-* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover (only available for single species because ordinal levels often do not match actoss different species thus leading to different intercept terms);
+* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover (only available for single species because ordinal levels often do not match across different species thus leading to different intercept terms);
 * `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection probability functions (only available for single species because used distribution is unique for all species thus multiple species cannot be combined in a single input matrix).
 
 Other distributions can be specified by user-defined functions as explained later in the manual.
@@ -438,8 +438,8 @@ table(wo_offset=summary(dol0)$summary$split,
     with_offset=summary(dol1)$summary$split)
 ocoptions(op)
 opar <- par(mfrow=c(1,2))
-plot(dol0, show_I=FALSE, show_S=FALSE)
-plot(dol1, show_I=FALSE, show_S=FALSE)
+plot(dol0, show_I=FALSE, show_S=FALSE, sort=FALSE, cex.axis=0.6)
+plot(dol1, show_I=FALSE, show_S=FALSE, sort=FALSE, cex.axis=0.6)
 par(opar)
 ```
 
