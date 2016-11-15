@@ -48,19 +48,17 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         mle <- getMLE(object, which, ...)
         cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)[,c(1L, 2L),drop=FALSE]
         cf <- rbind(mle$coef[c(1L, 2L)], cf)
-
-        cf0 <- linkinv(cf[,1L])
-        cf1 <- linkinv(cf[,1L] + cf[,2L])
-        if (!is.function(object$dist)) {
-            Dist <- as.character(object$dist)
-            Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1]]
-        } else {
-            Dist <- ""
-        }
-        if (Dist %in% c("zip2", "zinb2")) {
+## zip2 & zinb2 implementation:
+## - MLE returns unmodified coefs (P of 0 in ZI)
+## - .opticut1 returns:
+##       -1*coef[1:2]
+##       linkinv: binomial(link)$linkinv(eta)
+## - asymp uncertainty uses MLE, thus have to invert and use linkinv after
+        if (!is.function(object$dist) && object$dist %in% c("zip2", "zinb2")) {
             cf[,1L:2L] <- -cf[,1L:2L]
         }
-
+        cf0 <- linkinv(cf[,1L])
+        cf1 <- linkinv(cf[,1L] + cf[,2L])
         #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
         I <- abs(tanh(cf[,2L] * scale))
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)

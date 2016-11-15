@@ -67,6 +67,12 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             ll <- as.numeric(logLik(mod))
             linv <- mod$linkinv
         }
+## zip2 & zinb2 implementation:
+## - MLE returns unmodified coefs (P of 0 in ZI)
+## - .opticut1 returns:
+##       -1*coef[1:2]
+##       linkinv: binomial(link)$linkinv(eta)
+## - asymp uncertainty uses MLE, thus have to invert and use linkinv after
         if (dist %in% c("zip2", "zinb2")) {
             ZZ <- if (is.null(Z1)) {
                 data.matrix(X[,1,drop=FALSE])

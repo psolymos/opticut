@@ -262,3 +262,37 @@ nu <- uncertainty(no, type="multi", B=2)
 ## passing ... is not enough for resampling, treated as user error
 wu <- try(uncertainty(wo, type="multi", B=2), silent=TRUE)
 stopifnot(inherits(wu, "try-error"))
+
+## --- zip2 & zinb2 coef inversion
+
+## implementation:
+## - MLE returns unmodified coefs (P of 0 in ZI)
+## - .opticut1 returns:
+##       -1*coef[1:2]
+##       linkinv: binomial(link)$linkinv(eta)
+## - asymp uncertainty uses MLE, thus have to invert and use linkinv after
+
+## less 0 in g=1 stratum: assoc is 1+ or 2-
+yzi <- c(rep(0, 10), rpois(40, 6), rep(0, 30), rpois(20, 4))
+g <- rep(1:2, each=50)
+table(yzi, g)
+o1 <- opticut(yzi, strata=g, dist="zip2")
+o2 <- opticut(yzi, strata=g, dist="zinb2")
+## assoc must be positive for comb=rank
+stopifnot(o1$species[[1]]$assoc == 1)
+stopifnot(o2$species[[1]]$assoc == 1)
+## MLE is negative (prob of 0)
+stopifnot(getMLE(o1, 1)$coef[2] < 0)
+stopifnot(getMLE(o2, 1)$coef[2] < 0)
+stopifnot(coef(bestmodel(o1, 1)[[1]], "zero")[2] < 0)
+stopifnot(coef(bestmodel(o2, 1)[[1]], "zero")[2] < 0)
+## uncertainty should show 1+ (mu0 < mu1)
+o1$species[[1]]
+o2$species[[1]]
+uncertainty(o1, type="asymp", B=9)$uncertainty[[1]]
+uncertainty(o2, type="asymp", B=9)$uncertainty[[1]]
+B <- sapply(2:10, function(i) which((1:length(g)) != i)) # jackknife
+uncertainty(o1, type="boot", B=B)$uncertainty[[1]]
+uncertainty(o2, type="boot", B=B)$uncertainty[[1]]
+uncertainty(o1, type="multi", B=B)$uncertainty[[1]]
+uncertainty(o2, type="multi", B=B)$uncertainty[[1]]
