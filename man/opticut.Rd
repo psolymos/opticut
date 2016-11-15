@@ -480,6 +480,7 @@ opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
     dist=fun, zi_term=dolina$samp$method)
 dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
     strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
+summary(dol2)
 }
 
 ## current collapse value
