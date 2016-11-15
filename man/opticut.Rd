@@ -223,19 +223,25 @@ uses \code{\link[betareg]{betareg}}  of the betareg package.}
 
 \item{\code{"zip"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the abundance model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+The zero-inflation component refers to the probability of 0.}
 
 \item{\code{"zinb"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the abundance model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+The zero-inflation component refers to the probability of 0.}
 
 \item{\code{"zip2"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the zero-model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+The zero-inflation component refers to the probability of 1
+to be consistent with other methods regarding positive and negative effects.}
 
 \item{\code{"zinb2"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the zero-model,
-uses \code{\link[pscl]{zeroinfl}} of the pscl package.}
+uses \code{\link[pscl]{zeroinfl}} of the pscl package.
+The zero-inflation component refers to the probability of 1
+to be consistent with other methods regarding positive and negative effects.}
 
 \item{\code{"ordered"}}{response measured on ordinal scale,
 e.g. ordinal vegetation cover,
