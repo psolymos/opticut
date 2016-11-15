@@ -484,7 +484,10 @@ dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
 plot(dol)
 ```
 
-## Beta
+
+## Binomial, Beta distribution and ordinal data
+
+Stratigraphy example using Beta distribution:
 
 ```{r}
 library(rioja)
@@ -513,17 +516,9 @@ for (i in 1:12) {
 par(opar)
 ```
 
-Use shoshveg
-
-Custom distr: ZI-Beta
-
-## Binomial
-
-## Ordinal data
 
 ```{r eval=FALSE}
-library(opticut)
-ocoptions(try_error=TRUE)
+op <- ocoptions(try_error=TRUE)
 library(optpart)
 
 data(shoshsite)
@@ -556,6 +551,59 @@ table(sveg)
 o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
 plot(o2, sort=1)
 
+## ZI-Beta
+zi_beta_fun <- function(Y, X, linkinv, ...) {
+    kx <- ncol(X)
+    id1 <- Y > 0
+    id0 <- !id1
+    nll_ZIB_ML <- function(parms) {
+        mu <- plogis(X %*% parms[1:kx])
+        gamma <- exp(parms[kx + 1]) # precision
+        phi <- plogis(parms[kx+2])
+        alpha <- mu * gamma
+        beta <- (1 - mu) * gamma
+        loglik0 <- log(phi)
+        loglik1 <- log(1 - phi) + suppressWarnings(dbeta(Y,
+            alpha, beta, log = TRUE))
+        loglik <- sum(loglik0[id0]) + sum(loglik1[id1])
+        if (!is.finite(loglik) || is.na(loglik))
+            loglik <- -.Machine$double.xmax^(1/3)
+        -loglik
+    }
+    Yv <- Y
+    Yv[Y <= 0.001] <- 0.001
+    ini <- c(coef(betareg::betareg(Yv ~ .-1, data=X)), zi=-5)
+    X <- as.matrix(X)
+    res <- optim(ini, nll_ZIB_ML, ...)
+    list(coef=res$par,
+        logLik=-res$value,
+        linkinv=binomial("logit")$linkinv)
+}
+sveg <- as.matrix(shoshveg)
+sveg <- sveg[,colSums(sveg>0) >= 50]
+table(sveg)
+#sveg[sveg==0] <- 0.001
+sveg[sveg==0.1] <- 0.01
+sveg[sveg==0.5] <- 0.05
+sveg[sveg==1] <- 0.15
+sveg[sveg==2] <- 0.25
+sveg[sveg==3] <- 0.35
+sveg[sveg==4] <- 0.45
+sveg[sveg==5] <- 0.55
+sveg[sveg==6] <- 0.65
+sveg[sveg==7] <- 0.75
+sveg[sveg==8] <- 0.8
+table(sveg)
+
+o2 <- opticut(sveg ~ 1, strata=elev, dist=zi_beta_fun)
+plot(o2, sort=1)
+
+y <- as.matrix(varespec / 100)
+range(y[y>0])
+y <- y[,apply(y, 2, max) > 0.05]
+zi_beta_fun(y[,3], data.frame(matrix(1, nrow(y), 1)))
+opticut1(y[,1], matrix(1, nrow(y), 1), varechem$grazing, dist=zi_beta_fun)
+
 sveg2 <- as.matrix(shoshveg)
 sveg2[sveg2 > 0] <- 1
 sveg2 <- sveg2[,colnames(sveg)]
@@ -572,52 +620,21 @@ o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
 o4$species
 
 ## check for modifier variable
+ocoptions(op)
 ```
 
 
 ## Presence-only (use-availability) data
 
 ```{r eval=FALSE}
-library(opticut)
 library(ResourceSelection)
+data(goats)
 slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
 table(slp, goats$STATUS)
 o <- opticut(STATUS ~ ELEVATION, data=goats, strata=slp, dist="rsf")
 o <- opticut(goats$STATUS, strata=slp, dist="rsf")
 o$species
 plot(o, sort=FALSE)
-## Null model implies intercept only, which is dropped -- thus cannot be estimated. Use glm?
-## RSPF condition implies at least one covariate, it is thus not an issue
-
-
-goats$exp.HLI <- exp(goats$HLI)
-goats$sin.SLOPE <- sin(pi * goats$SLOPE / 180)
-goats$ELEVATION <- scale(goats$ELEVATION)
-goats$ET <- scale(goats$ET)
-goats$TASP <- scale(goats$TASP)
-m1 <- rsf(STATUS ~ TASP + sin.SLOPE + ELEVATION, goats, m=0, B = 0)
-m2 <- glm(STATUS ~ TASP + sin.SLOPE + ELEVATION, goats, family=binomial("logit"))
-c1 <- c(0, coef(m1))
-c2 <- coef(m2)
-cbind(weighted=c1, glm=c2)
-
-## settings
-n.used <- 1000
-m <- 10
-n <- n.used * m
-set.seed(1234)
-x <- data.frame(x1=rnorm(n), x2=runif(n))
-cfs <- c(1.5,-1,0.5)
-## fitting Exponential RSF model
-dat1 <- simulateUsedAvail(x, cfs, n.used, m, link="log")
-m1 <- rsf(status ~ .-status, dat1, m=0, B=0)
-m2 <- glm(status ~ .-status, dat1, family=binomial("logit"))
-## https://web.stanford.edu/~hastie/Papers/IPP.pdf
-m3 <- glm(status ~ .-status, dat1, family=binomial("logit"), weights=1E3^(1-dat1$status))
-c1 <- c(0, coef(m1))
-c2 <- coef(m2)
-c3 <- coef(m3)
-cbind(weighted=c1, glm=c2, inf=c3)
 ```
 
 ## Mixed-effects models (LMM, GLMM)
