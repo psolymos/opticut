@@ -12,7 +12,7 @@ output:
     toc: true
     toc_depth: 3
 documentclass: article
-fontsize: 12pt
+fontsize: 11pt
 classoption: letterpaper
 urlcolor: blue
 ---
@@ -652,9 +652,9 @@ o4$species
 ocoptions(op)
 ```
 
-Link functions:
+Link functions and uncertainty:
 
-```{r}
+```{r warning=FALSE}
 ## dolina example
 data(dolina)
 ## stratum as ordinal
@@ -1035,57 +1035,57 @@ Use `citation("opticut")` for an up-to-date citation.
 
 # References
 
-McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. Trends in Ecology and Evolution 13: 46--47.
+Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002. Determination of diagnostic species with statistical fidelity measures. Journal of Vegetation Science 13: 79--90.
 
-Dufrene M and Legendre P (1997) Species assemblages and indicator species: The need for a flexible asymmetrical approach. Ecological Monographs 67: 345--366.
+Cribari-Neto, Francisco, Achim Zeileis (2010). Beta Regression in
+R. Journal of Statistical Software 34(2), 1-24. URL
+http://www.jstatsoft.org/v34/i02/.
 
 De Caceres M and Legendre P (2009) Associations between species and groups of sites: Indices and statistical inference. Ecology 90: 3566--3574.
 
-O. Wildi and E. Feldmeyer-Christe 2013. Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data. COMMUNITY ECOLOGY 14(2): 139--143.
-
-Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002. Determination of diagnostic species with statistical fidelity measures. Journal of Vegetation Science 13: 79--90.
+Dufrene M and Legendre P (1997) Species assemblages and indicator species: The need for a flexible asymmetrical approach. Ecological Monographs 67: 345--366.
 
 Halme, P., Monkkonen, M., Kotiaho, J. S, Ylisirniö, A-L. 2009. Quantifying the indicator power of an indicator species. Conservation Biology 23: 1008–1016.
 
-Zettler ML, Proffitt CE, Darr A, et al. On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. Thompson F, ed. PLoS ONE. 2013;8(10):e78219. doi:10.1371/journal.pone.0078219.
-
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014): Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. Community Ecology 15:180--186.
 
-Jari Oksanen, F. Guillaume Blanchet, Michael Friendly, Roeland
+Lele, Subhash R., Jonah L. Keim and Peter Solymos (2016).
+ResourceSelection: Resource Selection (Probability) Functions
+for Use-Availability Data. R package version 0.3-0.
+https://CRAN.R-project.org/package=ResourceSelection
+
+McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. Trends in Ecology and Evolution 13: 46--47.
+
+Oksanen, Jari, F. Guillaume Blanchet, Michael Friendly, Roeland
 Kindt, Pierre Legendre, Dan McGlinn, Peter R. Minchin, R. B.
 O'Hara, Gavin L. Simpson, Peter Solymos, M. Henry H. Stevens,
 Eduard Szoecs and Helene Wagner (2016). vegan: Community Ecology
 Package. R package version 2.4-1.
 https://CRAN.R-project.org/package=vegan
 
-Achim Zeileis, Christian Kleiber, Simon Jackman (2008).
-Regression Models for Count Data in R. Journal of Statistical
-Software 27(8). URL http://www.jstatsoft.org/v27/i08/
-
-Francisco Cribari-Neto, Achim Zeileis (2010). Beta Regression in
-R. Journal of Statistical Software 34(2), 1-24. URL
-http://www.jstatsoft.org/v34/i02/.
-
-Venables, W. N. & Ripley, B. D. (2002) Modern Applied Statistics
-with S. Fourth Edition. Springer, New York. ISBN 0-387-95457-0
-
-David W. Roberts (2016a). labdsv: Ordination and Multivariate
-Analysis for Ecology. R package version 1.8-0.
-https://CRAN.R-project.org/package=labdsv
-
-David W. Roberts (2016b). optpart: Optimal Partitioning of
-Similarity Relations. R package version 2.3-0.
-https://CRAN.R-project.org/package=optpart
-
-Subhash R. Lele, Jonah L. Keim and Peter Solymos (2016).
-ResourceSelection: Resource Selection (Probability) Functions
-for Use-Availability Data. R package version 0.3-0.
-https://CRAN.R-project.org/package=ResourceSelection
-
 R Core Team (2016). R: A language and environment for
 statistical computing. R Foundation for Statistical Computing,
 Vienna, Austria. URL https://www.R-project.org/.
 
-Peter Solymos and Zygmunt Zawadzki (2016). pbapply: Adding
+Roberts, David W. (2016a). labdsv: Ordination and Multivariate
+Analysis for Ecology. R package version 1.8-0.
+https://CRAN.R-project.org/package=labdsv
+
+Roberts, David W. (2016b). optpart: Optimal Partitioning of
+Similarity Relations. R package version 2.3-0.
+https://CRAN.R-project.org/package=optpart
+
+Solymos, Peter and Zygmunt Zawadzki (2016). pbapply: Adding
 Progress Bar to '*apply' Functions. R package version 1.3-2.
 https://github.com/psolymos/pbapply
+
+Venables, W. N. & Ripley, B. D. (2002) Modern Applied Statistics
+with S. Fourth Edition. Springer, New York. ISBN 0-387-95457-0
+
+Wildi, O. and E. Feldmeyer-Christe 2013. Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data. COMMUNITY ECOLOGY 14(2): 139--143.
+
+Zeileis, Achim, Christian Kleiber, Simon Jackman (2008).
+Regression Models for Count Data in R. Journal of Statistical
+Software 27(8). URL http://www.jstatsoft.org/v27/i08/
+
+Zettler ML, Proffitt CE, Darr A, et al. On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. Thompson F, ed. PLoS ONE. 2013;8(10):e78219. doi:10.1371/journal.pone.0078219.
