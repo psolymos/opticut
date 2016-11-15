@@ -11,7 +11,7 @@ output:
   word_document:
     toc: true
     toc_depth: 3
-documentclass: article
+documentclass: report
 fontsize: 12pt
 classoption: letterpaper
 ---
@@ -30,13 +30,7 @@ To address these limitations, Kemencei et al. (2014) proposed a model-based indi
 
 ## Install
 
-Install from the Comprehensive R Archive Network (CRAN):
-
-```{r eval=FALSE}
-install.packages("opticut")
-```
-
-Install development version from GitHub ():
+Install development version from GitHub (CRAN version not yet available at the time of writing):
 
 ```{r eval=FALSE}
 library(devtools)
@@ -120,59 +114,7 @@ Custom distr: ZI-Beta
 
 ## Ordinal data
 
-```{r eval=FALSE}
-library(opticut)
-ocoptions(try_error=TRUE)
-library(optpart)
-
-data(shoshsite)
-data(shoshveg)
-
-elev <- cut(shoshsite$elevation, breaks=c(0, 7200, 8000, 9000, 20000))
-levels(elev) <- c("low","mid1","mid2", "high")
-
-sveg <- as.matrix(shoshveg)
-sveg[sveg > 0] <- 1
-o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
-plot(o, sort=1)
-
-
-sveg <- as.matrix(shoshveg)
-sveg <- sveg[,colSums(sveg>0) >= 50]
-table(sveg)
-sveg[sveg==0] <- 0.001
-sveg[sveg==0.1] <- 0.01
-sveg[sveg==0.5] <- 0.05
-sveg[sveg==1] <- 0.15
-sveg[sveg==2] <- 0.25
-sveg[sveg==3] <- 0.35
-sveg[sveg==4] <- 0.45
-sveg[sveg==5] <- 0.55
-sveg[sveg==6] <- 0.65
-sveg[sveg==7] <- 0.75
-sveg[sveg==8] <- 0.8
-table(sveg)
-o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
-plot(o2, sort=1)
-
-sveg2 <- as.matrix(shoshveg)
-sveg2[sveg2 > 0] <- 1
-sveg2 <- sveg2[,colnames(sveg)]
-o3 <- opticut(sveg2 ~ 1, strata=elev, dist="binomial")
-plot(o3, sort=1)
-
-sveg2 <- as.matrix(shoshveg)
-sveg2[sveg2 > 0] <- 1
-sveg2 <- sveg2[,colnames(sveg)]
-
-Y <- shoshveg$ASTMIS
-table(Y)
-o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
-o4$species
-
-## check for modifier variable
-```
-
+Use shoshveg
 
 ## Presence-only (use-availability) data
 
@@ -418,3 +360,309 @@ Zettler ML, Proffitt CE, Darr A, et al. On the Myths of Indicator Species: Issue
 
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014): Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. Community Ecology 15:180--186.
 
+```{r eval=FALSE}
+library(opticut)
+ocoptions(try_error=TRUE)
+library(optpart)
+
+data(shoshsite)
+data(shoshveg)
+
+elev <- cut(shoshsite$elevation, breaks=c(0, 7200, 8000, 9000, 20000))
+levels(elev) <- c("low","mid1","mid2", "high")
+
+sveg <- as.matrix(shoshveg)
+sveg[sveg > 0] <- 1
+o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
+plot(o, sort=1)
+
+
+sveg <- as.matrix(shoshveg)
+sveg <- sveg[,colSums(sveg>0) >= 50]
+table(sveg)
+sveg[sveg==0] <- 0.001
+sveg[sveg==0.1] <- 0.01
+sveg[sveg==0.5] <- 0.05
+sveg[sveg==1] <- 0.15
+sveg[sveg==2] <- 0.25
+sveg[sveg==3] <- 0.35
+sveg[sveg==4] <- 0.45
+sveg[sveg==5] <- 0.55
+sveg[sveg==6] <- 0.65
+sveg[sveg==7] <- 0.75
+sveg[sveg==8] <- 0.8
+table(sveg)
+o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
+plot(o2, sort=1)
+
+sveg2 <- as.matrix(shoshveg)
+sveg2[sveg2 > 0] <- 1
+sveg2 <- sveg2[,colnames(sveg)]
+o3 <- opticut(sveg2 ~ 1, strata=elev, dist="binomial")
+plot(o3, sort=1)
+
+sveg2 <- as.matrix(shoshveg)
+sveg2[sveg2 > 0] <- 1
+sveg2 <- sveg2[,colnames(sveg)]
+
+Y <- shoshveg$ASTMIS
+table(Y)
+o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
+o4$species
+
+## check for modifier variable
+```
+
+
+# Calibration
+
+```{r eval=FALSE}
+library(opticut)
+library(dclone)
+library(rjags)
+
+set.seed(234)
+n <- 50*4
+K <- 4
+g <- sample(1:K, n, replace=TRUE)
+x <- rnorm(n, 0, 1)
+z <- ifelse(g == 1, 1, 0)
+b0 <- 1
+b1 <- 1.5
+a <- 0.2
+mu <- b0 + z*b1 + x*a
+#p <- plogis(mu)
+#y <- rbinom(n, 1, p)
+lam <- exp(mu)
+y <- rpois(n, lam)
+table(y, g)
+boxplot(lam ~ g)
+
+df <- data.frame(y=y, x=x, g=g)
+df <- df[-(1:5),]
+#o <- opticut(y ~ x, data=df, strata=g, dist="binomial")
+o <- opticut(y ~ x, data=df, strata=g, dist="poisson")
+summary(o)
+
+mle <- getMLE(o, 1)
+mle
+summary(o)$bestpart
+
+dat <- list(
+    y=y[1:5],
+    x=matrix(x[1:5],5,1),
+    bp=drop(summary(o)$bestpart),
+    pi=rep(1/K, K),
+    n=5,
+    K=K,
+    p=1,
+    cf=mle$coef,
+    prec=solve(mle$vcov)
+)
+
+model <- custommodel("model {
+    for (i in 1:n) {
+#        y[i] ~ dbern(ilogit(mu[i]))
+        y[i] ~ dpois(exp(mu[i]))
+        mu[i] <- b0 + bp[k[i]]*b1 + inprod(x[i,], a)
+        k[i] ~ dcat(pi)
+    }
+    b0 <- theta[1]
+    b1 <- theta[2]
+    a <- theta[3:(2+p)]
+    theta[1:(2+p)] ~ dmnorm(cf[1:(2+p)], prec[1:(2+p),1:(2+p)])
+}")
+
+j <- jags.fit(dat, "k", model, n.iter=1000, n.chains=1)
+m <- as.matrix(j)
+head(m)
+g[1:5]
+y[1:5]
+f <- function(x, K) {
+    out <- numeric(K)
+    for (k in 1:K)
+        out[k] <- sum(x==k)
+    out
+}
+apply(as.matrix(j), 2, f, K=K)
+apply(as.matrix(j), 2, f, K=K) / nrow(as.matrix(j))
+apply(apply(as.matrix(j), 2, f, K=K), 2, which.max)
+g[1:5]
+
+```
+
+
+```{r eval=FALSE}
+## multiple species
+set.seed(234)
+n <- 50*4
+K <- 4
+g <- sample(1:K, n, replace=TRUE)
+g[1:K] <- 1:K
+x <- rnorm(n, 0, 1)
+z <- ifelse(g %in% 1:2, 1, 0)
+b0 <- 1
+b1 <- 1.5
+a <- 0.2
+mu <- b0 + z*b1 + x*a
+lam <- exp(mu)
+y1 <- rpois(n, lam)
+
+z <- ifelse(g %in% 2:3, 1, 0)
+b0 <- 1
+b1 <- 1.5
+a <- 0.2
+mu <- b0 + z*b1 + x*a
+lam <- exp(mu)
+y2 <- rpois(n, lam)
+y <- cbind(y1=y1, y2=y2)
+
+df <- data.frame(x=x, g=g)
+df <- df[-(1:5),]
+yy <- y[-(1:5),]
+#o <- opticut(y ~ x, data=df, strata=g, dist="binomial")
+object <- opticut(yy ~ x, data=df, strata=g, dist="poisson:log")
+summary(object)
+
+zz=calibrate(object, y[1:5,], df[1:5,])
+
+## check colnames in Y and X
+ynew <- y[1:5,]
+xnew <- matrix(x[1:5],5,1)
+bp <- summary(object)$bestpart
+K <- ncol(bp)
+S <- nrow(bp)
+mle <- lapply(seq_len(S), function(i)
+    getMLE(object, i))
+cf <- sapply(mle, "[[", "coef")
+prec <- array(sapply(mle, function(z) solve(z$vcov)),
+    dim = c(nrow(cf), nrow(cf), S))
+
+dat <- list(
+    y=ynew,
+    x=xnew,
+    bp=bp,
+    pi=rep(1/K, K),
+    n=NROW(ynew),
+    K=K,
+    S=S,
+    p=ncol(object$X) - 1L,
+    cf=cf,
+    prec=prec
+)
+
+model <- custommodel("model {
+    for (i in 1:n) {
+        for (j in 1:S) {
+#            y[i,j] ~ dbern(ilogit(mu[i,j]))
+            y[i,j] ~ dpois(exp(mu[i,j]))
+            mu[i,j] <- b0[j] + bp[j,k[i]]*b1[j] + inprod(x[i,], a[j,])
+        }
+        k[i] ~ dcat(pi)
+    }
+    for (j in 1:S) {
+        b0[j] <- theta[j,1]
+        b1[j] <- theta[j,2]
+        a[j,1:p] <- theta[j,3:(2+p)]
+        theta[j,1:(2+p)] ~ dmnorm(cf[1:(2+p),j], prec[1:(2+p),1:(2+p),j])
+    }
+}")
+
+j <- jags.fit(dat, "k", model, n.iter=5000, n.chains=1)
+m <- as.matrix(j)
+head(m)
+g[1:5]
+y[1:5,]
+f <- function(x, K) {
+    out <- numeric(K)
+    for (k in 1:K)
+        out[k] <- sum(x==k)
+    out
+}
+apply(as.matrix(j), 2, f, K=K)
+apply(as.matrix(j), 2, f, K=K) / nrow(as.matrix(j))
+apply(apply(as.matrix(j), 2, f, K=K), 2, which.max)
+g[1:5]
+
+```
+
+
+Todo:
+OK - use notation: j=1...p & r=1...S
+OK - implement test cases for lm/glm
+- write internal function (.calibrate)
+- implement user interface: calibrate, calibrate.opticut(object, ynew, xnew, ...)
+- add NB, beta, ZI cases (ZI: inits!) [drop all the 1-species models!]
+- gaussian needs sig^2
+
+
+```{r eval=FALSE}
+model <- custommodel(c(model="model {",
+    "  for (i in 1:n) {",
+    "    for (r in 1:S) {",
+    "      y[i,r] ~ dpois(exp(mu[i,r]))", # poisson
+#    "      y[i,r] ~ dbern(ilogit(mu[i,j]))", # binomial:logit
+#    "      y[i,r] ~ dbern(icloglog(mu[i,j]))", # binomial:cloglog
+#    "      y[i,r] ~ dbern(phi(mu[i,j]))", # binomial:probit
+#    "      y[i,r] ~ dnorm(mu[i,j])", # gaussian
+    "      mu[i,r] <- b0[r] + bp[r,k[i]]*b1[r] + inprod(x[i,], a[r,])",
+#    "      mu[i,r] <- b0[r] + bp[r,k[i]]*b1[r]",
+    "    }",
+    "    k[i] ~ dcat(pi)",
+    "  }",
+    "  for (r in 1:S) {",
+    "    b0[r] <- theta[r,1]",
+    "    b1[r] <- theta[r,2]",
+    "    a[r,1:p] <- theta[r,3:(2+p)]", # z & x
+    "    theta[r,1:(2+p)] ~ dmnorm(cf[1:(2+p),r], prec[1:(2+p),1:(2+p),r])",
+#    "    theta[r,1:2] ~ dmnorm(cf[1:2,r], prec[1:2,1:2,r])", # z only
+    "  }",
+    "}"))
+
+```
+
+Dolina and calibration
+
+```{r eval=FALSE}
+data(dolina)
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+Y <- dolina$xtab#[dolina$samp$method=="Q",]
+X <- dolina$samp#[dolina$samp$method=="Q",]
+inew <- 1:nrow(Y) %in% sample(nrow(Y), 10)
+Y <- Y[,colSums(Y[!inew,] > 0) >= 20]
+#Y <- ifelse(Y > 0, 1, 0)
+x <- X[!inew,]
+xnew <- dolina$samp[inew,]
+y <- Y[!inew,]
+ynew <- Y[inew,]
+o <- opticut(y ~ stratum + lmoist + method, data=x, strata=mhab, dist="poisson")
+#o <- opticut(y ~ 1, data=x, strata=mhab, dist="poisson")
+
+## binary calibration
+cal <- calibrate(o, ynew, xnew)
+#cal <- calibrate(o, ynew)
+round(cal$pi,2)
+round(cor(cal$pi),2)
+cal$gnew
+dolina$samp[inew,"mhab"]
+cm <- table(pred=cal$gnew, true=X[inew,"mhab"])
+cm <- cm[rownames(cm),rownames(cm)]
+cm
+sum(diag(cm)) / sum(cm)
+
+## multinomial calibration
+oo <- lapply(1:ncol(y), function(i) {
+    glm(y[,i] ~ mhab + stratum + lmoist + method, x, family=poisson)
+})
+xnew <- model.matrix(~ stratum + lmoist + method, xnew)
+cal <- calibrate(oo, ynew, xnew, K=4)
+round(cal$pi,2)
+round(cor(cal$pi),2)
+levels(x$mhab)[cal$gnew]
+dolina$samp[inew,"mhab"]
+cm <- table(pred=levels(x$mhab)[cal$gnew], true=X[inew,"mhab"])
+cm <- cm[rownames(cm),rownames(cm)]
+cm
+sum(diag(cm)) / sum(cm)
+
+```
