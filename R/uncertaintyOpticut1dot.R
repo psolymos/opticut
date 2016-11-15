@@ -51,6 +51,16 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
 
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
+        if (!is.function(object$dist)) {
+            Dist <- as.character(object$dist)
+            Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1]]
+        } else {
+            Dist <- ""
+        }
+        if (Dist %in% c("zip2", "zinb2")) {
+            cf[,1L:2L] <- -cf[,1L:2L]
+        }
+
         #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
         I <- abs(tanh(cf[,2L] * scale))
         out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)

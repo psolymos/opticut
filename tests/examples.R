@@ -166,7 +166,8 @@ u <- uncertainty(o, type="multi", B=2)
 
 Yzi <- Y
 Yzi[1,] <- 0
-B <- replicate(2, sample.int(n, replace=TRUE))
+#B <- replicate(2, sample.int(n, replace=TRUE))
+B <- sapply(2:3, function(i) which((1:n) != i)) # jackknife
 B[1,] <- 1
 summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zip"))
 u <- uncertainty(o, type="asymp", B=9)
