@@ -69,7 +69,7 @@ To get started, open R and load tha **opticut** package as:
 library(opticut)
 ```
 
-# Partitioning for single species
+# Patritioning
 
 Optimal partitioning (optimal cut, or in short: opticut) is found for each species independent of each other. We make observations ($y_i$) of possibly multiple species at $i=1,...,n$ sites. Now let us consider a discrete site descriptor ($g_i$) with $K$ levels or strata ($K>2$). This stratification might come from remotely sensed or other geospatial information, field measurements, or from multivariate clustering. We can use $g_i$ to create $m=1,...,M$ possible binary partitions based on coding one or more levels as 1s and the rest with 0s. We denote any such possible partition as $z^{(m)}$. The total number of binary partitions is $M=2^{K-1}-1$, not counting cases when 0s or 1s are completely missing (which is the null model). The opticut method, as opposed to for example IndVal method is invariant to the coding of 0s and 1s in $z^{(m)}$. This means that complementary cases, such as $z^{(m)}$ and $1-z^{(m)}$, are treated as interchangeable. The opticut package provides utility functions to create and check binary partitions from multi-level vectors (`kComb`, `allComb`, `checkComb`). 
 
@@ -292,7 +292,7 @@ oComb(1:4, "+")
 oComb(attr(rc, "est"))
 ```
 
-# Partitioning for multiple species
+## Partitioning for multiple species
 
 The `opticut` function can take matrices or a model formula as its input, and repeats the procedure done by `opticut1` for multiple species in a community matrix. The summary shows the best-supported model for each species,
 in this case based on a Poisson count model (`dist = "poisson"`). 
@@ -327,6 +327,18 @@ species when `comb = "rank"`. In this case the splits can be different
 across the species, whereas `comb = "all"` uses the
 same pre-defined partitions across all species.
 
+Compare the `"all"` and `"rank"` based combinations: same best partitions
+putting aside complementaryity
+
+```{r}
+op <- ocoptions(cut = -Inf)
+summary(opticut(formula = y ~ 1, strata = g, dist = "poisson", comb = "all"))
+summary(opticut(formula = y ~ 1, strata = g, dist = "poisson", comb = "rank"))
+ocoptions(op)
+```
+
+## Accessing models and partitions
+
 The `bestmodel` method returns the best-supported model for further model diagnostics and prediction, the `getMLE` prints out the estimated
 coefficients and the variance-covariance matrix:
 
@@ -347,17 +359,8 @@ The `bestpart` method returns the binary partition for the best-supported model:
 bestpart(oc)
 ```
 
-Compare the `"all"` and `"rank"` based combinations: same best partitions
-putting aside complementaryity
 
-```{r}
-op <- ocoptions(cut = -Inf)
-summary(opticut(formula = y ~ 1, strata = g, dist = "poisson", comb = "all"))
-summary(opticut(formula = y ~ 1, strata = g, dist = "poisson", comb = "rank"))
-ocoptions(op)
-```
-
-# Quantifying uncertainty
+## Quantifying uncertainty
 
 Uncertainty in the estimated coefficients and uncertainty in the derived indicator value for the best-supported model ($I^{(m')}$) is quantified based on the estimate of the Hessian matrix assuming asymptotic normality of the MLE. The distribution of $I^{(m')}$ in this case is based on parametric bootstrap. This approach (`type = "asymp"` in `uncertainty`) is suitable when asymptotic normality assumption is reasonable, i.e. sample size is large. For small sample situations, a parametric bootstrap algorithm is implemented (`type = "boot"`) to estimate uncertainty in $I^{(m')}$. The summary contains lower and upper confidence limits (for a given error rate) representing the asymptotic or bootstrap distribution (based on $B$ number of iterations) given the fixed partition for the best model, $z^{(m')}$.
 
@@ -688,7 +691,37 @@ o$species
 plot(o, sort=FALSE)
 ```
 
-## Mixed-effects models (LMM, GLMM)
+## Customizing the distribution
+
+```{r}
+## dolina example
+data(dolina)
+## stratum as ordinal
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+## filter species to speed up things a bit
+Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
+
+## we may want to expand the Zero-inflation component in a ZIP model
+## see how the return value needs to be structured
+fun <- function(Y, X, linkinv, zi_term, ...) {
+    X <- as.matrix(X)
+    mod <- pscl::zeroinfl(Y ~ X-1 | zi_term, dist = "poisson", ...)
+    list(coef=coef(mod),
+        logLik=logLik(mod),
+        linkinv=mod$linkinv)
+}
+Xdol <- model.matrix(~ stratum + lmoist + method, data=dolina$samp)
+## this fits the null model (i.e. no partitions added)
+fun(Y[,"amin"], Xdol, zi_term=dolina$samp$method)
+## now we can use dist=fun
+opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
+    dist=fun, zi_term=dolina$samp$method)
+dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
+summary(dol2)
+```
+
+### Mixed-effects models (LMM, GLMM)
 
 Here is an example using mixed models and the package **lme4**:
 
@@ -719,7 +752,7 @@ lmefun(Y1, X, gr=g)
 opticut1(Y1, X, Z, dist=lmefun, gr=g)
 ```
 
-## Generalized additive models (GAM)
+### Generalized additive models (GAM)
 
 ```{r}
 library(mgcv)
@@ -758,7 +791,7 @@ o <- opticut(pa ~ 1, oven, strata=veg, dist="binomial")
 summary(o)
 ```
 
-## N-mixture models
+### N-mixture models
 
 A single-visit based N-mixture is an example where
 detection error is estimated. Let us compare results
@@ -797,6 +830,7 @@ print(opticut1(Y, X, as.factor(x0), dist="poisson"), cut=-Inf)
 ## N-mixture
 print(opticut1(Y, X, as.factor(x0), dist=svfun), cut=-Inf)
 ```
+
 # Package options
 
 ## High performance computing
