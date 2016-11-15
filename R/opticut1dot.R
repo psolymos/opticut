@@ -80,9 +80,9 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 "zinb2"="negbin")
             mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist=Dist,
                 link=link, ...)
-            cf <- c(-coef(mod, "zero"), coef(mod, "count"))
+            cf <- c(coef(mod, "zero"), coef(mod, "count"))
             ll <- as.numeric(logLik(mod))
-            linv <- function(eta) binomial(link)$linkinv(eta)
+            linv <- function(eta) 1 - binomial(link)$linkinv(eta)
         }
         if (dist == "ordered") {
             if (!is.null(list(...)$method))
