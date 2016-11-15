@@ -92,13 +92,16 @@ checks if combinations are unique and non-complementary
 (misfits are returned as attributes):
 
 ```{r}
+## finding all combinations
 (f <- rep(LETTERS[1:4], each=2))
 (mc <- allComb(f, collapse = "_"))
-checkComb(mc)
+## checking for complementary entries
+checkComb(mc) # TRUE
+## adding complementary entries to the matrix
 mc2 <- cbind(z = 1 - mc[,1], mc[,c(1:ncol(mc), 1)])
 colnames(mc2) <- 1:ncol(mc2)
 mc2
-checkComb(mc2)
+checkComb(mc2) # FALSE
 ```
 
 ## Choosing a parametric model
@@ -264,6 +267,29 @@ Only the model weights ($w$) are different:
 ```{r}
 summary(opticut(y, strata = g, comb = "all", dist = "gaussian"))
 summary(opticut(y, strata = g, comb = "rank", dist = "gaussian"))
+```
+
+Here is how the ranking info is turned into binary partitions internally:
+
+```{r}
+## simulate some data
+set.seed(1234)
+n <- 200
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+lam <- exp(0.5 + 0.5*x1 + -0.2*x2)
+Y <- rpois(n, lam)
+
+## binary partitions
+head(rc <- rankComb(Y, model.matrix(~x2), as.factor(x0), dist="poisson"))
+attr(rc, "est") # expected values in factor levels
+aggregate(exp(0.5 + 0.5*x1), list(x0=x0), mean) # true values
+
+## simple example
+oComb(1:4, "+")
+## using estimates
+oComb(attr(rc, "est"))
 ```
 
 # Partitioning for multiple species
@@ -621,6 +647,31 @@ o4$species
 
 ## check for modifier variable
 ocoptions(op)
+```
+
+Link functions:
+
+```{r}
+## dolina example
+data(dolina)
+## stratum as ordinal
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+## filter species to speed up things a bit
+Y <- ifelse(dolina$xtab[,colSums(dolina$xtab > 0) >= 20] > 0, 1, 0)
+## opticut results, note the cloglog link function
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial:cloglog")
+
+## parallel computing for uncertainty
+ucdol <- uncertainty(dol, type="multi", B=25)
+
+bestpart(ucdol)
+heatmap(t(bestpart(ucdol)), scale="none", col=occolors()(25),
+    distfun=function(x) dist(x, "manhattan"))
+
+## See how indicator value changes with different partitions
+with(ucdol$uncertainty[["pvic"]],
+    boxplot(I ~ best, col="gold", ylab="Indicator value"))
 ```
 
 
