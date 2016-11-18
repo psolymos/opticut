@@ -22,7 +22,7 @@ argument to \code{ocoptions} to restore the parameter values.
 Tags are the following:
 
   \item{collapse}{character value to be used when merging factor levels,
-  the default is \code{" "}.}
+  the default is \code{"+"}.}
   \item{cut}{log likelihood ratio value, model/species with lower
   values are excluded from summaries and plots,
   the default is \code{2}.}
@@ -63,7 +63,7 @@ unlist(getOption("ocoptions"))
 summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
 
 ## resetting pboptions and checking new settings
-ocop <- ocoptions(collapse="+", sort=FALSE)
+ocop <- ocoptions(collapse="&", sort=FALSE)
 unlist(getOption("ocoptions"))
 ## running again with new settings
 summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
