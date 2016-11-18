@@ -109,7 +109,7 @@ the fact that the Lorenz curve is symmetric around this line
 when the point at which the Lorenz curve has a slope equal to 1, sits
 on the line of symmetry.
 The curve is called asymmetric when when this point is away from 
-the line of symmetry. Th Lorenz asymmetry coefficient describes
+the line of symmetry. The Lorenz asymmetry coefficient describes
 this and calculated simply as the sum of x and y coordinates
 of the point at which slope of the curve is 1 (parallel with
 the line of equality). This coordinate can be calculated

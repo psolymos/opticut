@@ -98,3 +98,59 @@ f_lorenz <- function(j, i, z)
             lc=cv2))
     out
 }
+
+lorenz_breaks <-
+function(x, probs=seq(0, 1, 0.1), type=c("lc","pr"),
+make_unique=FALSE, digits=6, na.rm=FALSE)
+{
+    type <- latch.arg(type)
+    if (any(probs < 0) || any(probs > 1))
+        stop("probs must be in [0,1]")
+    probs <- sort(probs)
+    if (na.rm)
+        x <- x[!is.na(x)]
+    o <- order(x)
+    x <- cumsum(x[o]) / sum(x)
+    if (type=="lc")
+        q <- probs
+    if (type=="pr")
+        q <- quantile(x, probs=probs, na.rm=TRUE)
+    xo <- x[o]
+    i <- sapply(q, function(z) min(xo[x >= z]))
+    names(i) <- format(probs)
+    if (make_unique)
+        i <- unique(round(i, 6))
+    i
+}
+
+
+col2grey <- function(col, method="luminosity") {
+    method <- match.arg(method, c("lightness", "average", "luminosity"))
+    col <- col2rgb(col) / 255
+    if (method == "lightness")
+        out <- (apply(col, 2, max) + apply(col, 2, min)) / 2
+    if (method == "average")
+        out <- colMeans(col)
+    if (method == "luminosity")
+        out <- 0.21 * col["red",] + 0.72 * col["green",] + 0.07 * col["blue",]
+    grey(out)
+}
+
+n <- 25
+col <- occolors()(n)
+plot(0, type="n", ann=FALSE, axes=FALSE,
+    xlim=c(0, n), ylim=c(0, 5))
+for (i in 1:n) {
+    polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1),
+        col=col[i], border=col[i])
+    polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+1,
+        col=col2grey(col, "lightness")[i], border=col2grey(col, "lightness")[i])
+    polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+2,
+        col=col2grey(col, "average")[i], border=col2grey(col, "average")[i])
+    polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+3,
+        col=col2grey(col, "luminosity")[i], border=col2grey(col, "luminosity")[i])
+    polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+4,
+        col=col[i], border=col[i])
+}
+text(rep(n/2, 4), (1:5)-0.5,
+    c("color", "lightness", "average", "luminosity", "color"))
