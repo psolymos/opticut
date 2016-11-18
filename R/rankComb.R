@@ -5,6 +5,8 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
         X <- matrix(1L, length(Y), 1L)
     if (!is.factor(Z))
         stop("Z must be a factor")
+    if (length(Y) != length(Z))
+        stop("length(Y) must equal length(Z)")
     if (missing(collapse))
         collapse <-  getOption("ocoptions")$collapse
     Z0 <- model.matrix(~Z)
