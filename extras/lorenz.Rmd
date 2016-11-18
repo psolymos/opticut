@@ -1,0 +1,284 @@
+% Lorenz curve for defining core habitat classes in suitability models
+% P Solymos
+% July 2013
+
+Motivation
+==========
+
+Species distribution models often model occurrence
+as a function of covariates, and predictions
+are binarized based on some threshold.
+The threshold is usually based on the assessment
+of classification accuracy using the observations
+and predicted occurrence probabilities (using AUC, ROC, etc.).
+
+With density (habitat suitability) model, the aim is
+to quantify ranking of habitats when occupancy is 1, i.e.
+habitat suitability given presence. Therefore, a 0/1
+classification is not the best approach because the 
+crux is with observation >0. Further,
+the counts might be from different protocols, when
+counts would become non-comparable. So there is a need
+for defining a threshold for expected suitability.
+
+Applications include:
+
+* want to map multiple species and shade the maps so that
+  those are comparable across species (e.g. peak and 
+  valleys has similar meaning)
+* want to delineate core habitats (patch) to calculate
+  some other metrics (distance to edge, edge contrast,
+  patch size, fragmentation, etc).
+
+A common approach is to use a mean/median or quantile based cutoff
+or multiple cutoffs for mapping. Applying the same cutoff(s)
+would have different meaning for different species. E.g. it would
+under predict core habitats for a widely distributed generalist,
+and overpredict for a range restricted specialist.
+
+Lorenz curve
+============
+
+The Lorenz curve is used to describe income inequality in finance,
+and used in diversity calculations (e.g. right tail sum diversity
+profiles based on majorization rule), or to describe
+size inequality in plant and animal populations. Its use for
+density, habitat suitability model seems quite straightforward,
+albeit it seems missing from the literature.
+The reason for this gap in the literature can be the fact
+that fine grained (habitat level) but large scale (province wide)
+abundance models are not really widespread.
+
+Here is a simple simulated example with 25 land cover classes
+and with a generalist (abundance is not concentrated
+to few classes) and specialist species (habitat is concentrated 
+in few classes).
+
+The Lorenz curve plots the cumulative distribution of
+the metric of interest (here abundance of a species) after sorting
+in increasing order, as a function of the cumulative
+distribution of the available population (here area of
+land cover types).
+
+Inequality
+----------
+
+One diagonal connecting (0,0) and (1,1) points is called the
+_line of equality_ because the plot follows this line
+when abundance in land cover types is proportional to
+the availability of those habitats (density is constant).
+The lower the line goes from the line of equality,
+the more inequality is to be found in the abundance
+distribution. The deviation is quantified by the
+Gini coefficient, which is the area between the
+line of equality and the empirical curve divided by
+0.5 (area under the line of equality). A Gini
+coefficient of 0 mean perfect equality, while values
+close to 1 indicate high inequality.
+
+```{r lorenzcurve}
+set.seed(12345)
+nc <- 25
+av <- rlnorm(nc)
+av <- av / sum(av) # availability for land cover classes
+x_g <- rgamma(25, 5, 2) # suitability for generalist
+x_s <- rgamma(25, 0.5, 2) # suitability for specialist
+library(ineq)
+lc_g <- Lc(x_g, n=av)
+lc_s <- Lc(x_s, n=av)
+plot(lc_g, col=4, 
+     xlab="cumulative landscape area", 
+     ylab="cumulative population size")
+lines(lc_s, col=2)
+legend("topleft", col=c(4,2), lwd=2, lty=1,
+    legend=c("generalist","specialist"), bg="white")
+Gini(x_g) # Gini coefficient for generalist
+Gini(x_s) # Gini coefficient for specialist
+```
+
+Asymmetry
+---------
+
+The deviation from the line of equality
+and all indices quantifying the inequality (e.g. Gini index)
+give information about the overall inequality in the
+statistical population.
+The other diagonal connecting the points (1,0) and (0,1)
+is called the _line of symmetry_. The name refers to
+the fact that the Lorenz curve is symmetric around this line
+when the point at which the Lorenz curve has a slope equal to 1, sits
+on the line of symmetry.
+The curve is called asymmetric when when this point is away from 
+the line of symmetry. Th Lorenz asymmetry coefficient describes
+this and calculated simply as the sum of x and y coordinates
+of the point at which slope of the curve is 1 (parallel with
+the line of equality). This coordinate can be calculated
+from the data or by differentiating a fitted curve to the data points.
+The asymmetry coefficient is 1 under symmetry
+(point is on the line of symmetry, the sum of the two coordinates equals 1).
+
+```{r asymmetry}
+LAC <-
+function (x, n = rep(1, length(x))) 
+{
+    o <- order(x)
+    x <- x[o]
+    n <- n[o]
+    x <- n * x
+    p <- cumsum(n)/sum(n)
+    L <- cumsum(x)/sum(x)
+    p <- c(0, p)
+    L <- c(0, L)
+
+    qp <- qnorm(p) 
+    qp <- qp[is.finite(qp)]
+    qL <- qnorm(L)
+    qL <- qL[is.finite(qL)]
+    m <- lm(qL ~ qp)
+    Lstar <- pnorm(fitted(m))
+    dL <- diff(Lstar)/diff(pnorm(qp))
+    i <- min(which(dL > 1))
+    out <- list(p=p[i], 
+         L=L[i], 
+         x=x[i],
+         n=n[1])
+#    dL <- diff(L)/diff(p)
+#    m1 <- max(which(dL < 1))
+#    m2 <- min(which(dL > 1))
+#    out <- list(p=mean(c(p[m1], p[m2])), 
+#         L=mean(c(L[m1], L[m2])), 
+#         x=mean(c(x[m1-1], x[m2-1])),
+#         n=mean(c(n[m1-1], n[m2-1])))
+    out$S <- out$L + out$p
+    out
+}
+lac_g <- LAC(x_g, n=av)
+lac_s <- LAC(x_s, n=av)
+plot(lc_g, col=4, 
+     xlab="cumulative landscape area", 
+     ylab="cumulative population size")
+lines(lc_s, col=2)
+abline(1,-1, col=3)
+lines(c(0, lac_g$p), c(lac_g$L, lac_g$L), col=4, lty=2)
+lines(c(lac_g$p, lac_g$p), c(0, lac_g$L), col=4, lty=2)
+lines(c(0, lac_s$p), c(lac_s$L, lac_s$L), col=2, lty=2)
+lines(c(lac_s$p, lac_s$p), c(0, lac_s$L), col=2, lty=2)
+abline(lac_g$L-lac_g$p, 1, col=4, lty=2)
+abline(lac_s$L-lac_s$p, 1, col=2, lty=2)
+legend("topleft", col=c(4,2), lwd=2, lty=1,
+    legend=c("generalist","specialist"), bg="white")
+lac_g$S # asymmetry coefficient for generalist
+lac_s$S # asymmetry coefficient for specialist
+```
+
+Thresholds
+=========
+
+The threshold I propose is defined by this point where
+the slope of the Lorenz curve is 1.
+This separates low and high suitability areas
+in the landscape based on the distribution
+of the data, implicitly taking into account
+the differences in equality and asymmetry of the data.
+
+The habitat suitability cutoff is the back scaled
+y value from the graph. Core habitat is defined
+by land cover classes concentrated right of the
+x value ($t_1$).
+
+Another threshold could be based on the point
+where the line of symmetry intersects with the
+Lorenz curve. This point can be found by calculating
+the sum of the x and y coordinates and finding the 
+point where the sum equals 1 ($t_2$).
+
+These two cutoff values are equal when the curve is symmetric.
+
+```{r barplots}
+z_g <- data.frame(x=x_g, av=av)
+z_g <- z_g[order(x_g),]
+z_g$L <- cumsum(z_g$x) / sum(x_g)
+z_g$p <- cumsum(z_g$av)
+z_g$Lp <- z_g$L + z_g$p
+z_g$t1 <- ifelse(z_g$L > lac_g$L, 1, 0)
+z_g$t2 <- 0
+z_g$t2[which.min(abs(z_g$Lp-1)):nc] <- 1
+
+z_s <- data.frame(x=x_s, av=av)
+z_s <- z_s[order(x_s),]
+z_s$L <- cumsum(z_s$x) / sum(x_s)
+z_s$p <- cumsum(z_s$av)
+z_s$Lp <- z_s$L + z_s$p
+z_s$t1 <- ifelse(z_s$L > lac_s$L, 1, 0)
+z_s$t2 <- 0
+z_s$t2[which.min(abs(z_s$Lp-1)):nc] <- 1
+
+op <- par(mfrow=c(2,2))
+barplot(z_g$x, z_g$av, col=c("white", "blue")[z_g$t1+1],
+    main="generalist, t1", ylab="suitability", xlab="land cover classes",
+    ylim=c(0,max(z_g$x, z_s$x)))
+barplot(z_g$x, z_g$av, col=c("white", "blue")[z_g$t2+1],
+    main="generalist, t2", ylab="suitability", xlab="land cover classes",
+    ylim=c(0,max(z_g$x, z_s$x)))
+barplot(z_s$x, z_s$av, col=c("white", "red")[z_s$t1+1],
+    main="specialist, t1", ylab="suitability", xlab="land cover classes",
+    ylim=c(0,max(z_g$x, z_s$x)))
+barplot(z_s$x, z_s$av, col=c("white", "red")[z_s$t2+1],
+    main="specialist, t2", ylab="suitability", xlab="land cover classes",
+    ylim=c(0,max(z_g$x, z_s$x)))
+par(op)
+```
+
+Mapping
+=======
+
+The Lorenz curve can be based on ordered predicted values as well.
+Using one of the characteristic points ($t_1$, $t_2$) one can scale
+the suitability values to a common standard.
+
+```{r mapping}
+z_g$x1 <- z_g$x / z_g$x[which(z_g$t1==1)[1]]
+z_g$x2 <- z_g$x / z_g$x[which(z_g$t2==1)[1]]
+z_s$x1 <- z_s$x / z_s$x[which(z_s$t1==1)[1]]
+z_s$x2 <- z_s$x / z_s$x[which(z_s$t2==1)[1]]
+
+op <- par(mfrow=c(2,2))
+plot(c(0, z_s$p), c(0, z_s$x1), type="l", col=2, lwd=2, main="t1",
+     xlab="scaled suitability", ylab="proportion of landscape")
+lines(c(0, z_g$p), c(0, z_g$x1), type="l", col=4, lwd=2)
+abline(v=z_g$p[which(z_g$t1==1)[1]], lty=2, col=4)
+abline(v=z_s$p[which(z_s$t1==1)[1]], lty=2, col=2)
+abline(1,0)
+
+plot(c(0, z_s$p), c(0, z_s$x2), type="l", col=2, lwd=2, main="t2",
+     xlab="scaled suitability", ylab="proportion of landscape")
+lines(c(0, z_g$p), c(0, z_g$x2), type="l", col=4, lwd=2)
+abline(v=z_g$p[which(z_g$t2==1)[1]], lty=2, col=4)
+abline(v=z_s$p[which(z_s$t2==1)[1]], lty=2, col=2)
+abline(1,0)
+
+plot(c(0, z_g$p), c(0, z_g$x), type="l", col=4, lwd=2, main="t1",
+     xlab="unscaled suitability", ylab="proportion of landscape")
+lines(c(0, z_s$p), c(0, z_s$x), type="l", col=2, lwd=2)
+abline(v=z_g$p[which(z_g$t1==1)[1]], lty=2, col=4)
+abline(v=z_s$p[which(z_s$t1==1)[1]], lty=2, col=2)
+
+plot(c(0, z_g$p), c(0, z_g$x), type="l", col=4, lwd=2, main="t2",
+     xlab="unscaled suitability", ylab="proportion of landscape")
+lines(c(0, z_s$p), c(0, z_s$x), type="l", col=2, lwd=2)
+abline(v=z_g$p[which(z_g$t2==1)[1]], lty=2, col=4)
+abline(v=z_s$p[which(z_s$t2==1)[1]], lty=2, col=2)
+par(op)
+```
+
+Next steps
+==========
+
+1. Apply these ideas on actual species results,
+2. determine core habitats and check sensibility
+   of results (White-throated Sparrow,
+   CAWA, Yellow-rumped Warbler, BTNW, Brown Creeper,
+   Lincoln Sparrow),
+3. apply threshold in maps.
+4. Possibly use rescaled suitability in
+   Marxan type prioritization?
