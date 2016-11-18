@@ -136,6 +136,8 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
     out
 }
 
+## http://www.tannerhelland.com/3643/grayscale-image-algorithm-vb6/
+## http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
 col2grey <- function(col, method="luminosity") {
     method <- match.arg(method, c("lightness", "average", "luminosity"))
     col <- col2rgb(col) / 255
