@@ -1,16 +1,7 @@
 lorenz <-
-function(x)
+function(x, na.last=TRUE)
 {
-    out <- .lorenz(x)
-    out$x <- x
-    class(out) <- "lorenz"
-    out
-}
-
-.lorenz <-
-function(x)
-{
-    o <- order(x)
+    o <- order(x, na.last=na.last)
     xo <- x[o]
     p <- seq_len(length(xo)) / sum(length(xo))
     L <- cumsum(xo) / sum(xo)
@@ -23,31 +14,65 @@ function(x)
     G <- G - 1 - (1 / length(xo))
 
     m1 <- which.max(J)
-    list(xcut = unname(xo[m1]),
+    out <- list(
+        data=cbind(p=p, L=L),
+        ## xcut: habitat suitability cutoff is the back scaled
+        ##       L value (original x) from the graph
+        lambda = unname(xo[m1]),
+        ## L: cumulative distribution of the metric of interest
         L = unname(L[m1 + 1]),
+        ## p: cumulative distribution of the available population
         p = unname(p[m1 + 1]),
+        ## S: asymmetry is the sum of x and y coordinates
+        ##    at the point of slope 1 (symmetry: S=1)
         S = unname(L[m1 + 1] + p[m1 + 1]),
+        ## G: Gini coefficient of 0 mean perfect equality,
+        ##    values close to 1 indicate high inequality.
         G = G,
+        ## Youden index
         J = max(p - L))
+    class(out) <- "lorenz"
+    out
 }
 
 print.lorenz <-
-function(x)
+function(x, digits, ...)
 {
-    str(x)
+    if (missing(digits))
+        digits <- max(3L, getOption("digits") - 3L)
+    cat("Lorenz curve statistics\n\n",
+    "  Threshold = ", format(x$lambda, digits = digits),
+    " (L = ", format(x$L, digits = digits),
+    ", p = ", format(x$p, digits = digits), ")\n",
+    "  Youden index = ", format(x$J, digits = digits), "\n",
+    "  Gini index = ", format(x$G, digits = digits), "\n",
+    "  Asymmetry = ", format(x$J, digits = digits), "\n\n", sep="")
+    invisible(x)
 }
 
+## remove diags, add=T/F for adding the line to another one
 plot.lorenz <-
-function(x)
+function(x, lwd=2, diag=NA, antidiag=NA, tangent=NA, threshold=NA, ...)
 {
-    plot(x)
+    plot(x$data, type="l", xaxs = "i", yaxs = "i", lwd=lwd, ...)
+    if (!is.na(diag))
+        abline(0, 1, col=diag)
+    if (!is.na(antidiag))
+        abline(1,-1, col=antidiag)
+    if (!is.na(threshold)) {
+        lines(c(0, x$p), c(x$L, x$L), col=threshold)
+        lines(c(x$p, x$p), c(0, x$L), col=threshold)
+    }
+    if (!is.na(tangent))
+        abline(x$L-x$p, 1, col=tangent)
+    invisible(x)
 }
 
 ## classifier function: x, g
 ## - lorenz(x) based cut is used to crosstabulate with g and return prop matrix
 
 ## modeling function: combine rankComb and classifier
-## summary, plot etc functions for that
+## summary, plot etc functions for that using freq of g + use/avail coloring
 
 f_lorenz <- function(j, i, z)
 {
