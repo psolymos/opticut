@@ -4,7 +4,7 @@
     packageStartupMessage(paste(pkgname, ver[1], "\t", ver[2]))
     if (is.null(getOption("ocoptions")))
         options("ocoptions" = list(
-            collapse=" ",
+            collapse="+",
             cut=2,
             sort=TRUE,
             theme="br",
