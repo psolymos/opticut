@@ -55,6 +55,9 @@ numeric, number of significant digits in output.
   \item{object}{
 object to summarize.
 }
+  \item{\dots}{
+other arguments passed to the underlying functions.
+}
 }
 \details{
 The Lorenz curve is a continuous piecewise linear function

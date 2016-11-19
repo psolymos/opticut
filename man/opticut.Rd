@@ -199,7 +199,7 @@ logical. If \code{TRUE}, setting row names and converting column names
 See \code{\link{as.data.frame}}.
 }
   \item{\dots}{
-other arguments passed to the underlying functions, see \code{\link{opticut}}.
+other arguments passed to the underlying functions.
 }
 }
 \details{
