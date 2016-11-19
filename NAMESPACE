@@ -1,6 +1,6 @@
 export("opticut", "optilevels", "opticut1",
     "wrsi", "sindex",
-    "ocoptions", "occolors",
+    "ocoptions", "occolors", "col2gray",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "getMLE",
     "uncertainty",
