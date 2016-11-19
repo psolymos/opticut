@@ -86,4 +86,5 @@ Here is a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example: [Rmd](http
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
 E. & Solymos, P. (2014): Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
-_Community Ecology_ **15**:180--186. [[PDF](https://drive.google.com/file/d/0B-q59n6LIwYPWnBjLUxvcXJVUXc/view?usp=sharing)]
+_Community Ecology_ **15**:180--186.
+[[link](http://dx.doi.org/10.1556/ComEc.15.2014.2.6), [PDF](https://drive.google.com/file/d/0B-q59n6LIwYPWnBjLUxvcXJVUXc/view?usp=sharing)]
