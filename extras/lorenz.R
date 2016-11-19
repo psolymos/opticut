@@ -139,8 +139,9 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
     xt <- attr(l, "summary")["x(t)"]
     h <- ifelse(f >= xt, 1, 0)
     tot <- as.matrix(mefa4::Xtab(f ~ Z + h))
-    tot <- tot / sum(f)
+    tot <- tot / sum(tot)
     freq <- as.matrix(mefa4::Xtab(~ Z + h))
+    freq <- freq / sum(freq)
     out <- list(fitted=f, lorenz=l, total=tot, freq=freq, part=h)
     out
 }
