@@ -339,6 +339,7 @@ Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
 E. & Solymos, P. (2014): Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
+<doi:10.1556/ComEc.15.2014.2.6>
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

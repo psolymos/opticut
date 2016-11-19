@@ -1,5 +1,6 @@
 export("opticut", "optilevels", "opticut1",
     "wrsi", "sindex",
+    "lorenz",
     "ocoptions", "occolors", "col2gray",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "getMLE",
@@ -15,6 +16,7 @@ S3method("bestpart", "uncertainty")
 S3method("bestpart", "uncertainty1")
 S3method("getMLE", "opticut")
 S3method("plot", "opticut")
+S3method("plot", "lorenz")
 S3method("wplot", "opticut")
 S3method("wplot", "opticut1")
 S3method("print", "opticut")
@@ -23,9 +25,12 @@ S3method("print", "uncertainty1")
 S3method("print", "uncertainty")
 S3method("print", "summary.uncertainty")
 S3method("print", "summary.opticut")
+S3method("print", "summary.lorenz")
+S3method("quantile", "lorenz")
 S3method("strata", "opticut")
 S3method("summary", "opticut")
 S3method("summary", "uncertainty")
+S3method("summary", "lorenz")
 S3method("uncertainty", "opticut")
 
 S3method("as.data.frame", "opticut")

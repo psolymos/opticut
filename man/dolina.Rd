@@ -64,8 +64,9 @@ Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
 E. & Solymos, P., 2014. Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
+<doi:10.1556/ComEc.15.2014.2.6>
 
-Solymos, P., Kemencei, Z. Pall-Gergely, B., Farkas, R., Vilisics, F., Nagy, A., Kisfali, M. & Hornung, E., 2016. Public data from the dolina project. Version 1.0. Zenodo, DOI: 10.5281/zenodo.53080
+Solymos, P., Kemencei, Z. Pall-Gergely, B., Farkas, R., Vilisics, F., Nagy, A., Kisfali, M. & Hornung, E., 2016. Public data from the dolina project. Version 1.0. Zenodo, <doi:10.5281/zenodo.53080>
 }
 \examples{
 data(dolina)

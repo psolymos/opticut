@@ -30,9 +30,9 @@ character, the method used for grayscale conversion.
 Grayscale conversion methods in \code{col2gray} calculate gray levels based on
 red (R), green (G), and blue (B) color channels as follows:
 \code{"BT.709"}: 0.2126 * R + 0.7152 * G + 0.0722 * B,
-luma correction following the  ITU-R BT.709 recommendation;
+luminosity correction following the  ITU-R BT.709 recommendation;
 \code{"BT.601"}: 0.299 * R + 0.587 * G + 0.114 * B,
-luma correction following the  ITU-R BT.601 recommendation;
+luminosity correction following the  ITU-R BT.601 recommendation;
 \code{"desaturate"}: (max(R, G, B) + min(R, G, B)) / 2, also called lightness;
 \code{"average"}: (R + G + B) / 3;
 \code{"maximum"}: max(R, G, B);

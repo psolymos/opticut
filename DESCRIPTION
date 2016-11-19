@@ -8,7 +8,7 @@ Maintainer: Peter Solymos <solymos@ualberta.ca>
 Description: Likelihood based optimal partitioning for indicator
   species analysis. Finding the best binary partition for each species
   based on model selection, possibly controlling for modifying/confounding
-  variables as described in Kemencei et al. (2014, Community Ecology 15:180--186).
+  variables as described in Kemencei et al. (2014) <doi:10.1556/ComEc.15.2014.2.6>.
   The package also implements various measures of uncertainty based on
   binary partitions, optimal multinomial partitioning, and exploratory
   selection indices, with native support for parallel computations.
