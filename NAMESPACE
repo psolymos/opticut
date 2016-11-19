@@ -34,7 +34,7 @@ S3method("as.data.frame", "uncertainty")
 S3method("as.data.frame", "summary.uncertainty")
 
 importFrom("mefa4", "groupSums", "nonDuplicated")
-importFrom("grDevices", "colorRampPalette")
+importFrom("grDevices", "colorRampPalette", "col2rgb", "gray")
 importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
            "par", "plot", "polygon", "title")
 importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",

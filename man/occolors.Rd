@@ -26,7 +26,7 @@ for the \code{\link{col2rgb}} function. This is converted to grayscale.
 character, the method used for grayscale conversion.
 }
 }
-\description{
+\details{
 Grayscale conversion methods calculate gray levels based on
 red (R), green (G), and blue (B) color channels:
 \item{"BT.709"}{0.2126 * R + 0.7152 * G + 0.0722 * B, luma correction following the  ITU-R BT.709 recommendation}
