@@ -59,6 +59,15 @@ function(x, digits, ...)
     invisible(x)
 }
 
+
+quantile.lorenz <-
+function(x, probs = seq(0, 1, 0.25), ...)
+{
+    structure(sapply(probs, function(z) min(x[x[,"L"] >= z, "x"])),
+        names=paste0(format(100 * probs, trim=TRUE,
+        digits = max(2L, getOption("digits"))), "%"))
+}
+
 plot.lorenz <-
 function(x, type=c("L", "x"), tangent=NA, h=NA, v=NA, ...)
 {
@@ -137,19 +146,33 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
 }
 
 ## http://www.tannerhelland.com/3643/grayscale-image-algorithm-vb6/
-## http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
-col2grey <- function(col, method="luminosity") {
-    method <- match.arg(method, c("lightness", "average", "luminosity"))
+col2gray <- function(col, method="BT.709") {
+    method <- match.arg(method, c("BT.709", "BT.601",
+        "desaturate", "average", "maximum", "minimum",
+        "red", "green", "blue"))
     col <- col2rgb(col) / 255
-    if (method == "lightness")
+    if (method == "BT.709")
+        out <- 0.2126 * col["red",] + 0.7152 * col["green",] + 0.0722 * col["blue",]
+    if (method == "BT.601")
+        out <- 0.299 * col["red",] + 0.587 * col["green",] + 0.114 * col["blue",]
+    if (method == "desaturate")
         out <- (apply(col, 2, max) + apply(col, 2, min)) / 2
     if (method == "average")
         out <- colMeans(col)
-    if (method == "luminosity")
-        out <- 0.21 * col["red",] + 0.72 * col["green",] + 0.07 * col["blue",]
-    grey(out)
+    if (method == "maximum")
+        out <- apply(col, 2, max)
+    if (method == "minimum")
+        out <- apply(col, 2, min)
+    if (method == "red")
+        out <- col["red",]
+    if (method == "green")
+        out <- col["green",]
+    if (method == "blue")
+        out <- col["blue",]
+    gray(out)
 }
 
+col2gray(occolors()(5))
 n <- 25
 col <- occolors()(n)
 plot(0, type="n", ann=FALSE, axes=FALSE,
@@ -158,11 +181,11 @@ for (i in 1:n) {
     polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1),
         col=col[i], border=col[i])
     polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+1,
-        col=col2grey(col, "lightness")[i], border=col2grey(col, "lightness")[i])
+        col=col2gray(col, "lightness")[i], border=col2gray(col, "lightness")[i])
     polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+2,
-        col=col2grey(col, "average")[i], border=col2grey(col, "average")[i])
+        col=col2gray(col, "average")[i], border=col2gray(col, "average")[i])
     polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+3,
-        col=col2grey(col, "luminosity")[i], border=col2grey(col, "luminosity")[i])
+        col=col2gray(col, "luminosity")[i], border=col2gray(col, "luminosity")[i])
     polygon(c(i-1, i, i, i-1), c(0, 0, 1, 1)+4,
         col=col[i], border=col[i])
 }
