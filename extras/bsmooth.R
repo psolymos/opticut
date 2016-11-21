@@ -4,8 +4,9 @@ dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 ## filter species to speed up things a bit
 Y <- ifelse(dolina$xtab[,colSums(dolina$xtab > 0) >= 20] > 0, 1, 0)
 ## opticut results, note the cloglog link function
-dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="binomial:cloglog")
+#dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+#    strata=dolina$samp$mhab, dist="binomial:cloglog")
+dol <- opticut(Y, strata=dolina$samp$mhab, dist="binomial:cloglog")
 
 ## parallel computing for uncertainty
 library(parallel)
@@ -45,4 +46,6 @@ xx <- mefa4::groupMeans(xx, 1, strata(object))
 heatmap(t(xx), scale="none", col=occolors()(25),
     distfun=function(x) dist(x, "manhattan"))
 
+yy <- mefa4::groupMeans(Y, 1, strata(object))
+plot(yy, xx);abline(0,1)
 
