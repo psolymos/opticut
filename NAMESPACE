@@ -4,7 +4,7 @@ export("opticut", "optilevels", "opticut1",
     "ocoptions", "occolors", "col2gray",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "getMLE",
-    "uncertainty",
+    "uncertainty", "bsmooth",
     "wplot",
     "fix_levels", "strata", "check_strata", "beta2i")
 S3method("opticut", "default")
@@ -14,6 +14,7 @@ S3method("bestmodel", "optilevels")
 S3method("bestpart", "opticut")
 S3method("bestpart", "uncertainty")
 S3method("bestpart", "uncertainty1")
+S3method("bsmooth", "uncertainty1")
 S3method("getMLE", "opticut")
 S3method("plot", "opticut")
 S3method("plot", "lorenz")
