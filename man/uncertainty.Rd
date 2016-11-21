@@ -5,6 +5,7 @@
 \alias{print.uncertainty}
 \alias{print.summary.uncertainty}
 \alias{summary.uncertainty}
+\alias{strata.uncertainty}
 \alias{bestpart.uncertainty}
 \alias{bestpart.uncertainty1}
 \alias{check_strata}
@@ -23,6 +24,7 @@ uncertainty(object, ...)
     B = 99, cl = NULL, ...)
 
 check_strata(x, mat)
+\method{strata}{uncertainty}(object, ...)
 
 \method{bestpart}{uncertainty}(object, ...)
 \method{bestpart}{uncertainty1}(object, ...)
@@ -212,8 +214,12 @@ heatmap(t(bestpart(ucdol)), scale="none", col=occolors()(25),
     distfun=function(x) dist(x, "manhattan"))
 
 ## See how indicator value changes with different partitions
+## (and why it is the wrong metric to use in this calse)
 with(ucdol$uncertainty[["pvic"]],
     boxplot(I ~ best, col="gold", ylab="Indicator value"))
+## What we should calculate is the bootstrap smoothed mean of the
+## expected value and its confidence intervals
+
 }
 }
 \keyword{ manip }
