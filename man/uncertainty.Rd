@@ -11,6 +11,8 @@
 \alias{check_strata}
 \alias{as.data.frame.uncertainty}
 \alias{as.data.frame.summary.uncertainty}
+\alias{bsmooth}
+\alias{bsmooth.uncertainty1}
 \title{
 Quantifying uncertainty for fitted objects
 }
@@ -38,6 +40,8 @@ check_strata(x, mat)
     row.names = NULL, optional = FALSE, sort, ...)
 \method{as.data.frame}{summary.uncertainty}(x,
     row.names = NULL, optional = FALSE, sort, ...)
+
+\method{bsmooth}{uncertainty1}(object, ...)
 }
 \arguments{
   \item{object}{
@@ -125,6 +129,9 @@ reliability) and conficence interval for I (based on \code{level}).
 strata as best partitions (number of strata times number of species).
 
 The coercion method \code{\link{as.data.frame}} returns a data frame.
+
+The \code{bsmooth} method returns bootstrap smoothed results
+for each strata.
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata
@@ -219,7 +226,9 @@ with(ucdol$uncertainty[["pvic"]],
     boxplot(I ~ best, col="gold", ylab="Indicator value"))
 ## What we should calculate is the bootstrap smoothed mean of the
 ## expected value and its confidence intervals
-
+bs <- bsmooth(ucdol$uncertainty[["pvic"]])
+boxplot(t(bs), ylab="Expected value")
+cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
 }
 }
 \keyword{ manip }
