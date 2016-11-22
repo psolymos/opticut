@@ -13,6 +13,7 @@
 \alias{as.data.frame.summary.uncertainty}
 \alias{bsmooth}
 \alias{bsmooth.uncertainty1}
+\alias{bsmooth.uncertainty}
 \title{
 Quantifying uncertainty for fitted objects
 }
@@ -42,6 +43,7 @@ check_strata(x, mat)
     row.names = NULL, optional = FALSE, sort, ...)
 
 \method{bsmooth}{uncertainty1}(object, ...)
+\method{bsmooth}{uncertainty}(object, ...)
 }
 \arguments{
   \item{object}{
@@ -182,9 +184,14 @@ summary(uc3)
 bestpart(uc3)
 heatmap(bestpart(uc3), scale="none", col=occolors()(25))
 
+## bootstrap smoothed predictions per strata
+bsmooth(uc3)
+heatmap(bestpart(uc3), scale="none", col=occolors()(25))
+
 ## individual species results
 uc3$uncertainty
 bestpart(uc3$uncertainty[[1]])
+bsmooth(uc3$uncertainty[[1]])
 
 ## block bootstrap
 block_fun <- function()
