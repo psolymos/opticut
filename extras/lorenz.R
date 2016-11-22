@@ -132,7 +132,7 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
     if (missing(collapse))
         collapse <-  getOption("ocoptions")$collapse
     Z0 <- model.matrix(~Z)
-    m <- .opticut1(Y, X, Z1=Z0[,-1L,drop=FALSE],
+    m <- opticut:::.opticut1(Y, X, Z1=Z0[,-1L,drop=FALSE],
         dist=dist, full_model=TRUE, ...)
     f <- fitted(m)
     l <- lorenz(f)
@@ -145,4 +145,8 @@ function(Y, X, Z, dist="gaussian", collapse, ...)
     out <- list(fitted=f, lorenz=l, total=tot, freq=freq, part=h)
     out
 }
+rc <- opticut(Y ~ x2, strata=Z, dist="poisson")
+bp <- bestpart(rc)
+lc <- lorenzComb(Y, X, Z, dist="poisson")
 
+table(bp, lc$part)
