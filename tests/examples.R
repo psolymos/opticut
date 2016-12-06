@@ -91,6 +91,7 @@ strata(u4b)
 
 bestmodel(m1)
 bestmodel(m2)
+bestmodel(m2, pos_only=TRUE)
 bestmodel(m3)
 ## dist=fun cannot return the best model (--> uncertainty(type=asymm) fails)
 bm4 <- try(bestmodel(m4), silent=TRUE) # dist=fun problem

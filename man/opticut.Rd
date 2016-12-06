@@ -41,7 +41,7 @@ strata(object, ...)
 \method{strata}{opticut}(object, ...)
 
 \method{bestmodel}{opticut}(object, which = NULL, ...)
-\method{bestpart}{opticut}(object, ...)
+\method{bestpart}{opticut}(object, pos_only = FALSE, ...)
 \method{getMLE}{opticut}(object, which, ...)
 
 wplot(x, ...)
@@ -197,6 +197,13 @@ Missing values are not allowed. See \code{\link{as.data.frame}}.
 logical. If \code{TRUE}, setting row names and converting column names
 (to syntactic names: see \code{\link{make.names}}) is optional.
 See \code{\link{as.data.frame}}.
+}
+  \item{pos_only}{
+logical, best partition normally returns the original variable without
+recognizing the direction of the association.
+\code{pos_only = TRUE} returns values where negative associations are
+taken into account and \code{1} indicates strata of positive association.
+This is only important when \code{comb} is not \code{"rank"}.
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
