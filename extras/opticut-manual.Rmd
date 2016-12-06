@@ -71,7 +71,7 @@ library(opticut)
 
 # Patritioning
 
-Optimal partitioning (optimal cut, or in short: opticut) is found for each species independent of each other. We make observations ($y_i$) of possibly multiple species at $i=1,...,n$ sites. Now let us consider a discrete site descriptor ($g_i$) with $K$ levels or strata ($K>2$). This stratification might come from remotely sensed or other geospatial information, field measurements, or from multivariate clustering. We can use $g_i$ to create $m=1,...,M$ possible binary partitions based on coding one or more levels as 1s and the rest with 0s. We denote any such possible partition as $z^{(m)}$. The total number of binary partitions is $M=2^{K-1}-1$, not counting cases when 0s or 1s are completely missing (which is the null model). The opticut method, as opposed to for example IndVal method is invariant to the coding of 0s and 1s in $z^{(m)}$. This means that complementary cases, such as $z^{(m)}$ and $1-z^{(m)}$, are treated as interchangeable. The opticut package provides utility functions to create and check binary partitions from multi-level vectors (`kComb`, `allComb`, `checkComb`). 
+Optimal partitioning (optimal cut, or in short: opticut) is found for each species independent of each other. We make observations ($y_i$) of possibly multiple species at $i=1,...,n$ sites. Now let us consider a discrete site descriptor ($g_i$) with $K$ levels or strata ($k=1,\ldots,K; K>2$). This stratification might come from remotely sensed or other geospatial information, field measurements, or from multivariate clustering. We can use $g_i$ to create $m=1,...,M$ possible binary partitions based on coding one or more levels as 1s and the rest with 0s. We denote any such possible partition as $z^{(m)}$. The total number of binary partitions is $M=2^{K-1}-1$, not counting cases when 0s or 1s are completely missing (which is the null model). The opticut method, as opposed to for example IndVal method is invariant to the coding of 0s and 1s in $z^{(m)}$. This means that complementary cases, such as $z^{(m)}$ and $1-z^{(m)}$, are treated as interchangeable. The opticut package provides utility functions to create and check binary partitions from multi-level vectors (`kComb`, `allComb`, `checkComb`). 
 
 ## Manipulating partitions
 
@@ -395,10 +395,16 @@ check_strata(oc, B) # check representation
 summary(uncertainty(oc, type = "boot", B = B))
 ```
 
-The reliability of the best partition can also be assessed using the setting `type = "multi"` (as in *multi*ple models). In this case, the model partitions are re-evaluated for each bootstrap sample. Model uncertainty is assessed as the number of times a partition is supported out of the $B$ bootstrap runs. The reliability ($R$) metric in the summary is the proportion for the most frequently supported partition. The corresponding indicator value and confidence interval is conditional on this most commonly supported partition.
+The reliability of the best partition can also be assessed using the setting `type = "multi"` (as in *multi*ple models). In this case, the model partitions are re-evaluated for each bootstrap sample. Model uncertainty is assessed as the number of times a partition is supported out of the $B$ bootstrap runs ($b=1,\ldots,B$). The reliability ($R$) metric in the summary is the proportion for the most frequently supported partition. The corresponding indicator value and confidence interval is conditional on this most commonly supported partition.
 
 ```{r}
-summary(uncertainty(oc, type = "multi", B = B))
+summary(ucm <- uncertainty(oc, type = "multi", B = B))
+```
+
+The bootstrap averaged ('bagged') expected values for each $k=1,\ldots,K$ stratum in $g$ can be accessed using the `bsmooth` method that calculates $E[Y_i \mid g_i = k] = \frac{1}{B} \sum_{b=1}^{B} f^{-1}({}^{(b)}\hat{\beta}_0^{(m')} + {}^{(b)}\hat{\beta}_1^{(m')} {}^{(b)}z_i^{(m')})$:
+
+```{r}
+bsmooth(ucm)
 ```
 
 # Distributions
