@@ -1,6 +1,6 @@
 # User-visible changes in the opticut package
 
-## Version 0.1-0 -- Jan 12, 2016
+## Version 0.1-0 -- Dec 16, 2016
 
 * 1st major release.
 
