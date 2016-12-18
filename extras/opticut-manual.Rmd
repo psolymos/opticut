@@ -6,11 +6,11 @@ output:
   pdf_document:
     keep_tex: no
     toc: true
-    toc_depth: 3
-    number_sections: false
+    toc_depth: 2
+    number_sections: true
   word_document:
     toc: true
-    toc_depth: 3
+    toc_depth: 2
 documentclass: article
 fontsize: 11pt
 classoption: letterpaper
@@ -604,7 +604,7 @@ We will try to find species associated with different elevations.
 
 First we try a Binomial model for 0/1 data. Note that we set the `try_error` option to `TRUE` so the function will not stop when it runs into an error.
 
-```{r}
+```{r fig.height=8,fig.width=6}
 library(optpart)
 
 data(shoshsite)
@@ -616,7 +616,7 @@ levels(elev) <- c("low","mid1","mid2", "high")
 sveg <- as.matrix(shoshveg)
 sveg[sveg > 0] <- 1
 o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
-plot(o, sort=1)
+plot(o, sort=1, mar=c(4,6,2,2), cex.axis=0.5, ylab="")
 ```
 
 Next, we use the same data set as percent cover data and specify a Beta distribution:
@@ -638,7 +638,7 @@ sveg[sveg==7] <- 0.75
 sveg[sveg==8] <- 0.8
 table(sveg)
 o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
-plot(o2, sort=1)
+plot(o2, sort=1, mar=c(4,6,2,2), cex.axis=0.6, ylab="")
 ```
 
 Finally, here is how an ordered logistic model can be fit to a single species.
@@ -729,12 +729,6 @@ First off, we define the function:
 library(mgcv)
 library(detect)
 data(oven)
-#oven$veg <- factor(NA, c("agr","open","decid","conif", "mix"))
-#oven$veg[oven$pforest < 0.5] <- "open"
-#oven$veg[oven$pagri > 0.5 & oven$pforest < 0.5] <- "agr"
-#oven$veg[oven$pforest >= 0.5] <- "mix"
-#oven$veg[oven$pforest >= 0.5 & oven$pdecid >= 0.6] <- "decid"
-#oven$veg[oven$pforest >= 0.5 & oven$pdecid < 0.4] <- "conif"
 oven$veg <- factor(NA, c("open","decid","conif"))
 oven$veg[oven$pforest < 0.5] <- "open"
 oven$veg[oven$pforest >= 0.5 & oven$pdecid >= 0.5] <- "decid"
