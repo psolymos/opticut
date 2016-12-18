@@ -63,7 +63,7 @@ to report a problem.
 
 ## Loading the package
 
-To get started, open R and load tha **opticut** package as:
+To get started, open R and load the **opticut** package as:
 
 ```{r}
 library(opticut)
@@ -223,9 +223,9 @@ try(opticut1(Y = y, Z = comb, dist = "gaussian"))
 checkComb(comb)
 ```
 
-The global option `check_comb` can be set to override this default behaviour,
+The global option `check_comb` can be set to override this default behavior,
 although there is no real point in duplicating reparametrized
-but otherwised identical models:
+but otherwise identical models:
 
 ```{r}
 op <- ocoptions(check_comb = FALSE, cut = -Inf)
@@ -235,10 +235,10 @@ ocoptions(op)
 
 ## Rank based combinations
 
-The IndVal method requires the algorithm to evaluate $2^K-1$ binary partitions. Our opticut approach is parametrization invariant with respect to coding the levels in the binary partitions (it affects the intercept term but not the contrast or the log likelihood ratio). This effectively halves the number of partitions we need to compare ($2^{K-1}-1$, `comb = "all"` in opticut). Still, the number of partitions increases according to powers of 2. Here we propose an approach that increases linearly with $K$. This algorithm is based on sorting all the $K$ partitions in $g$ according to increasing order of the linear predictor estimates for $K$ coefficients (as opposed to estimating 2 coefficients for a binary partition). The logic follows from the fact that the optimal binary partitioning tries to find the best split in terms of likelihood ratio with lower estimates on one side, and higher estimates on the other side of the split. As a consequence, we only need to try $K-1$ binary partitions to find the optimal $z^{(m')}$. This algorithm is implemented in the rankComb function that is called by opticut with the argument `comb = "rank"`.
+The IndVal method requires the algorithm to evaluate $2^K-1$ binary partitions. Our opticut approach is parametrization invariant with respect to coding the levels in the binary partitions (it affects the intercept term but not the contrast or the log likelihood ratio). This effectively halves the number of partitions we need to compare ($2^{K-1}-1$, `comb = "all"` in opticut). Still, the number of partitions increases according to powers of 2. Here we propose an approach that increases linearly with $K$. This algorithm is based on sorting all the $K$ partitions in $g$ according to increasing order of the linear predictor estimates for $K$ coefficients (as opposed to estimating 2 coefficients for a binary partition). The logic follows from the fact that the optimal binary partitioning tries to find the best split in terms of likelihood ratio with lower estimates on one side, and higher estimates on the other side of the split. As a consequence, we only need to try $K-1$ binary partitions to find the optimal $z^{(m')}$. This algorithm is implemented in the `rankComb` function that is called by opticut with the argument `comb = "rank"`.
 
 The function `rankComb` evaluates a model with a $K$-level factor
-and returns a corresponding partitioning matrix. Attibutes
+and returns a corresponding partitioning matrix. Attributes
 hold the estimates for the $K$ levels:
 
 ```{r}
@@ -260,7 +260,7 @@ fix_levels(as.factor(c("A b", "C d")), sep="")
 
 There is an overhead of fitting the model to calculate the ranking first. But computing efficiencies can be still high compared to all partitions. As a consequence of the ranking process, we do not have summaries for all the possible binary partitions, only for the top candidates. Moreover, the partitions produced for each species might not be identical. Therefore the model weights ($w$) and Simpson index ($H$) have different interpretation and cannot be that easily compared across species, unless the model weights are highly concentrated for the top models. In this case, the sum of weights for the missing models becomes negligible. Another consequence of the ranking process is that $\beta_1^{(m)}$ estimates are always positive. In the case of comparing all the partitions, the full set of partitions is fixed for all species, and some respond positively while others respond negatively to the same binary variable in terms of the $\beta_1^{(m)}$ values. Thus it is required to store the sign of the relationship as part of the summary. 
 
-The `comb = "rank"` is the defult setting in `opticut`. It is clear
+The `comb = "rank"` is the default setting in `opticut`. It is clear
 that the 2 approaches lead to identical best partitions.
 Only the model weights ($w$) are different:
 
@@ -465,9 +465,9 @@ DQ <- mefa4::nonDuplicated(DQ, dol_mhab, TRUE)
 ```
 
 Let's compare the results of ignoring sampling effort differences
-with a casewhen we use sampling effort as offset.
+with a case when we use sampling effort as offset.
 Offsets are defined as `log(7)` or `log(3)` representing
-the sampling volume differences (more debris searched leads to more smails found).
+the sampling volume differences (more debris searched leads to more snails found).
 Using offsets results in less species that is associated with litter:
 
 ```{r}
@@ -555,16 +555,19 @@ with(ucdol$uncertainty[["pvic"]],
 
 ## Percent cover data: Binomial, Beta distribution, and ordinal
 
-Stratigraphy example using Beta distribution: the only limitation of the Beta distribution in this context is that boundary values (0 and 1) are not part of the support, so a tiny value (here 0.0001) is used instead. It is explained later how to define a zero-inflated Beta distribution.
-
-The data we are using is from the **rioja** package:
-pollen stratigraphic data from Abernethy Forest, Scotland, spanning approximately 5500--12100 BP (from Birks & Mathews 1978, New Phytologist 80, 455--84).
+The data we are using is from the **rioja** package (Juggins 2015)
+is pollen stratigraphic data from Abernethy Forest, Scotland, spanning approximately 5500--12100 BP (from Birks & Mathews 1978).
 
 ```{r}
 library(rioja)
 data(aber)
 strat.plot(aber$spec, aber$ages$Depth, scale.percent=TRUE, y.rev=TRUE)
+```
 
+We use the Beta distribution for the stratigraphy example. 
+The only limitation of the Beta distribution in this context is that boundary values (0 and 1) are not part of the support. One can use a tiny value (e.g. 0.0001). We are going to focus on species with at least 5 percent maximum values in the data set.
+
+```{r}
 z <- as.factor(cut(aber$ages$Depth, 5))
 ab <- as.matrix(aber$spec) / 100
 ab[ab == 0] <- 0.0001
@@ -572,10 +575,18 @@ ab <- ab[,apply(ab, 2, max) > 0.05]
 
 a <- opticut(ab, strata=z, comb="rank", dist="beta")
 summary(a)
+```
 
+The plot shows results in a vertical orientation, resembling the stratigraphy plot.
+
+```{r}
 plot(a, sort=FALSE, horizontal=FALSE, pos=1, upper=0.8,
     show_I=FALSE, show_S=FALSE, mar=c(6,6,1,1), xlab="", ylab="")
+```
 
+Let us combine together the best partitions with the raw data:
+
+```{r}
 bp <- bestpart(a)
 opar <- par(mfrow=c(3,4), mar=c(2,2,1,1))
 for (i in 1:12) {
@@ -587,13 +598,13 @@ for (i in 1:12) {
 par(opar)
 ```
 
-The following data set is from the **optpart** package:
+The following data set is from the **optpart** package (Roberts 2016b):
 vascular plant species cover for the Shoshone National Forest, Wyoming, USA.
 We will try to find species associated with different elevations.
+
 First we try a Binomial model for 0/1 data. Note that we set the `try_error` option to `TRUE` so the function will not stop when it runs into an error.
 
 ```{r}
-op <- ocoptions(try_error=TRUE)
 library(optpart)
 
 data(shoshsite)
@@ -630,7 +641,6 @@ o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
 plot(o2, sort=1)
 ```
 
-
 Finally, here is how an ordered logistic model can be fit to a single species.
 Note that number of ordered categories and baseline levels might change from one species to the other, therefore this distribution is not available for multiple species.
 
@@ -644,69 +654,33 @@ o4$species
 
 ## Presence-only (use-availability) data
 
-Presence only data is a result from animal movement studies, or based on museum specimens. Here is an example of Mountain Goat telemetry data that were collected in the Coast Mountains of northwest British Columbia, Canada, as described in Lele and Keim (2006, Ecology 87, 3021-3028).
+Presence only data is a result from animal movement studies, or based on museum specimens. Here is an example of Mountain Goat telemetry data that were collected in the Coast Mountains of northwest British Columbia, Canada, as described in Lele and Keim (2006).
 
-Multiple species analysis is not possible doe to different number of used (presence) points for each species. It leads to a ragged-array format which is not straightforward to supply through the formula interface. The analysis of such presence-only data is also subject to conditions as explained by Solymos and Lele (2016, Methods in Ecology and Evolution, 7, 196-205).
+Multiple species analysis is not possible doe to different number of used (presence) points for each species. It leads to a ragged-array format which is not straightforward to supply through the formula interface. The analysis of such presence-only data is also subject to conditions as explained by Solymos & Lele (2016).
 
-```{r eval=FALSE}
+According to our expectations, Mountain Goats are associated with steeper slopes:
+
+```{r}
 library(ResourceSelection)
 data(goats)
-slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
+slp <- cut(goats$SLOPE,c(0, 20, 30, 40, 50, 90), include.lowest=TRUE)
 table(slp, goats$STATUS)
 o <- opticut(STATUS ~ ELEVATION, data=goats, strata=slp, dist="rsf")
-o <- opticut(goats$STATUS, strata=slp, dist="rsf")
 o$species
 plot(o, sort=FALSE, show_S=FALSE)
 ```
 
 ## Customizing the distribution
 
-We implement a zero-inflated Beta distribution:
+Me may want to expand the Zero-inflation component in a ZIP model.
+So instead of a constant zero probability, we may want to include covariate effects to account for some variation in the counts.
+See how the return value needs to be structured when supplying a function as distribution.
 
 ```{r}
-## ZI-Beta
-zi_beta_fun <- function(Y, X, linkinv, ...) {
-    kx <- ncol(X)
-    id1 <- Y > 0
-    id0 <- !id1
-    nll_ZIB_ML <- function(parms) {
-        mu <- plogis(X %*% parms[1:kx])
-        gamma <- exp(parms[kx + 1]) # precision
-        phi <- plogis(parms[kx+2])
-        alpha <- mu * gamma
-        beta <- (1 - mu) * gamma
-        loglik0 <- log(phi)
-        loglik1 <- log(1 - phi) + suppressWarnings(dbeta(Y,
-            alpha, beta, log = TRUE))
-        loglik <- sum(loglik0[id0]) + sum(loglik1[id1])
-        if (!is.finite(loglik) || is.na(loglik))
-            loglik <- -.Machine$double.xmax^(1/3)
-        -loglik
-    }
-    Yv <- Y
-    Yv[Y <= 0.001] <- 0.001
-    ini <- c(coef(betareg::betareg(Yv ~ .-1, data=X)), zi=-5)
-    X <- as.matrix(X)
-    res <- optim(ini, nll_ZIB_ML, ...)
-    list(coef=res$par,
-        logLik=-res$value,
-        linkinv=binomial("logit")$linkinv)
-}
-
-o3 <- opticut(sveg ~ 1, strata=elev, dist=zi_beta_fun)
-plot(o3, sort=1)
-```
-
-```{r}
-## dolina example
 data(dolina)
-## stratum as ordinal
 dolina$samp$stratum <- as.integer(dolina$samp$stratum)
-## filter species to speed up things a bit
 Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
 
-## we may want to expand the Zero-inflation component in a ZIP model
-## see how the return value needs to be structured
 fun <- function(Y, X, linkinv, zi_term, ...) {
     X <- as.matrix(X)
     mod <- pscl::zeroinfl(Y ~ X-1 | zi_term, dist = "poisson", ...)
@@ -715,9 +689,7 @@ fun <- function(Y, X, linkinv, zi_term, ...) {
         linkinv=mod$linkinv)
 }
 Xdol <- model.matrix(~ stratum + lmoist + method, data=dolina$samp)
-## this fits the null model (i.e. no partitions added)
 fun(Y[,"amin"], Xdol, zi_term=dolina$samp$method)
-## now we can use dist=fun
 opticut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
     dist=fun, zi_term=dolina$samp$method)
 dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
@@ -725,25 +697,13 @@ dol2 <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
 summary(dol2)
 ```
 
+
 ### Mixed-effects models (LMM, GLMM)
 
-Here is an example using mixed models and the package **lme4**:
+Here is an example using mixed models and the package **lme4** (Bates et al. 2015) with the dolina data. Pairs of samples were taken at each sampling location using 2 methods. The `mwthod` is now a fixed factor, while location is a random intercept (see Kemencei et al. 2014 for more explanation).
 
 ```{r}
 library(lme4)
-set.seed(1234)
-n <- 200
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-ee <- rnorm(n/5)
-g <- rep(1:5, each=n/5)
-lam1 <- exp(0.5 + 0.5*x1 + -0.2*x2 + ee[g])
-Y1 <- rpois(n, lam1)
-
-X <- model.matrix(~x2)
-Z <- allComb(x0)
-
 lmefun <- function(Y, X, linkinv, gr, ...) {
     X <- as.matrix(X)
     m <- glmer(Y ~ X-1 + (1|gr), family=poisson("log"), ...)
@@ -751,23 +711,34 @@ lmefun <- function(Y, X, linkinv, gr, ...) {
         logLik=logLik(m),
         linkinv=family(m)$linkinv)
 }
-lmefun(Y1, X, gr=g)
+lmefun(Y[,1], X=matrix(1, nrow(Y), 1), gr=dolina$samp$sample)
 
-opticut1(Y1, X, Z, dist=lmefun, gr=g)
+o <- opticut(Y[,"dper"] ~ method, data=dolina$samp, strata=dolina$samp$mhab, 
+    dist=lmefun, gr=dolina$samp$sample)
+print(o$species[[1]], cut=-Inf)
 ```
 
 ### Generalized additive models (GAM)
+
+We will use the `gam` function from the **mgcv** package (Wood 2006)
+and data of Ovenbird survey counts from Solymos et al. (2012).
+
+First off, we define the function:
 
 ```{r}
 library(mgcv)
 library(detect)
 data(oven)
-oven$veg <- factor(NA, c("agr","open","decid","conif", "mix"))
+#oven$veg <- factor(NA, c("agr","open","decid","conif", "mix"))
+#oven$veg[oven$pforest < 0.5] <- "open"
+#oven$veg[oven$pagri > 0.5 & oven$pforest < 0.5] <- "agr"
+#oven$veg[oven$pforest >= 0.5] <- "mix"
+#oven$veg[oven$pforest >= 0.5 & oven$pdecid >= 0.6] <- "decid"
+#oven$veg[oven$pforest >= 0.5 & oven$pdecid < 0.4] <- "conif"
+oven$veg <- factor(NA, c("open","decid","conif"))
 oven$veg[oven$pforest < 0.5] <- "open"
-oven$veg[oven$pagri > 0.5 & oven$pforest < 0.5] <- "agr"
-oven$veg[oven$pforest >= 0.5] <- "mix"
-oven$veg[oven$pforest >= 0.5 & oven$pdecid >= 0.8] <- "decid"
-oven$veg[oven$pforest >= 0.5 & oven$pdecid < 0.2] <- "conif"
+oven$veg[oven$pforest >= 0.5 & oven$pdecid >= 0.5] <- "decid"
+oven$veg[oven$pforest >= 0.5 & oven$pdecid < 0.5] <- "conif"
 table(oven$veg, useNA="always")
 oven$xlat <- scale(oven$lat)
 oven$xlong <- scale(oven$long)
@@ -778,16 +749,30 @@ gamfun <- function(Y, X, linkinv, Data, ...) {
         logLik=logLik(m),
         linkinv=family(m)$linkinv)
 }
+```
+
+Try it on a single partition: agriculture vs. not:
+
+```{r}
 x <- ifelse(oven$veg=="agr",1,0)
 X <- model.matrix(~x)
 gamfun(oven$count, X, Data=oven, family=poisson)
 print(opticut1(oven$count, X=X[,1,drop=FALSE], oven$veg, dist=gamfun,
     Data=oven, family=poisson), cut=-Inf)
+```
 
+Poisson count example with GAM:
+
+```{r}
 o <- opticut(count ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=poisson)
 summary(o)
 o <- opticut(count ~ 1, oven, strata=veg, dist="poisson")
 summary(o)
+```
+
+Binomial GAM:
+
+```{r}
 oven$pa <- ifelse(oven$count > 0, 1, 0)
 o <- opticut(pa ~ 1, oven, strata=veg, dist=gamfun, Data=oven, family=binomial)
 summary(o)
@@ -795,44 +780,38 @@ o <- opticut(pa ~ 1, oven, strata=veg, dist="binomial")
 summary(o)
 ```
 
-### N-mixture models
+
+### Incorporating detectability: N-mixture models
 
 A single-visit based N-mixture is an example where
-detection error is estimated. Let us compare results
-based on naive GLM and N-mixture:
+detection error is estimated (Solymos et al. 2012, Solymos & Lele 2016).
+We will use the Ovenbird data from the **detect** package (Solymos et al. 2016).
 
 ```{r}
-library(detect)
-set.seed(2345)
-n <- 500
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-x3 <- runif(n, 0, 1)
-lam <- exp(0.5 + 1*x1 + -0.2*x2)
-p <- plogis(2 + -2*x3)
-Y <- rpois(n, lam*p)
-
-X <- model.matrix(~x2)
-
-op <- par(mfrow=c(1,2))
-boxplot((lam*p) ~ x0, ylab="lam*p", xlab="x0")
-boxplot(lam ~ x0, ylab="lam", xlab="x0")
-par(op)
-
 svfun <- function(Y, X, linkinv, ...) {
     X <- as.matrix(X)
-    m <- svabu(Y ~ X-1 | x3, ...)
-    list(coef=coef(m, "sta"),
+    m <- detect::svabu(Y ~ X-1 | Xdet-1, ...)
+    list(coef=coef(m),
         logLik=logLik(m),
         linkinv=poisson()$linkinv)
 }
-svfun(Y, X)
+## detection model
+oven$xjulian <- scale(oven$julian)
+Xdet <- model.matrix(~ xjulian, oven)
+svfun(oven$count, X=model.matrix(~ xlat + xlong, oven))
+```
 
+Let us compare results
+based on naive GLM and N-mixture:
+
+```{r}
 ## naive GLM
-print(opticut1(Y, X, as.factor(x0), dist="poisson"), cut=-Inf)
+o1 <- opticut(count ~ xlat + xlong, oven, strata=veg, dist="poisson")
+print(o1$species[[1]], cut=-Inf)
 ## N-mixture
-print(opticut1(Y, X, as.factor(x0), dist=svfun), cut=-Inf)
+summary(svabu(count ~ xlat + veg | xjulian, data=oven))
+o2 <- opticut(count ~ xlat + xlong, oven, strata=veg, dist=svfun)
+print(o2$species[[1]], cut=-Inf)
 ```
 
 # Package options
@@ -985,14 +964,14 @@ Default options with **opticut** are:
 str(pboptions())
 ```
 
-See `?pboptions` for a description of these options. Use `pboptions(type = "none")` to turn off the probress bar in interactive R sessions. The progress bar is automatically turned off during non-interactive sessions.
+See `?pboptions` for a description of these options. Use `pboptions(type = "none")` to turn off the progress bar in interactive R sessions. The progress bar is automatically turned off during non-interactive sessions.
 
 ## Dynamic documents
 
 **opticut** object summaries come with an `as.data.frame` method that can be used
 to turn the summary into a data frame, which is what for example the
 `kable` function from **knitr** package expects. This way, formatting the
-output isw much facilitated, and the user does not have to dig into the
+output is much facilitated, and the user does not have to dig into the
 structure of the summary object.
 
 The GitHub repository has a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example do demonstrate how to format **opticut** objects for best effects: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
@@ -1033,63 +1012,66 @@ Please cite the **opticut** package in scholarly publications as:
 
 Peter Solymos and Ermias T. Azeria (2016). opticut: Likelihood
 Based Optimal Partitioning for Indicator Species Analysis. R
-package version <insert appropriate version number here>. https://github.com/psolymos/opticut
+package version \<insert appropriate version number here\>. https://github.com/psolymos/opticut
 
 Use `citation("opticut")` for an up-to-date citation.
 
 # References
 
-Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002. Determination of diagnostic species with statistical fidelity measures. Journal of Vegetation Science 13: 79--90.
+Bates, D., Maechler, M., Bolker, B. & Walker, S. (2015). Fitting Linear Mixed-Effects Models Using lme4. *Journal of Statistical Software* 67(1): 1--48. 
 
-Cribari-Neto, Francisco, Achim Zeileis (2010). Beta Regression in
-R. Journal of Statistical Software 34(2), 1-24. URL
-http://www.jstatsoft.org/v34/i02/.
+Birks, H. H. & Mathews, R. W. (1978). Studies in the vegetational history of Scotland V. Late Devensian and early Flandrian macrofossil stratigraphy at Abernethy Forest, Invernessshire. *New Phytologist* 80: 455--84.
 
-De Caceres M and Legendre P (2009) Associations between species and groups of sites: Indices and statistical inference. Ecology 90: 3566--3574.
+Chytry, M., Tichy, L., Holt, J. & Botta-Dukat, Z. (2002). Determination of diagnostic species with statistical fidelity measures. *Journal of Vegetation Science* 13: 79--90.
 
-Dufrene M and Legendre P (1997) Species assemblages and indicator species: The need for a flexible asymmetrical approach. Ecological Monographs 67: 345--366.
+Cribari-Neto, F. & Zeileis, A. (2010). Beta Regression in R. *Journal of Statistical Software* 34(2): 1--24. http://www.jstatsoft.org/v34/i02/.
 
-Halme, P., Monkkonen, M., Kotiaho, J. S, Ylisirniö, A-L. 2009. Quantifying the indicator power of an indicator species. Conservation Biology 23: 1008–1016.
+De Caceres, M. & Legendre, P. (2009). Associations between species and groups of sites: Indices and statistical inference. *Ecology* 90: 3566--3574.
 
-Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014): Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. Community Ecology 15:180--186.
+Dufrene, M. & Legendre, P. (1997) Species assemblages and indicator species: The need for a flexible asymmetrical approach. *Ecological Monographs* 67: 345--366.
 
-Lele, Subhash R., Jonah L. Keim and Peter Solymos (2016).
+Halme, P., Monkkonen, M., Kotiaho, J. S, Ylisirnio, A-L. (2009). Quantifying the indicator power of an indicator species. *Conservation Biology* 23: 1008--1016.
+
+Juggins, S. (2015). rioja: Analysis of Quaternary Science Data, R package version 0.9-9. http://cran.r-project.org/package=rioja
+
+Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014). Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. *Community Ecology* 15: 180--186.
+
+Lele, S. R., Keim, J. L. & Solymos, P. (2016).
 ResourceSelection: Resource Selection (Probability) Functions
 for Use-Availability Data. R package version 0.3-0.
 https://CRAN.R-project.org/package=ResourceSelection
 
-McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. Trends in Ecology and Evolution 13: 46--47.
+McGeoch, M. A. & Chown, S. L. (1998). Scaling up the value of bioindicators. *Trends in Ecology and Evolution* 13: 46--47.
 
-Oksanen, Jari, F. Guillaume Blanchet, Michael Friendly, Roeland
-Kindt, Pierre Legendre, Dan McGlinn, Peter R. Minchin, R. B.
-O'Hara, Gavin L. Simpson, Peter Solymos, M. Henry H. Stevens,
-Eduard Szoecs and Helene Wagner (2016). vegan: Community Ecology
-Package. R package version 2.4-1.
-https://CRAN.R-project.org/package=vegan
+Oksanen, J., Blanchet, F. G., Friendly, M., Kindt, R., Legendre, P., McGlinn, D., Minchin, P. R., O'Hara, R. B., Simpson, G. L., Solymos, P., Stevens, M. H. H., Szoecs, E. & Wagner, H. (2016). vegan: Community Ecology Package. R package version 2.5-0. https://CRAN.R-project.org/package=vegan
 
-R Core Team (2016). R: A language and environment for
-statistical computing. R Foundation for Statistical Computing,
-Vienna, Austria. URL https://www.R-project.org/.
+R Core Team (2016). *R: A language and environment for statistical computing*. R Foundation for Statistical Computing,
+Vienna, Austria. https://www.R-project.org/.
 
-Roberts, David W. (2016a). labdsv: Ordination and Multivariate
+Roberts, D. W. (2016a). labdsv: Ordination and Multivariate
 Analysis for Ecology. R package version 1.8-0.
 https://CRAN.R-project.org/package=labdsv
 
-Roberts, David W. (2016b). optpart: Optimal Partitioning of
+Roberts, D. W. (2016b). optpart: Optimal Partitioning of
 Similarity Relations. R package version 2.3-0.
 https://CRAN.R-project.org/package=optpart
 
-Solymos, Peter and Zygmunt Zawadzki (2016). pbapply: Adding
+Solymos, P., Moreno, M. & Lele, S. R. (2016). detect: Analyzing Wildlife Data with Detection Error. R package version 0.4-0. https://github.com/psolymos/detect
+
+Solymos, P., Lele, S. R. & Bayne, E. (2012). Conditional likelihood approach for analyzing single visit abundance survey data in the presence of zero inflation and detection error. *Environmetrics* 23: 197--205.
+
+Solymos, P. & Lele, S. R. (2016). Revisiting resource selection probability functions and single-visit methods: clarification and extensions. *Methods in Ecology and Evolution* 7: 196--205. 
+
+Solymos, P. & Zawadzki, Z. (2016). pbapply: Adding
 Progress Bar to '*apply' Functions. R package version 1.3-2.
 https://github.com/psolymos/pbapply
 
-Venables, W. N. & Ripley, B. D. (2002) Modern Applied Statistics
-with S. Fourth Edition. Springer, New York. ISBN 0-387-95457-0
+Venables, W. N. & Ripley, B. D. (2002). *Modern Applied Statistics with S*. Fourth Edition. Springer, New York. ISBN 0-387-95457-0
 
-Wildi, O. and E. Feldmeyer-Christe 2013. Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data. COMMUNITY ECOLOGY 14(2): 139--143.
+Wildi, O. & Feldmeyer-Christe, E. (2013). Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data. *Community Ecology* 14(2): 139--143.
 
-Zeileis, Achim, Christian Kleiber, Simon Jackman (2008).
-Regression Models for Count Data in R. Journal of Statistical
-Software 27(8). URL http://www.jstatsoft.org/v27/i08/
+Wood, S. N. (2006). *Generalized Additive Models: An Introduction with R*. Chapman and Hall/CRC.
 
-Zettler ML, Proffitt CE, Darr A, et al. On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. Thompson F, ed. PLoS ONE. 2013;8(10):e78219. doi:10.1371/journal.pone.0078219.
+Zeileis, A., Kleiber, C. & Jackman, S. (2008). Regression Models for Count Data in R. *Journal of Statistical Software*, 27(8), 1-25. http://www.jstatsoft.org/v27/i08/
+
+Zettler, M. L., Proffitt, C. E., Darr, A., Degraer, S., Devriese, L., Greathead, C., Kotta, J., Magni, P., Martin, G., Reiss, H., Speybroeck, J., Tagliapietra, D., Van Hoey, G. & Ysebaert, T. (2013). On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. *PLoS ONE*, 8(10):e78219.
