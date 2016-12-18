@@ -1,5 +1,5 @@
 ---
-title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
+title: 'opticut: likelihood-based optimal partitioning for indicator species analysis (supporting information)'
 author: "Peter Solymos and Ermias T. Azeria"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -401,6 +401,12 @@ The reliability of the best partition can also be assessed using the setting `ty
 summary(ucm <- uncertainty(oc, type = "multi", B = B))
 ```
 
+The `bestpart` method returns the selection frequencies for the best-supported models (based on `type = "multi"` with `comb = "rank"`):
+
+```{r}
+bestpart(ucm)
+```
+
 The bootstrap averaged ('bagged') expected values for each $k=1,\ldots,K$ stratum in $g$ can be accessed using the `bsmooth` method that calculates $E[Y_i \mid g_i = k] = \frac{1}{B} \sum_{b=1}^{B} f^{-1}({}^{(b)}\hat{\beta}_0^{(m')} + {}^{(b)}\hat{\beta}_1^{(m')} {}^{(b)}z_i^{(m')})$:
 
 ```{r}
@@ -419,7 +425,7 @@ dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
 ```
 
-## Gaussian
+## Real valued data: Gaussian
 
 ```{r}
 dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
@@ -430,7 +436,7 @@ summary(dol)
 plot(dol, horizontal=FALSE, pos=1, upper=0.8)
 ```
 
-## Poisson and Negative Binomial
+## Nonnegative counts: Poisson and Negative Binomial
 
 ```{r}
 dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
@@ -500,7 +506,7 @@ ocoptions(op)
 It failed for the `"mbor"` (*Macrogastra borealis*) species, which is now excluded from the output.
 
 
-## Zero-inflated distributions
+## Zero-inflated count distributions
 
 The Zero-inflated Negative Binomial implementation in the **pscl** package
 seems more robust, no error messages. We use the `dist = "zinb2"` option
@@ -520,9 +526,39 @@ plot(dol)
 ```
 
 
-## Binomial, Beta distribution and ordinal data
+## Presence-absence data: Binomial
 
-Stratigraphy example using Beta distribution:
+The following example uses the dolina data set and illustrates how the link function can be specified in the Binomial case:
+
+```{r warning=FALSE}
+## dolina example
+data(dolina)
+## stratum as ordinal
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+## filter species to speed up things a bit
+Y <- ifelse(dolina$xtab[,colSums(dolina$xtab > 0) >= 20] > 0, 1, 0)
+## opticut results, note the cloglog link function
+dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="binomial:cloglog")
+
+## parallel computing for uncertainty
+ucdol <- uncertainty(dol, type="multi", B=25)
+
+bestpart(ucdol)
+heatmap(t(bestpart(ucdol)), scale="none", col=occolors()(25),
+    distfun=function(x) dist(x, "manhattan"))
+
+## See how indicator value changes with different partitions
+with(ucdol$uncertainty[["pvic"]],
+    boxplot(I ~ best, col="gold", ylab="Indicator value"))
+```
+
+## Percent cover data: Binomial, Beta distribution, and ordinal
+
+Stratigraphy example using Beta distribution: the only limitation of the Beta distribution in this context is that boundary values (0 and 1) are not part of the support, so a tiny value (here 0.0001) is used instead. It is explained later how to define a zero-inflated Beta distribution.
+
+The data we are using is from the **rioja** package:
+pollen stratigraphic data from Abernethy Forest, Scotland, spanning approximately 5500--12100 BP (from Birks & Mathews 1978, New Phytologist 80, 455--84).
 
 ```{r}
 library(rioja)
@@ -551,8 +587,12 @@ for (i in 1:12) {
 par(opar)
 ```
 
+The following data set is from the **optpart** package:
+vascular plant species cover for the Shoshone National Forest, Wyoming, USA.
+We will try to find species associated with different elevations.
+First we try a Binomial model for 0/1 data. Note that we set the `try_error` option to `TRUE` so the function will not stop when it runs into an error.
 
-```{r eval=FALSE}
+```{r}
 op <- ocoptions(try_error=TRUE)
 library(optpart)
 
@@ -566,8 +606,11 @@ sveg <- as.matrix(shoshveg)
 sveg[sveg > 0] <- 1
 o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
 plot(o, sort=1)
+```
 
+Next, we use the same data set as percent cover data and specify a Beta distribution:
 
+```{r}
 sveg <- as.matrix(shoshveg)
 sveg <- sveg[,colSums(sveg>0) >= 50]
 table(sveg)
@@ -585,7 +628,42 @@ sveg[sveg==8] <- 0.8
 table(sveg)
 o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
 plot(o2, sort=1)
+```
 
+
+Finally, here is how an ordered logistic model can be fit to a single species.
+Note that number of ordered categories and baseline levels might change from one species to the other, therefore this distribution is not available for multiple species.
+
+```{r}
+Y <- shoshveg$ASTMIS
+table(Y)
+o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
+o4$species
+```
+
+
+## Presence-only (use-availability) data
+
+Presence only data is a result from animal movement studies, or based on museum specimens. Here is an example of Mountain Goat telemetry data that were collected in the Coast Mountains of northwest British Columbia, Canada, as described in Lele and Keim (2006, Ecology 87, 3021-3028).
+
+Multiple species analysis is not possible doe to different number of used (presence) points for each species. It leads to a ragged-array format which is not straightforward to supply through the formula interface. The analysis of such presence-only data is also subject to conditions as explained by Solymos and Lele (2016, Methods in Ecology and Evolution, 7, 196-205).
+
+```{r eval=FALSE}
+library(ResourceSelection)
+data(goats)
+slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
+table(slp, goats$STATUS)
+o <- opticut(STATUS ~ ELEVATION, data=goats, strata=slp, dist="rsf")
+o <- opticut(goats$STATUS, strata=slp, dist="rsf")
+o$species
+plot(o, sort=FALSE, show_S=FALSE)
+```
+
+## Customizing the distribution
+
+We implement a zero-inflated Beta distribution:
+
+```{r}
 ## ZI-Beta
 zi_beta_fun <- function(Y, X, linkinv, ...) {
     kx <- ncol(X)
@@ -614,90 +692,10 @@ zi_beta_fun <- function(Y, X, linkinv, ...) {
         logLik=-res$value,
         linkinv=binomial("logit")$linkinv)
 }
-sveg <- as.matrix(shoshveg)
-sveg <- sveg[,colSums(sveg>0) >= 50]
-table(sveg)
-#sveg[sveg==0] <- 0.001
-sveg[sveg==0.1] <- 0.01
-sveg[sveg==0.5] <- 0.05
-sveg[sveg==1] <- 0.15
-sveg[sveg==2] <- 0.25
-sveg[sveg==3] <- 0.35
-sveg[sveg==4] <- 0.45
-sveg[sveg==5] <- 0.55
-sveg[sveg==6] <- 0.65
-sveg[sveg==7] <- 0.75
-sveg[sveg==8] <- 0.8
-table(sveg)
 
-o2 <- opticut(sveg ~ 1, strata=elev, dist=zi_beta_fun)
-plot(o2, sort=1)
-
-y <- as.matrix(varespec / 100)
-range(y[y>0])
-y <- y[,apply(y, 2, max) > 0.05]
-zi_beta_fun(y[,3], data.frame(matrix(1, nrow(y), 1)))
-opticut1(y[,1], matrix(1, nrow(y), 1), varechem$grazing, dist=zi_beta_fun)
-
-sveg2 <- as.matrix(shoshveg)
-sveg2[sveg2 > 0] <- 1
-sveg2 <- sveg2[,colnames(sveg)]
-o3 <- opticut(sveg2 ~ 1, strata=elev, dist="binomial")
+o3 <- opticut(sveg ~ 1, strata=elev, dist=zi_beta_fun)
 plot(o3, sort=1)
-
-sveg2 <- as.matrix(shoshveg)
-sveg2[sveg2 > 0] <- 1
-sveg2 <- sveg2[,colnames(sveg)]
-
-Y <- shoshveg$ASTMIS
-table(Y)
-o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
-o4$species
-
-## check for modifier variable
-ocoptions(op)
 ```
-
-Link functions and uncertainty:
-
-```{r warning=FALSE}
-## dolina example
-data(dolina)
-## stratum as ordinal
-dolina$samp$stratum <- as.integer(dolina$samp$stratum)
-## filter species to speed up things a bit
-Y <- ifelse(dolina$xtab[,colSums(dolina$xtab > 0) >= 20] > 0, 1, 0)
-## opticut results, note the cloglog link function
-dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="binomial:cloglog")
-
-## parallel computing for uncertainty
-ucdol <- uncertainty(dol, type="multi", B=25)
-
-bestpart(ucdol)
-heatmap(t(bestpart(ucdol)), scale="none", col=occolors()(25),
-    distfun=function(x) dist(x, "manhattan"))
-
-## See how indicator value changes with different partitions
-with(ucdol$uncertainty[["pvic"]],
-    boxplot(I ~ best, col="gold", ylab="Indicator value"))
-```
-
-
-## Presence-only (use-availability) data
-
-```{r eval=FALSE}
-library(ResourceSelection)
-data(goats)
-slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
-table(slp, goats$STATUS)
-o <- opticut(STATUS ~ ELEVATION, data=goats, strata=slp, dist="rsf")
-o <- opticut(goats$STATUS, strata=slp, dist="rsf")
-o$species
-plot(o, sort=FALSE)
-```
-
-## Customizing the distribution
 
 ```{r}
 ## dolina example
