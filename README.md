@@ -15,11 +15,16 @@ variables as described in Kemencei et al. (2014).
 
 ## Versions
 
+Install stable version from CRAN:
+
+```R
+install.packages("opticut")
+```
+
 Install development version from GitHub:
 
 ```R
-library(devtools)
-install_github("psolymos/opticut")
+devtools::install_github("psolymos/opticut")
 ```
 
 User visible changes in the package are listed in the [NEWS](https://github.com/psolymos/opticut/blob/master/NEWS.md) file.
