@@ -362,7 +362,7 @@ bestpart(oc)
 
 ## Quantifying uncertainty
 
-Uncertainty in the estimated coefficients and uncertainty in the derived indicator value for the best-supported model ($I^{(m')}$) is quantified based on the estimate of the Hessian matrix assuming asymptotic normality of the MLE. The distribution of $I^{(m')}$ in this case is based on parametric bootstrap. This approach (`type = "asymp"` in `uncertainty`) is suitable when asymptotic normality assumption is reasonable, i.e. sample size is large. For small sample situations, a parametric bootstrap algorithm is implemented (`type = "boot"`) to estimate uncertainty in $I^{(m')}$. The summary contains lower and upper confidence limits (for a given error rate) representing the asymptotic or bootstrap distribution (based on $B$ number of iterations) given the fixed partition for the best model, $z^{(m')}$.
+Uncertainty in the estimated coefficients and uncertainty in the derived indicator value for the best-supported model ($I^{(m')}$) is quantified based on the estimate of the Hessian matrix assuming asymptotic normality of the MLE. The distribution of $I^{(m')}$ in this case is based on parametric bootstrap. This approach (`type = "asymp"` in `uncertainty`) is suitable when asymptotic normality assumption is reasonable, i.e. sample size is large. For small sample situations, a non-parametric bootstrap algorithm is implemented (`type = "boot"`) to estimate uncertainty in $I^{(m')}$. The summary contains lower and upper confidence limits (for a given error rate) representing the asymptotic or bootstrap distribution (based on $B$ number of iterations) given the fixed partition for the best model, $z^{(m')}$.
 
 The output is summarized, the `$uncertainty` component contains individual species results:
 
@@ -511,7 +511,7 @@ It failed for the `"mbor"` (*Macrogastra borealis*) species, which is now exclud
 The Zero-inflated Negative Binomial implementation in the **pscl** package
 seems more robust, no error messages. We use the `dist = "zinb2"` option
 so that we test for optimal partitioning in the zero-inflation (ZI) component.
-Using a mixture distribution can be important if 0s can occur no only
+Using a mixture distribution can be important if 0s can occur not only
 as a result of the ZI component, but due to low abundance in the count distribution (Poisson or Negative Binomial). Differentiating among these different types of zeros is not possible by binarizing the data and using logistic regression.
 
 In the case of `"zip2"` and `"zinb2"` distributions, the coefficients
@@ -656,7 +656,7 @@ o4$species
 
 Presence only data is a result from animal movement studies, or based on museum specimens. Here is an example of Mountain Goat telemetry data that were collected in the Coast Mountains of northwest British Columbia, Canada, as described in Lele and Keim (2006).
 
-Multiple species analysis is not possible doe to different number of used (presence) points for each species. It leads to a ragged-array format which is not straightforward to supply through the formula interface. The analysis of such presence-only data is also subject to conditions as explained by Solymos & Lele (2016).
+Multiple species analysis is not possible due to different number of used (presence) points for each species. It leads to a ragged-array format which is not straightforward to supply through the formula interface. The analysis of such presence-only data is also subject to conditions as explained by Solymos & Lele (2016).
 
 According to our expectations, Mountain Goats are associated with steeper slopes:
 
