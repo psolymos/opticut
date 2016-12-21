@@ -29,17 +29,21 @@ character, the method used for grayscale conversion.
 \details{
 Grayscale conversion methods in \code{col2gray} calculate gray levels based on
 red (R), green (G), and blue (B) color channels as follows:
-\code{"BT.709"}: 0.2126 * R + 0.7152 * G + 0.0722 * B,
-luminosity correction following the  ITU-R BT.709 recommendation;
-\code{"BT.601"}: 0.299 * R + 0.587 * G + 0.114 * B,
-luminosity correction following the  ITU-R BT.601 recommendation;
-\code{"desaturate"}: (max(R, G, B) + min(R, G, B)) / 2, also called lightness;
-\code{"average"}: (R + G + B) / 3;
-\code{"maximum"}: max(R, G, B);
-\code{"minimum"}: min(R, G, B);
-\code{"red"}: R;
-\code{"green"}: G;
-\code{"blue"}: B.
+
+\describe{
+\item{\code{"BT.709"}}{0.2126 * R + 0.7152 * G + 0.0722 * B,
+    luminosity correction following the  ITU-R BT.709 recommendation;}
+\item{\code{"BT.601"}}{0.299 * R + 0.587 * G + 0.114 * B,
+    luminosity correction following the  ITU-R BT.601 recommendation;}
+\item{\code{"desaturate"}}{(max(R, G, B) + min(R, G, B)) / 2,
+    also called lightness;}
+\item{\code{"average"}}{(R + G + B) / 3;}
+\item{\code{"maximum"}}{max(R, G, B);}
+\item{\code{"minimum"}}{min(R, G, B);}
+\item{\code{"red"}}{R;}
+\item{\code{"green"}}{G;}
+\item{\code{"blue"}}{B.}
+}
 }
 \value{
 \code{occolors} returns a function, see \code{\link{colorRampPalette}}.

@@ -5,10 +5,10 @@
 \alias{quantile.lorenz}
 \alias{plot.lorenz}
 \title{
-Lorenz curve bases thresholds and partitions
+Lorenz curve based thresholds and partitions
 }
 \description{
-Lorenz curve bases thresholds and partitions.
+Lorenz curve based thresholds and partitions.
 }
 \usage{
 lorenz(x, na.last = TRUE)
