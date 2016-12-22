@@ -144,7 +144,7 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
         out
     }
     PI <- apply(mm, 2, f, K=K) / nrow(mm)
-    rownames(PI) <- colnames(bp)
+    #rownames(PI) <- colnames(bp)
     colnames(PI) <- rownames(ynew)
     gnew <- apply(PI, 2, which.max)
     list(ynew=ynew,

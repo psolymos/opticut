@@ -1,5 +1,5 @@
 ---
-title: 'opticut: likelihood based optimal partitioning for indicator species analysis'
+title: 'Calibration with opticut'
 author: "Peter Solymos and Ermias T. Azeria"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -7,7 +7,7 @@ output:
     keep_tex: no
     toc: true
     toc_depth: 3
-    number_sections: false
+    number_sections: true
   word_document:
     toc: true
     toc_depth: 3
@@ -16,410 +16,15 @@ fontsize: 12pt
 classoption: letterpaper
 ---
 
-# Introduction
+# Calibration with single species
 
-Identifying and monitoring indicator species has long been considered a cost-effective way of tracking environmental change or the status of the biota. Examples include the characterization of vegetation types (Chytry et al. 2002), degradation of ecosystems (McGeoch & Chown 1988), or signalling cryptic or rare species (Halme et al. 2009). Throughout these examples, a key attribute of indicator species (also referred to as character or differential species) is that they have strong associations with the environmental variables that they are supposed to indicate.
-
-Approaches to quantify the degree of environmental associations for species (indicator value) traditionally falls into three major types of approaches: (1) contingency table based measures (De Caceres & Legendre 2009); (2) analysis of variance (ANOVA; Wildi & Feldmeyer-Christe 2013); and (3) the widely used non-parametric IndVal method (Dufrene & Legendre 1997). While the different approaches have strong appeal and applications, they do not always meet the challenges presented by ecological data. 
-
-Ecological data come in different forms: binary, ordinal, count, abundance, or presence only data. Some of these data types are suitable for a particular approach, while some formats need ‘tweaking’. For example, binarizing abundance or count data for contingency tables leads to information loss. ANOVA, on the other hand, implies normality and homoscedastic errors, which might not always be satisfied by 0/1, ordinal, skewed, or % cover data. Finally, randomization test for the IndVal approach requires count data, which renders hypothesis testing difficult if not impossible for continuous or ordinal data.
-
-Another staple of observation field studies is the presence of modifying or confounding variables, or the presence of systematic biases (variable sampling effort, imperfect detectability, sample selection bias). Ignoring these effects can lead to erroneous indicator species analysis (Zettler et al. 2013). Controlling for these effects can improve the assessment of species-environment relationships, thus lead to better evaluation of indicator species. 
-
-To address these limitations, Kemencei et al. (2014) proposed a model-based indicator species analysis that accounted for the effects of modifying variables, and non-independence in the data due to paired sampling design. This model-based approach has been generalized and made available in the opticut R extension package. The opticut package offers computationally efficient and extensible algorithms for finding indicator species, tools for exploring and visualizing the results, and quantifying uncertainties. This manual showcases the functionality of the package.
-
-## Install
-
-Install development version from GitHub (CRAN version not yet available at the time of writing):
-
-```{r eval=FALSE}
-library(devtools)
-install_github("psolymos/opticut")
-```
-
-User visible changes in the package are listed in the [NEWS](https://github.com/psolymos/opticut/blob/master/NEWS.md) file.
-
-## Report a problem
-
-Use the [issue tracker](https://github.com/psolymos/opticut/issues)
-to report a problem.
-
-## License
-
-[GPL-2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-
-## Loading the package
-
-To get started, open R and load tha **opticut** package as:
+This is not necessarily great.
 
 ```{r}
-library(opticut)
-```
-
-# Partitioning for single species
-
-## All combinations
-
-* explain all comb, wplot, plot
-* explain object structure
-* use Gaussian toy data
-* fixlevels, summary, plot, beta2i
-
-## User defined combinations
-
-* show user defined strata matrix
-
-## Rank based combinations
-
-* plot, summary
-
-# Partitioning for multiple species
-
-* interface, object structure
-* bestpart, bestmodel, summary, print
-* wplot, plot, all/rank comb (custom strata)
-
-# Quantifying uncertainty
-
-* anymp/boot/multi
-* explain object structure (toy data)
-* bestpart, summary
-* jackknife, check_strata, heatmap etc.
-* custom dist: cannot return bestmodel, use bestpart to refit
-* custom dist: can do boot & multi, but not asymp, show how to get I
-
-# Distributions
-
-* dolina data set: use wherever possible
-* modification
-* offsets
-
-## Gaussian
-
-## Poisson and Negative Binomial
-
-Dolina, cover offsets here
-
-## Zero-inflated distributions
-
-Dolina
-
-## Binomial
-
-## Beta
-
-Use shoshveg
-
-Custom distr: ZI-Beta
-
-## Ordinal data
-
-Use shoshveg
-
-## Presence-only (use-availability) data
-
-```{r eval=FALSE}
-library(opticut)
-library(ResourceSelection)
-slp <- cut(goats$SLOPE,c(-1, 20, 30, 40, 50, 90))
-table(slp, goats$STATUS)
-o <- opticut(STATUS ~ ELEVATION, data=goats, strata=slp, dist="rsf")
-o <- opticut(goats$STATUS, strata=slp, dist="rsf")
-o$species
-plot(o, sort=FALSE)
-## Null model implies intercept only, which is dropped -- thus cannot be estimated. Use glm?
-## RSPF condition implies at least one covariate, it is thus not an issue
-
-
-goats$exp.HLI <- exp(goats$HLI)
-goats$sin.SLOPE <- sin(pi * goats$SLOPE / 180)
-goats$ELEVATION <- scale(goats$ELEVATION)
-goats$ET <- scale(goats$ET)
-goats$TASP <- scale(goats$TASP)
-m1 <- rsf(STATUS ~ TASP + sin.SLOPE + ELEVATION, goats, m=0, B = 0)
-m2 <- glm(STATUS ~ TASP + sin.SLOPE + ELEVATION, goats, family=binomial("logit"))
-c1 <- c(0, coef(m1))
-c2 <- coef(m2)
-cbind(weighted=c1, glm=c2)
-
-## settings
-n.used <- 1000
-m <- 10
-n <- n.used * m
-set.seed(1234)
-x <- data.frame(x1=rnorm(n), x2=runif(n))
-cfs <- c(1.5,-1,0.5)
-## fitting Exponential RSF model
-dat1 <- simulateUsedAvail(x, cfs, n.used, m, link="log")
-m1 <- rsf(status ~ .-status, dat1, m=0, B=0)
-m2 <- glm(status ~ .-status, dat1, family=binomial("logit"))
-## https://web.stanford.edu/~hastie/Papers/IPP.pdf
-m3 <- glm(status ~ .-status, dat1, family=binomial("logit"), weights=1E3^(1-dat1$status))
-c1 <- c(0, coef(m1))
-c2 <- coef(m2)
-c3 <- coef(m3)
-cbind(weighted=c1, glm=c2, inf=c3)
-```
-
-## Mixed-effects models (LMM, GLMM)
-
-## Generalized additive models (GAM)
-
-## N-mixture models
-
-# Package options
-
-## High performance computing
-
-```{r warning=FALSE}
-data(dolina)
-dolina$samp$stratum <- as.integer(dolina$samp$stratum)
-Y <- ifelse(dolina$xtab > 0, 1, 0)
-dol <- opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="binomial")
-
-## parallel computing comparisons
-library(parallel)
-cl <- makeCluster(2)
-
-## sequential, all combinations (2^(K-1) - 1)
-system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="binomial", comb="all", cl=NULL))
-
-## sequential, rank based combinations (K - 1)
-system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="binomial", comb="rank", cl=NULL))
-
-## parallel, all combinations (2^(K-1) - 1)
-system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="binomial", comb="all", cl=cl))
-
-## parallel, rank based combinations (K - 1)
-system.time(opticut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="binomial", comb="rank", cl=cl))
-stopCluster(cl)
-```
-
-## Global options
-
-The `ocoptions` function provides a convenient way of handling options 
-related to the **opticut** package.
-The function takes arguments in `<tag> = <value>` form, or a list of tagged values.
-The tags must come from the parameters described below.
-When parameters are set by `ocoptions`, their former values are
-returned in an invisible named list. Such a list can be passed as an
-argument to `ocoptions` to restore the parameter values.
-Tags are the following:
-
-* `collapse`: character value to be used when merging factor levels,
-  the default is `" "`.
-* `cut`: log likelihood ratio value, model/species with lower
-  values are excluded from summaries and plots,
-  the default is `2`.
-* `sort`: logical value indicating if species/partitions
-  should be meaningfully sorted, the default is `TRUE`.
-  It can take numeric value when only species (`1`)
-  or partitions (`2`) are to be sorted (`1:2` is equivalent to
-  `TRUE`, wile any other numeric value is equivalent to `FALSE`).
-* `theme`: the color theme to be used based on `occolors`,
-  the default is `"br"`.
-* `check_comb`: check the design matrices for complementary partitions
-  using `checkComb`,
-  the default is `TRUE`.
-* `try_error`: if `opticut` should `try` to exclude
-  species where the models failed (`TRUE`), the default
-  is to stop when an error is encountered (`FALSE`).
-* `scale`: the scaling factor used to calculate indicator value (`I`)
-  based on the estimated coefficient (b): `I = abs(tanh(b*scale))`,
-  the default is `0.5`.
-
-```{r}
-## simple example from Legendre 2013
-## Indicator Species: Computation, in
-## Encyclopedia of Biodiversity, Volume 4
-## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
-gr <- as.factor(paste0("X", rep(1:5, each=5)))
-spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
-    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
-    Species3=rep(c(18,2,0,0,0), each=5))
-rownames(spp) <- gr
-
-## current settings
-str(ocoptions()) # these give identical answers
-str(getOption("ocoptions"))
-summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
-
-## resetting pboptions and checking new settings
-ocop <- ocoptions(collapse="+", sort=FALSE)
-str(ocoptions())
-## running again with new settings
-summary(ocall <- opticut(spp ~ 1, strata=gr, dist="gaussian", comb="all"))
-
-## resetting original
-ocoptions(ocop)
-str(ocoptions())
-```
-
-## Color themes
-
-The **opticut** package uses color themes for plotting and 
-provides a convenient way of setting color palettes via the `occolors` function.
-The function takes a single `theme` argument and returns a function as
-in `colorRampPalette`.
-
-The `theme` argument can be a character value, character vector, or a function used to interpolate the colors. The built-in values are `"br"` (blue-red divergent palette, colorblind safe),
-`"gr"` (green-red divergent palette), `"bw"` (black and white).
-Hexadecimal values for the built-in palettes are taken from [http://colorbrewer2.org](http://colorbrewer2.org/).
-
-```{r}
-plot(1:100, rep(2, 100), pch = 15,
-    ylim = c(0, 21), axes = FALSE, ann = FALSE,
-    col = occolors()(100)) # default 'bg'
-text(50, 1, "theme = 'br'")
-points(1:100, rep(5, 100), pch = 15,
-    col=occolors("gr")(100))
-text(50, 4, "theme = 'gr'")
-points(1:100, rep(8, 100), pch = 15,
-    col=occolors("bw")(100))
-text(50, 7, "theme = 'bw'")
-points(1:100, rep(11, 100), pch = 15,
-    col=occolors(terrain.colors)(100))
-text(50, 10, "theme = terrain.colors")
-points(1:100, rep(14, 100), pch = 15,
-    col=occolors(c("purple", "pink", "orange"))(100))
-text(50, 13, "theme = c('purple', 'pink', 'orange')")
-points(1:100, rep(17, 100), pch = 15,
-    col=occolors(c("#a6611a", "#ffffbf", "#018571"))(100))
-text(50, 16, "theme = c('#a6611a', '#ffffbf', '#018571')")
-points(1:100, rep(20, 100), pch = 15,
-    col=occolors(c("#7b3294", "#ffffbf", "#008837"))(100))
-text(50, 19, "theme = c('#7b3294', '#ffffbf', '#008837')")
-```
-
-## Progress bar
-
-The expected completion time of extensive calculations and the
-progress is shown by the progress bar via the **pbapply** package.
-Default options with **opticut** are:
-
-```{r}
-str(pboptions())
-```
-
-See `?pboptions` for a description of these options. Use `pboptions(type = "none")` to turn off the probress bar in interactive R sessions. The progress bar is automatically turned off during non-interactive sessions.
-
-## Dynamic documents
-
-**opticut** object summaries come with an `as.data.frame` method that can be used
-to turn the summary into a data frame, which is what for example the
-`kable` function from **knitr** package expects. This way, formatting the
-output isw much facilitated, and the user does not have to dig into the
-structure of the summary object.
-
-The GitHub repository has a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example do demonstrate how to format **opticut** objects for best effects: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
-
-```{r}
-library(knitr)
-
-y <- cbind(
-    Sp1=c(4,6,3,5, 5,6,3,4, 4,1,3,2),
-    Sp2=c(0,0,0,0, 1,0,0,1, 4,2,3,4),
-    Sp3=c(0,0,3,0, 2,3,0,5, 5,6,3,4))
-g <-    c(1,1,1,1, 2,2,2,2, 3,3,3,3)
-oc <- opticut(formula = y ~ 1, strata = g, dist = "poisson")
-uc <- uncertainty(oc, type = "asymp", B = 999)
-
-print(kable(as.data.frame(oc), digits=3))
-print(kable(oc$species[[1]][,c(1,2,4,5,8,9,10)], digits=3))
-print(kable(as.data.frame(uc), digits=3))
-```
-
-The `kable` output is rendered as nice tables (without the `print` part):
-
-```{r}
-kable(as.data.frame(oc), digits=3)
-kable(oc$species[[1]][,c(1,2,4,5,8,9,10)], digits=3)
-kable(as.data.frame(uc), digits=3)
-```
-
-# References
-
-McGeoch MA and Chown SL (1998) Scaling up the value of bioindicators. Trends in Ecology and Evolution 13: 46--47.
-
-Dufrene M and Legendre P (1997) Species assemblages and indicator species: The need for a flexible asymmetrical approach. Ecological Monographs 67: 345--366.
-
-De Caceres M and Legendre P (2009) Associations between species and groups of sites: Indices and statistical inference. Ecology 90: 3566--3574.
-
-O. Wildi and E. Feldmeyer-Christe 2013. Indicator values (IndVal) mimic ranking by F-ratio in real-world vegetation data. COMMUNITY ECOLOGY 14(2): 139--143.
-
-Chytry, Milan; Tichy, Lubomir; Holt, Jason & Botta-Dukat, Zoltan 2002. Determination of diagnostic species with statistical fidelity measures. Journal of Vegetation Science 13: 79--90.
-
-Halme, P., Mönkkönen, M., Kotiaho, J. S, Ylisirniö, A-L. 2009. Quantifying the indicator power of an indicator species. Conservation Biology 23: 1008–1016.
-
-Zettler ML, Proffitt CE, Darr A, et al. On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. Thompson F, ed. PLoS ONE. 2013;8(10):e78219. doi:10.1371/journal.pone.0078219.
-
-Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014): Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. Community Ecology 15:180--186.
-
-```{r eval=FALSE}
-library(opticut)
-ocoptions(try_error=TRUE)
-library(optpart)
-
-data(shoshsite)
-data(shoshveg)
-
-elev <- cut(shoshsite$elevation, breaks=c(0, 7200, 8000, 9000, 20000))
-levels(elev) <- c("low","mid1","mid2", "high")
-
-sveg <- as.matrix(shoshveg)
-sveg[sveg > 0] <- 1
-o <- opticut(sveg ~ 1, strata=elev, dist="binomial")
-plot(o, sort=1)
-
-
-sveg <- as.matrix(shoshveg)
-sveg <- sveg[,colSums(sveg>0) >= 50]
-table(sveg)
-sveg[sveg==0] <- 0.001
-sveg[sveg==0.1] <- 0.01
-sveg[sveg==0.5] <- 0.05
-sveg[sveg==1] <- 0.15
-sveg[sveg==2] <- 0.25
-sveg[sveg==3] <- 0.35
-sveg[sveg==4] <- 0.45
-sveg[sveg==5] <- 0.55
-sveg[sveg==6] <- 0.65
-sveg[sveg==7] <- 0.75
-sveg[sveg==8] <- 0.8
-table(sveg)
-o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
-plot(o2, sort=1)
-
-sveg2 <- as.matrix(shoshveg)
-sveg2[sveg2 > 0] <- 1
-sveg2 <- sveg2[,colnames(sveg)]
-o3 <- opticut(sveg2 ~ 1, strata=elev, dist="binomial")
-plot(o3, sort=1)
-
-sveg2 <- as.matrix(shoshveg)
-sveg2[sveg2 > 0] <- 1
-sveg2 <- sveg2[,colnames(sveg)]
-
-Y <- shoshveg$ASTMIS
-table(Y)
-o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
-o4$species
-
-## check for modifier variable
-```
-
-
-# Calibration
-
-```{r eval=FALSE}
 library(opticut)
 library(dclone)
 library(rjags)
+source("~/repos/opticut/extras/calibrate.R")
 
 set.seed(234)
 n <- 50*4
@@ -444,56 +49,24 @@ df <- df[-(1:5),]
 o <- opticut(y ~ x, data=df, strata=g, dist="poisson")
 summary(o)
 
-mle <- getMLE(o, 1)
-mle
-summary(o)$bestpart
+co <- calibrate(o, cbind("Sp 1"=(y[1:5])), model.matrix(~x, data.frame(x=x[1:5])))
 
-dat <- list(
-    y=y[1:5],
-    x=matrix(x[1:5],5,1),
-    bp=drop(summary(o)$bestpart),
-    pi=rep(1/K, K),
-    n=5,
-    K=K,
-    p=1,
-    cf=mle$coef,
-    prec=solve(mle$vcov)
-)
-
-model <- custommodel("model {
-    for (i in 1:n) {
-#        y[i] ~ dbern(ilogit(mu[i]))
-        y[i] ~ dpois(exp(mu[i]))
-        mu[i] <- b0 + bp[k[i]]*b1 + inprod(x[i,], a)
-        k[i] ~ dcat(pi)
-    }
-    b0 <- theta[1]
-    b1 <- theta[2]
-    a <- theta[3:(2+p)]
-    theta[1:(2+p)] ~ dmnorm(cf[1:(2+p)], prec[1:(2+p),1:(2+p)])
-}")
-
-j <- jags.fit(dat, "k", model, n.iter=1000, n.chains=1)
-m <- as.matrix(j)
-head(m)
-g[1:5]
 y[1:5]
-f <- function(x, K) {
-    out <- numeric(K)
-    for (k in 1:K)
-        out[k] <- sum(x==k)
-    out
-}
-apply(as.matrix(j), 2, f, K=K)
-apply(as.matrix(j), 2, f, K=K) / nrow(as.matrix(j))
-apply(apply(as.matrix(j), 2, f, K=K), 2, which.max)
 g[1:5]
-
+co$gnew
+round(co$pi, 2)
 ```
 
+We get g=1 cases correctly classified (this is where Sp1 is to be found),
+But the rest is just all equally probable. All what we see is that it is not g=1.
+All makes sense, but not very useful.
+Luckily for us, we usually have >1 species.
 
-```{r eval=FALSE}
-## multiple species
+# Calibration with multiple species
+
+This should work much better in principle.
+
+```{r}
 set.seed(234)
 n <- 50*4
 K <- 4
@@ -520,110 +93,22 @@ y <- cbind(y1=y1, y2=y2)
 df <- data.frame(x=x, g=g)
 df <- df[-(1:5),]
 yy <- y[-(1:5),]
-#o <- opticut(y ~ x, data=df, strata=g, dist="binomial")
-object <- opticut(yy ~ x, data=df, strata=g, dist="poisson:log")
-summary(object)
+o <- opticut(yy ~ x, data=df, strata=g, dist="poisson")
+summary(o)
 
-zz=calibrate(object, y[1:5,], df[1:5,])
+co <- calibrate(o, y[1:5,], df[1:5,])
 
-## check colnames in Y and X
-ynew <- y[1:5,]
-xnew <- matrix(x[1:5],5,1)
-bp <- summary(object)$bestpart
-K <- ncol(bp)
-S <- nrow(bp)
-mle <- lapply(seq_len(S), function(i)
-    getMLE(object, i))
-cf <- sapply(mle, "[[", "coef")
-prec <- array(sapply(mle, function(z) solve(z$vcov)),
-    dim = c(nrow(cf), nrow(cf), S))
-
-dat <- list(
-    y=ynew,
-    x=xnew,
-    bp=bp,
-    pi=rep(1/K, K),
-    n=NROW(ynew),
-    K=K,
-    S=S,
-    p=ncol(object$X) - 1L,
-    cf=cf,
-    prec=prec
-)
-
-model <- custommodel("model {
-    for (i in 1:n) {
-        for (j in 1:S) {
-#            y[i,j] ~ dbern(ilogit(mu[i,j]))
-            y[i,j] ~ dpois(exp(mu[i,j]))
-            mu[i,j] <- b0[j] + bp[j,k[i]]*b1[j] + inprod(x[i,], a[j,])
-        }
-        k[i] ~ dcat(pi)
-    }
-    for (j in 1:S) {
-        b0[j] <- theta[j,1]
-        b1[j] <- theta[j,2]
-        a[j,1:p] <- theta[j,3:(2+p)]
-        theta[j,1:(2+p)] ~ dmnorm(cf[1:(2+p),j], prec[1:(2+p),1:(2+p),j])
-    }
-}")
-
-j <- jags.fit(dat, "k", model, n.iter=5000, n.chains=1)
-m <- as.matrix(j)
-head(m)
-g[1:5]
 y[1:5,]
-f <- function(x, K) {
-    out <- numeric(K)
-    for (k in 1:K)
-        out[k] <- sum(x==k)
-    out
-}
-apply(as.matrix(j), 2, f, K=K)
-apply(as.matrix(j), 2, f, K=K) / nrow(as.matrix(j))
-apply(apply(as.matrix(j), 2, f, K=K), 2, which.max)
 g[1:5]
+co$gnew
+round(co$pi, 2)
 
 ```
 
 
-Todo:
-OK - use notation: j=1...p & r=1...S
-OK - implement test cases for lm/glm
-- write internal function (.calibrate)
-- implement user interface: calibrate, calibrate.opticut(object, ynew, xnew, ...)
-- add NB, beta, ZI cases (ZI: inits!) [drop all the 1-species models!]
-- gaussian needs sig^2
+# Dolina and calibration
 
-
-```{r eval=FALSE}
-model <- custommodel(c(model="model {",
-    "  for (i in 1:n) {",
-    "    for (r in 1:S) {",
-    "      y[i,r] ~ dpois(exp(mu[i,r]))", # poisson
-#    "      y[i,r] ~ dbern(ilogit(mu[i,j]))", # binomial:logit
-#    "      y[i,r] ~ dbern(icloglog(mu[i,j]))", # binomial:cloglog
-#    "      y[i,r] ~ dbern(phi(mu[i,j]))", # binomial:probit
-#    "      y[i,r] ~ dnorm(mu[i,j])", # gaussian
-    "      mu[i,r] <- b0[r] + bp[r,k[i]]*b1[r] + inprod(x[i,], a[r,])",
-#    "      mu[i,r] <- b0[r] + bp[r,k[i]]*b1[r]",
-    "    }",
-    "    k[i] ~ dcat(pi)",
-    "  }",
-    "  for (r in 1:S) {",
-    "    b0[r] <- theta[r,1]",
-    "    b1[r] <- theta[r,2]",
-    "    a[r,1:p] <- theta[r,3:(2+p)]", # z & x
-    "    theta[r,1:(2+p)] ~ dmnorm(cf[1:(2+p),r], prec[1:(2+p),1:(2+p),r])",
-#    "    theta[r,1:2] ~ dmnorm(cf[1:2,r], prec[1:2,1:2,r])", # z only
-    "  }",
-    "}"))
-
-```
-
-Dolina and calibration
-
-```{r eval=FALSE}
+```{r}
 data(dolina)
 dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 Y <- dolina$xtab#[dolina$samp$method=="Q",]
@@ -643,14 +128,15 @@ cal <- calibrate(o, ynew, xnew)
 #cal <- calibrate(o, ynew)
 round(cal$pi,2)
 round(cor(cal$pi),2)
-cal$gnew
-dolina$samp[inew,"mhab"]
+data.frame(predicted=cal$gnew,
+    truth=dolina$samp[inew,"mhab"],
+    OK=cal$gnew == dolina$samp[inew,"mhab"])
 cm <- table(pred=cal$gnew, true=X[inew,"mhab"])
 cm <- cm[rownames(cm),rownames(cm)]
 cm
 sum(diag(cm)) / sum(cm)
 
-## multinomial calibration
+## multinomial calibration using calibrate.default
 oo <- lapply(1:ncol(y), function(i) {
     glm(y[,i] ~ mhab + stratum + lmoist + method, x, family=poisson)
 })
@@ -658,11 +144,102 @@ xnew <- model.matrix(~ stratum + lmoist + method, xnew)
 cal <- calibrate(oo, ynew, xnew, K=4)
 round(cal$pi,2)
 round(cor(cal$pi),2)
-levels(x$mhab)[cal$gnew]
-dolina$samp[inew,"mhab"]
+data.frame(predicted=levels(x$mhab)[cal$gnew],
+    truth=dolina$samp[inew,"mhab"],
+    OK=levels(x$mhab)[cal$gnew] == dolina$samp[inew,"mhab"])
 cm <- table(pred=levels(x$mhab)[cal$gnew], true=X[inew,"mhab"])
 cm <- cm[rownames(cm),rownames(cm)]
 cm
 sum(diag(cm)) / sum(cm)
+```
+
+```{r}
+library(optpart)
+
+data(shoshsite)
+data(shoshveg)
+
+#elev <- cut(shoshsite$elevation, breaks=c(0, 7200, 8000, 9000, 20000))
+#levels(elev) <- c("low", "mid1", "mid2", "high")
+elev <- cut(shoshsite$elevation, breaks=c(0, 7800, 8900, 20000))
+levels(elev) <- c("low", "mid", "high")
+
+sveg <- as.matrix(shoshveg)
+sveg[sveg > 0] <- 1
+
+set.seed(1)
+ss <- seq_len(nrow(sveg)) %in% sample.int(nrow(sveg), floor(nrow(sveg) * 0.9))
+sveg1 <- sveg[ss,]
+sveg1 <- sveg1[,colSums(sveg1) > 5]
+elev1 <- elev[ss]
+dim(sveg)
+dim(sveg1)
+sveg2 <- sveg[!ss, colnames(sveg1)]
+elev2 <- elev[!ss]
+
+
+o <- opticut(sveg1 ~ 1, strata=elev1, dist="binomial")
+plot(o, sort=1)
+co <- calibrate(o, sveg2)
+
+
+data.frame(predicted=co$gnew,
+    truth=elev2,
+    OK=co$gnew == elev2,
+    round(co$pi,2))
+sum(co$gnew == elev2) / nrow(sveg2)
+```
+
+## Diatom and pH calibration
+
+```{r}
+library(rioja)
+data(SWAP)
+data(RLGH)
+spec <- SWAP$spec
+pH <- SWAP$pH
+core <- RLGH$spec
+age <- RLGH$depths$Age
+
+ph <- cut(pH, c(0, 5, 6, 14))
+levels(ph) <- c("low", "mid", "high")
+sp <- as.matrix(ifelse(spec > 0, 1, 0))
+
+set.seed(1)
+ss <- seq_len(nrow(sp)) %in% sample.int(nrow(sp), floor(nrow(sp) * 0.9))
+sp1 <- sp[ss,]
+sp1 <- sp1[,colSums(sp1) > 0]
+ph1 <- ph[ss]
+dim(sp)
+dim(sp1)
+sp2 <- sp[!ss, colnames(sp1)]
+ph2 <- ph[!ss]
+
+
+o <- opticut(sp1 ~ 1, strata=ph1, dist="binomial")
+plot(o, sort=1)
+co <- calibrate(o, sp2)
+
+data.frame(predicted=co$gnew,
+    truth=ph2,
+    OK=co$gnew == ph2,
+    round(co$pi,2))
+sum(co$gnew == ph2) / nrow(sp2)
 
 ```
+
+## Conclusions
+
+* More species, merrier results (see simple simulation)
+* Binary partitions might not be the best, especially for count models
+* Multinomial models (K levels in g) are more eficient (see dolina example)
+* Many species in binomial context work quite well, if K is not unreasonably high.
+
+## Todo
+
+* OK use notation: j=1...p & r=1...S
+* OK implement test cases for lm/glm
+* OK write internal function (.calibrate)
+* OK implement user interface: calibrate, calibrate.opticut(object, ynew, xnew, ...)
+* add NB, beta, ZI cases (ZI: inits!) [drop all the 1-species models!]
+* gaussian needs sig^2
