@@ -1,6 +1,6 @@
 ## The Lorenz curve is a continuous piecewise linear function
 ## representing the distribution of income or wealth.
-## p_i=1/n, i=1,...,n
+## p_i=i/n, i=1,...,n
 ## L_i=sum_{j=1}^{i} x_j / sum_{j=1}^{n} x_j
 ## p_0=L_0=0
 lorenz <-
@@ -10,7 +10,7 @@ function(x, na.last=TRUE)
         stop("x must not be < 0")
     o <- order(x, na.last=na.last)
     xo <- x[o]
-    p <- seq_len(length(xo)) / sum(length(xo))
+    p <- seq_len(length(xo)) / length(xo)
     L <- cumsum(xo) / sum(xo)
     p <- c(0, p)
     L <- c(0, L)

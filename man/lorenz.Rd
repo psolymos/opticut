@@ -62,7 +62,7 @@ other arguments passed to the underlying functions.
 \details{
 The Lorenz curve is a continuous piecewise linear function
 representing the distribution of income or wealth.
-Cumulative portion of the population: p_i = 1 / n (i=1,...,n), vs.
+Cumulative portion of the population: p_i = i / n (i=1,...,n), vs.
 cumulative portion of wealth: L_i = sum_{j=1}^{i} x_j / sum_{j=1}^{n} x_j,
 where x_i are indexed in non-decreasing order (x_i <= x_{i+1}).
 By convention, p_0 = L_0 = 0.
