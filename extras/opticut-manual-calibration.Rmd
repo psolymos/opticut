@@ -127,6 +127,7 @@ o <- opticut(y ~ stratum + lmoist + method, data=x, strata=mhab, dist="poisson")
 cal <- calibrate(o, ynew, xnew)
 #cal <- calibrate(o, ynew)
 round(cal$pi,2)
+dolina$samp[inew,"mhab"]
 round(cor(cal$pi),2)
 data.frame(predicted=cal$gnew,
     truth=dolina$samp[inew,"mhab"],
@@ -243,3 +244,14 @@ sum(co$gnew == ph2) / nrow(sp2)
 * OK implement user interface: calibrate, calibrate.opticut(object, ynew, xnew, ...)
 * add NB, beta, ZI cases (ZI: inits!) [drop all the 1-species models!]
 * gaussian needs sig^2
+
+Inverse prediction might be a good metric of overall accuracy and scaling species
+contribution (i.e. the real indicator power).
+
+Implement binary-multinomial-continuous comparison.
+
+See how non-linear (unimodal, multimodal) responses affect inverse prediction
+
+Somehow show how # species affects accuracy.
+
+
