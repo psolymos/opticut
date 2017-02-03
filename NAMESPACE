@@ -6,7 +6,8 @@ export("opticut", "optilevels", "opticut1",
     "bestmodel", "bestpart", "getMLE",
     "uncertainty", "bsmooth",
     "wplot",
-    "fix_levels", "strata", "check_strata", "beta2i")
+    "fix_levels", "strata", "check_strata", "beta2i",
+    "iquantile")
 S3method("opticut", "default")
 S3method("opticut", "formula")
 S3method("bestmodel", "opticut")
@@ -29,6 +30,7 @@ S3method("print", "summary.uncertainty")
 S3method("print", "summary.opticut")
 S3method("print", "summary.lorenz")
 S3method("quantile", "lorenz")
+S3method("iquantile", "lorenz")
 S3method("strata", "opticut")
 S3method("strata", "uncertainty")
 S3method("summary", "opticut")

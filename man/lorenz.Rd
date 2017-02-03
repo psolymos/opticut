@@ -3,6 +3,8 @@
 \alias{summary.lorenz}
 \alias{print.summary.lorenz}
 \alias{quantile.lorenz}
+\alias{iquantile}
+\alias{iquantile.lorenz}
 \alias{plot.lorenz}
 \title{
 Lorenz curve based thresholds and partitions
@@ -14,6 +16,9 @@ Lorenz curve based thresholds and partitions.
 lorenz(x, na.last = TRUE)
 
 \method{quantile}{lorenz}(x, probs = seq(0, 1, 0.25), ...)
+iquantile(x, ...)
+\method{iquantile}{lorenz}(x, values, ...)
+
 \method{plot}{lorenz}(x, type = c("L", "x"),
     tangent = NA, h = NA, v = NA, ...)
 
@@ -31,6 +36,8 @@ if \code{FALSE}, they are put first; if \code{NA}, they are removed
 }
   \item{probs}{numeric vector of probabilities with values in [0,1],
 as in \code{\link{quantile}}.
+}
+  \item{values}{numeric vector of values for which the corresponding population quantiles are to be returned.
 }
   \item{type}{character, indicating what to plot. \code{"L"}: the cumulative
 distribution quantiles; \code{"x"}: ordered but not-cumulated values.
@@ -84,6 +91,9 @@ and the curve. Distance is largest at the tangent point
 (n = \code{length(x)}) and 3 columns (p, L, x).
 
 The \code{quantile} method finds values of x_i corresponding to quantiles p_i.
+The \code{iquantile} (inverse quantile) method finds quantiles of p_i
+corresponding to values of x_i.
+
 The \code{plot} method draws a Lorenz curve.
 The \code{summary} method returns characteristics of the Lorenz curve.
 }
@@ -118,6 +128,11 @@ l <- lorenz(x)
 head(l)
 tail(l)
 summary(l)
+summary(unclass(l))
+
+(q <- c(0.05, 0.5, 0.95))
+(p_i <- quantile(l, probs=q))
+iquantile(l, values=p_i)
 
 op <- par(mfrow=c(2,1))
 plot(l, lwd=2, tangent=2, h=3, v=4)
