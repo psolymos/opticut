@@ -254,4 +254,91 @@ See how non-linear (unimodal, multimodal) responses affect inverse prediction
 
 Somehow show how # species affects accuracy.
 
+## Multiclass classification measures
 
+x is data class, y is classification
+```{r}
+## simple binary confusion matrix
+cmat <- function(x, y, drop=TRUE) {
+    out <- c(
+        tp=sum(x * y),
+        fp=sum((1-x) * y),
+        fn=sum(x * (1-y)),
+        tn=sum((1-x) * (1-y)))
+    if (drop)
+        out else array(out, c(2L, 2L), 
+            list(data=c("t", "f"), class=c("p", "n")))
+}
+cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0))
+cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0), drop=FALSE)
+
+x <- sample(LETTERS[1:4], 20, replace=TRUE)
+y <- x
+for (i in 1:length(x))
+    if (runif(1) > 0.1)
+        y[i] <- sample(LETTERS[1:4], 1)
+mcm <- function(x, y, beta=1) {
+    levs <- sort(unique(x))
+    N <- length(x)
+    if (length(y) != N)
+        stop("x and y lengths must match")
+    if (length(setdiff(y, x)) > 0)
+        warning("y has more levels than x")
+    cm <- sapply(levs, function(z) {
+        xx <- ifelse(x == z, 1, 0)
+        yy <- ifelse(y == z, 1, 0)
+        cmat(xx, yy)
+    })
+    Stat <- c(
+        Acc = mean((cm["tp",] + cm["fn",]) / N),
+        Err = mean((cm["fp",] + cm["fn",]) / N),
+        Prc_m = sum(cm["tp",]) / sum(cm["tp",] + cm["fp",]),
+        Prc_M = mean(cm["tp",] / (cm["tp",] + cm["fp",])),
+        Rec_m = sum(cm["tp",]) / sum(cm["tp",] + cm["fn",]),
+        Rec_M = mean(cm["tp",] / (cm["tp",] + cm["fn",])))
+    Stat <- c(Stat, 
+        F_m = (beta^2 + 1) * Stat["Prc_m"] * Stat["Rec_m"] / 
+            (beta^2 * Stat["Prc_m"] + Stat["Rec_m"]),
+        F_M = (beta^2 + 1) * Stat["Prc_M"] * Stat["Rec_M"] / 
+            (beta^2 * Stat["Prc_M"] + Stat["Rec_M"]))
+    list(cmat=cm, stats=Stat, 
+        p=cm["tp",] / (cm["tp",] + cm["fp",]),
+        r=cm["tp",] / (cm["tp",] + cm["fn",]),
+        beta=beta)
+}
+
+mcm(x, y)
+```
+
+Might have to check valid levels (x, y, union)
+
+Dolina LOO
+
+```{r}
+data(dolina)
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+Y <- dolina$xtab[dolina$samp$method=="Q",]
+X <- dolina$samp[dolina$samp$method=="Q",]
+Y <- Y[,colSums(Y > 0) >= 20]
+
+gnew <- character(0)
+pm <- matrix(NA, 0, 4)
+for (i in 1:nrow(Y)) {
+    if (interactive()) {
+        cat("\nRun", i, "of", nrow(Y), "\n")
+    }
+    ii <- seq_len(nrow(Y)) != i
+    y_trn <- Y[ii,,drop=FALSE]
+    y_new <- Y[!ii,,drop=FALSE]
+    x_trn <- X[ii,,drop=FALSE]
+    #x_new <- X[!ii,,drop=FALSE]
+    o <- opticut(y_trn ~ 1, strata=x_trn$mhab, dist="poisson")
+    cal <- calibrate(o, y_new)
+    gnew <- c(gnew, cal$gnew)
+    pm <- rbind(pm, cal$pi)
+}
+
+mcm(X$mhab, factor(gnew, levels(X$mhab)))
+tt <- table(X$mhab, factor(gnew, levels(X$mhab)))
+sum(diag(tt))/sum(tt)
+```
