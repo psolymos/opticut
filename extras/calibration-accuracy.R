@@ -77,7 +77,9 @@ dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 Y <- dolina$xtab[dolina$samp$method=="Q",]
 X <- dolina$samp[dolina$samp$method=="Q",]
 Y <- Y[,colSums(Y > 0) >= 20]
+Y <- ifelse(Y > 0, 1, 0)
 s_col <- "mhab"
+Dist <- "binomial"
 }
 
 set.seed(1)
@@ -102,11 +104,13 @@ Dist <- "binomial"
 
 cl <- makeCluster(4)
 nn <- nrow(Y)
-gnew <- character(0)
-pm <- matrix(NA, 0, nlevels(X[,s_col]))
+mm <- ncol(Y)
+## All species + LOO
+gnew0 <- character(0)
+pm0 <- matrix(NA, 0, nlevels(X[,s_col]))
 for (i in 1:nn) {
     if (interactive()) {
-        cat("\n<<< Run", i, "of", nn, ">>>\n\n")
+        cat("<<< All species --- Run", i, "of", nn, ">>>\n")
     }
     ii <- seq_len(nrow(Y)) != i
     y_trn <- Y[ii,,drop=FALSE]
@@ -115,21 +119,10 @@ for (i in 1:nn) {
     #x_new <- X[!ii,,drop=FALSE]
     o <- opticut(y_trn ~ 1, strata=x_trn[,s_col], dist=Dist, cl=cl)
     cal <- calibrate(o, y_new, n.chains=length(cl), cl=cl)
-    gnew <- c(gnew, cal$gnew)
-    pm <- rbind(pm, cal$pi)
+    gnew0 <- c(gnew0, cal$gnew)
+    pm0 <- rbind(pm0, cal$pi)
 }
-stopCluster(cl)
-
-mcm(X[1:nn,s_col], factor(gnew, levels(X[,s_col])))
-(tt <- table(X[1:nn,s_col], factor(gnew, levels(X[,s_col]))))
-sum(diag(tt))/sum(tt)
-
-gnew0 <- gnew
-pm0 <- pm
-
-cl <- makeCluster(4)
-nn <- nrow(Y)
-mm <- ncol(Y)
+## -1 species + LOO
 gnew_list <- list()
 pm_list <- list()
 for (j in 1:mm) {
@@ -137,7 +130,7 @@ for (j in 1:mm) {
     pm <- matrix(NA, 0, nlevels(X[,s_col]))
     for (i in 1:nn) {
         if (interactive()) {
-            cat("<<< Spp", j, "of", mm, "--- Run", i, "of", nn, ">>>\n")
+            cat("<<< -Spp", j, "of", mm, "--- Run", i, "of", nn, ">>>\n")
         }
         ii <- seq_len(nrow(Y)) != i
         jj <- seq_len(ncol(Y)) != j
@@ -155,3 +148,32 @@ for (j in 1:mm) {
 }
 stopCluster(cl)
 
+#save(gnew0, pm0, gnew_list, pm_list, file="~/Dropbox/collaborations/opticut/R/calibr-simul.Rdata")
+#save(gnew0, pm0, gnew_list, pm_list, file="~/Dropbox/collaborations/opticut/R/calibr-dolina.Rdata")
+
+mcm(X[1:nn,s_col], factor(gnew0, levels(X[,s_col])))
+(tt <- table(X[1:nn,s_col], factor(gnew0, levels(X[,s_col]))))
+sum(diag(tt))/sum(tt)
+
+MCM0 <- mcm(X[,s_col], factor(gnew0, levels(X[,s_col])))
+MCM <- lapply(gnew_list, function(z) mcm(X[,s_col], factor(z, levels(X[,s_col]))))
+
+stat_fun <- function(x) x$accuracy
+
+Stat0 <- stat_fun(MCM0)
+Stat <- t(sapply(MCM, stat_fun))
+
+Acc0 <- mean(Stat0)
+Acc <- rowMeans(Stat)
+names(Acc) <- colnames(Y)
+
+plot(sort(Acc), type="b", pch=19)
+abline(h=Acc0, col=2, lty=2)
+dAcc <- Acc - Acc0
+
+dAccH <- t(t(Stat) - Stat0)
+rownames(dAccH) <- colnames(Y)
+
+matplot(apply(Stat, 2, sort), type="l", lty=1, lwd=2)
+for (i in 1:length(Stat0))
+    abline(h=Stat0[i], lty=2, col=i)

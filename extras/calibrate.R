@@ -55,7 +55,7 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
         model$mvn <- "    theta[r,1:2] ~ dmnorm(cf[1:2,r], prec[1:2,1:2,r])"
     }
     model$dist <- switch(object$dist,
-        "gaussian:identity"="      y[i,r] ~ dnorm(mu[i,r])",
+        #"gaussian:identity"="      y[i,r] ~ dnorm(mu[i,r])",
         "poisson"="      y[i,r] ~ dpois(exp(mu[i,r]))",
         "poisson:log"="      y[i,r] ~ dpois(exp(mu[i,r]))",
         "binomial"="      y[i,r] ~ dbern(ilogit(mu[i,r]))",
