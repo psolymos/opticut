@@ -15,9 +15,11 @@ Lorenz curve based thresholds and partitions.
 \usage{
 lorenz(x, na.last = TRUE)
 
-\method{quantile}{lorenz}(x, probs = seq(0, 1, 0.25), ...)
+\method{quantile}{lorenz}(x, probs = seq(0, 1, 0.25),
+    type = c("L", "p"), ...)
 iquantile(x, ...)
-\method{iquantile}{lorenz}(x, values, ...)
+\method{iquantile}{lorenz}(x, values,
+    type = c("L", "p"),...)
 
 \method{plot}{lorenz}(x, type = c("L", "x"),
     tangent = NA, h = NA, v = NA, ...)
@@ -39,8 +41,11 @@ as in \code{\link{quantile}}.
 }
   \item{values}{numeric vector of values for which the corresponding population quantiles are to be returned.
 }
-  \item{type}{character, indicating what to plot. \code{"L"}: the cumulative
-distribution quantiles; \code{"x"}: ordered but not-cumulated values.
+  \item{type}{character. For the \code{plot} method it indicates whether to plot
+the cumulative distribution quantiles (\code{"L"})
+or ordered but not-cumulated values (\code{"x"}). For the
+\code{quantile} and \code{iquantile} methods it indicates which
+of the quantiles (\code{"L"} or \code{"p"}) to use.
 }
   \item{tangent}{
 color value for the Lorenz-curve tangent when plotted. The default
@@ -90,9 +95,10 @@ and the curve. Distance is largest at the tangent point
 \code{lorenz} returns an object of class lorenz. It is a matrix with n+1 rows
 (n = \code{length(x)}) and 3 columns (p, L, x).
 
-The \code{quantile} method finds values of x_i corresponding to quantiles p_i.
-The \code{iquantile} (inverse quantile) method finds quantiles of p_i
-corresponding to values of x_i.
+The \code{quantile} method finds values of x_i corresponding to
+quantiles L_i or p_i (depending on the \code{type} argument).
+The \code{iquantile} (inverse quantile) method
+finds quantiles of L_i or p_i corresponding to values of x_i.
 
 The \code{plot} method draws a Lorenz curve.
 The \code{summary} method returns characteristics of the Lorenz curve.
@@ -131,8 +137,10 @@ summary(l)
 summary(unclass(l))
 
 (q <- c(0.05, 0.5, 0.95))
-(p_i <- quantile(l, probs=q))
-iquantile(l, values=p_i)
+(p_i <- quantile(l, probs=q, type="p"))
+iquantile(l, values=p_i, type="p")
+(p_i <- quantile(l, probs=q, type="L"))
+iquantile(l, values=p_i, type="L")
 
 op <- par(mfrow=c(2,1))
 plot(l, lwd=2, tangent=2, h=3, v=4)

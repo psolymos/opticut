@@ -1,7 +1,8 @@
 quantile.lorenz <-
-function(x, probs = seq(0, 1, 0.25), ...)
+function(x, probs = seq(0, 1, 0.25), type = c("L", "p"), ...)
 {
-    structure(sapply(probs, function(z) min(x[x[,"p"] >= z, "x"])),
+    type <- match.arg(type)
+    structure(sapply(probs, function(z) min(x[x[,type] >= z, "x"])),
         names=paste0(format(100 * probs, trim=TRUE,
         digits = max(2L, getOption("digits"))), "%"))
 }
