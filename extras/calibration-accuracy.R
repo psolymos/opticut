@@ -23,8 +23,8 @@ cmat <- function(x, y, drop=TRUE) {
         out else array(out, c(2L, 2L),
             list(data=c("t", "f"), class=c("p", "n")))
 }
-cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0))
-cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0), drop=FALSE)
+#cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0))
+#cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0), drop=FALSE)
 
 mcm <- function(x, y, beta=1) {
     levs <- if (is.factor(x))
@@ -59,12 +59,12 @@ mcm <- function(x, y, beta=1) {
         beta=beta)
 }
 
-x <- sample(LETTERS[1:4], 20, replace=TRUE)
-y <- x
-for (i in 1:length(x))
-    if (runif(1) > 0.1)
-        y[i] <- sample(LETTERS[1:4], 1)
-mcm(x, y)
+#x <- sample(LETTERS[1:4], 20, replace=TRUE)
+#y <- x
+#for (i in 1:length(x))
+#    if (runif(1) > 0.1)
+#        y[i] <- sample(LETTERS[1:4], 1)
+#mcm(x, y)
 
 
 ## LOO
@@ -72,16 +72,21 @@ mcm(x, y)
 ## define data
 
 if (FALSE) {
+Proj <- "dolina"
+Dist <- "binomial"
 data(dolina)
 dolina$samp$stratum <- as.integer(dolina$samp$stratum)
 Y <- dolina$xtab[dolina$samp$method=="Q",]
 X <- dolina$samp[dolina$samp$method=="Q",]
 Y <- Y[,colSums(Y > 0) >= 20]
-Y <- ifelse(Y > 0, 1, 0)
+if (Dist == "binomial")
+    Y <- ifelse(Y > 0, 1, 0)
 s_col <- "mhab"
-Dist <- "binomial"
 }
 
+if (FALSE) {
+Proj <- "simul"
+Dist <- "binomial"
 set.seed(1)
 k <- 5
 m <- 20
@@ -100,7 +105,7 @@ dim(Y) <- dim(mu)
 dimnames(Y) <- dimnames(mu)
 X <- data.frame(g=g)
 s_col <- "g"
-Dist <- "binomial"
+}
 
 cl <- makeCluster(4)
 nn <- nrow(Y)
@@ -148,8 +153,9 @@ for (j in 1:mm) {
 }
 stopCluster(cl)
 
-#save(gnew0, pm0, gnew_list, pm_list, file="~/Dropbox/collaborations/opticut/R/calibr-simul.Rdata")
-#save(gnew0, pm0, gnew_list, pm_list, file="~/Dropbox/collaborations/opticut/R/calibr-dolina.Rdata")
+save(X, Y, s_col, gnew0, pm0, gnew_list, pm_list,
+    file=file.path("~/Dropbox/collaborations/opticut/R",
+    paste0("calibr-", Proj, "-", Dist, ".Rdata")))
 
 mcm(X[1:nn,s_col], factor(gnew0, levels(X[,s_col])))
 (tt <- table(X[1:nn,s_col], factor(gnew0, levels(X[,s_col]))))
