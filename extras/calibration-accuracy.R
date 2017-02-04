@@ -183,3 +183,98 @@ rownames(dAccH) <- colnames(Y)
 matplot(apply(Stat, 2, sort), type="l", lty=1, lwd=2)
 for (i in 1:length(Stat0))
     abline(h=Stat0[i], lty=2, col=i)
+
+## weighted aweraging
+
+Proj <- "dolina"
+Dist <- "binomial"
+data(dolina)
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+Y <- dolina$xtab[dolina$samp$method=="Q",]
+X <- dolina$samp[dolina$samp$method=="Q",]
+Y <- Y[,colSums(Y > 0) >= 20]
+if (Dist == "binomial")
+    Y <- ifelse(Y > 0, 1, 0)
+s_col <- "mhab"
+
+i <- 111
+cl <- NULL
+ii <- seq_len(nrow(Y)) != i
+y_trn <- Y[ii,,drop=FALSE]
+y_new <- Y[!ii,,drop=FALSE]
+x_trn <- X[ii,,drop=FALSE]
+o <- opticut(y_trn ~ 1, strata=x_trn[,s_col], dist=Dist, cl=cl)
+u <- uncertainty(o, type="multi", B=100)
+
+ynew <- y_new
+object <- o
+wa <- function(object, ...)
+    UseMethod("wa")
+wa.opticut <- function(object, ynew) {
+    s <- summary(object)
+    bp <- s$bestpart
+    I <- s$summary$I
+    p <- t(apply(ynew, 1, function(z) z / sum(z)))
+    t(apply(p, 1, function(y)
+        colMeans(apply(bp, 2, function(z) y * z * I))))
+}
+object <- u
+wa.uncertainty <- function(object, ynew) {
+    bbp <- lapply(object$uncertainty, bestpart)
+    K <- nrow(bbp[[1L]])
+    bp <- array(NA, c(length(bbp), K, object$B+1L))
+    for (i in seq_len(length(bbp)))
+        bp[i,,] <- bbp[[i]]
+    I <- sapply(object$uncertainty, function(z) z$I)
+    p <- t(apply(ynew, 1, function(z) z / sum(z)))
+    fun <- function(i,j) {
+        colMeans(apply(bp[,,j], 2, function(z) p[i,] * z * I[j,]))
+    }
+    xx <- lapply(seq_len(nrow(ynew)), function(i)
+        sapply(seq_len(object$B+1L), function(j) fun(i,j)))
+    mm <- lapply(xx, function(z) apply(z, 2, which.max))
+    f <- function(x, K) {
+        out <- numeric(K)
+        for (k in 1:K)
+            out[k] <- sum(x==k)
+        out
+    }
+    out <- t(sapply(mm, f, K=K) / (object$B+1L))
+    rownames(out) <- rownames(ynew)
+    colnames(out) <- rownames(bbp[[1]])
+    out
+}
+wa(o, y_new)
+wa(u, y_new)
+
+cl <- makeCluster(4)
+nn <- nrow(Y)
+mm <- ncol(Y)
+## All species + LOO
+gnew0 <- character(nn)
+pm0 <- matrix(NA, nn, nlevels(X[,s_col]))
+gnew0u <- character(nn)
+pm0u <- matrix(NA, nn, nlevels(X[,s_col]))
+for (i in 1:nn) {
+    if (interactive()) {
+        cat("<<< All species --- Run", i, "of", nn, ">>>\n")
+    }
+    ii <- seq_len(nrow(Y)) != i
+    y_trn <- Y[ii,,drop=FALSE]
+    y_new <- Y[!ii,,drop=FALSE]
+    x_trn <- X[ii,,drop=FALSE]
+    o <- opticut(y_trn ~ 1, strata=x_trn[,s_col], dist=Dist, cl=cl)
+    u <- uncertainty(o, type="multi", B=100, cl=cl)
+    cal <- wa(o, y_new)
+    calu <- wa(u, y_new)
+    if (!any(is.na(cal)))
+        gnew0[i] <- colnames(cal)[which.max(cal)]
+    pm0[i,] <- cal[1,]
+    if (!any(is.na(cal)))
+        gnew0u[i] <- colnames(calu)[which.max(calu)]
+    pm0u[i,] <- calu[1,]
+}
+stopCluster(cl)
+iii <- gnew0 != ""
+mcm(X[iii,s_col], factor(gnew0[iii], levels(X[,s_col])))
+mcm(X[iii,s_col], factor(gnew0u[iii], levels(X[,s_col])))
