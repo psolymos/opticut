@@ -54,7 +54,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     }
 
     if (!is.function(dist)) {
-        Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1]][1]
+        Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1L]][1L]
         Dist <- match.arg(Dist,
             c("gaussian","poisson","binomial","negbin",
             "beta","zip","zinb","ordered", "rsf", "rspf",

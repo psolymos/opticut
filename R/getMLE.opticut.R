@@ -8,7 +8,7 @@ function(object, which, ...)
         ## full model cannot be returned for dist=fun
     if (!is.function(object$dist)) {
         Dist <- as.character(object$dist)
-        Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1]]
+        Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L]
     } else {
         Dist <- ""
     }
