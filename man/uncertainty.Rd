@@ -236,6 +236,28 @@ with(ucdol$uncertainty[["pvic"]],
 bs <- bsmooth(ucdol$uncertainty[["pvic"]])
 boxplot(t(bs), ylab="Expected value")
 cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
+
+## A more interesting simulated example for bootstrap smoothing
+set.seed(1)
+n <- 2000
+x <- sort(runif(n, -8, 8))
+p <- plogis(0.5 + -0.1 * x + -0.2 * x^2)
+y <- rbinom(n, 1, p)
+br <- seq(min(x), max(x), by=diff(range(x))/10)
+g <- cut(x, br, include.lowest=TRUE)
+levels(g) <- LETTERS[1:nlevels(g)]
+o <- opticut(y ~ 1, strata=g, dist="binomial")
+library(parallel)
+cl <- makeCluster(2)
+u <- uncertainty(o, type="multi", B=99, cl=cl)
+stopCluster(cl)
+bs <- bsmooth(u$uncertainty[[1]])
+stat <- cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
+plot(p ~ x, type="l", ylim=c(0,1))
+abline(v=br, col="grey", lty=3)
+lines(br[-1]-0.5, stat[,1], col=4)
+lines(br[-1]-0.5, stat[,2], col=4, lty=2)
+lines(br[-1]-0.5, stat[,3], col=4, lty=2)
 }
 }
 \keyword{ manip }
