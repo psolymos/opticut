@@ -1,6 +1,8 @@
 ipredict.opticut <-
 function(object, ynew, xnew=NULL, cl=NULL, ...)
 {
+    requireNamespace("rjags")
+    requireNamespace("dclone")
     ynew <- ynew[,colnames(object$Y),drop=FALSE]
     if (!is.null(xnew) && ncol(object$X) < 2L)
         xnew <- NULL

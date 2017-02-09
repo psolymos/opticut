@@ -1,6 +1,8 @@
 ipredict.default <-
 function(object, ynew, xnew=NULL, cl=NULL, K, ...)
 {
+    requireNamespace("rjags")
+    requireNamespace("dclone")
     cf <- sapply(object, coef)
     prec <- array(sapply(object, function(z) solve(vcov(z))),
         dim = c(nrow(cf), nrow(cf), length(object)))
