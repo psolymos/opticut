@@ -60,11 +60,11 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
         "binomial:logit"="      y[i,r] ~ dbern(ilogit(mu[i,r]))",
         "binomial:cloglog"="      y[i,r] ~ dbern(icloglog(mu[i,r]))",
         "binomial:probit"="      y[i,r] ~ dbern(phi(mu[i,r]))")
-    model <- custommodel(unlist(model))
+    model <- dclone::custommodel(unlist(model))
     if (is.null(cl)) {
-        jm <- jags.fit(dat, "k", model, ...)
+        jm <- dclone::jags.fit(dat, "k", model, ...)
     } else {
-        jm <- jags.parfit(cl=cl, dat, "k", model, ...)
+        jm <- dclone::jags.parfit(cl=cl, dat, "k", model, ...)
     }
     mm <- as.matrix(jm)
     f <- function(x, K) {

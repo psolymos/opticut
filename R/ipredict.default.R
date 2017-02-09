@@ -3,6 +3,8 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
 {
     requireNamespace("rjags")
     requireNamespace("dclone")
+    fam <- family(object[[1L]])$family
+    link <- family(object[[1L]])$link
     cf <- sapply(object, coef)
     prec <- array(sapply(object, function(z) solve(vcov(z))),
         dim = c(nrow(cf), nrow(cf), length(object)))
@@ -14,7 +16,9 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
         S=NCOL(ynew),
         cf=cf,
         prec=prec)
-    model <- custommodel(c(model="model {",
+    ## this needs to be able to run binomial as well based on family and link
+    ## also allow for missing xnew (take ipredict.opticut as example)
+    model <- dclone::custommodel(c(model="model {",
         "  for (i in 1:n) {",
         "    for (r in 1:S) {",
         "      y[i,r] ~ dpois(exp(mu[i,r]))", # poisson
@@ -43,9 +47,9 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
         dat$x <- xnew[,-1,drop=FALSE] # drop intercept
     }
     if (is.null(cl)) {
-        jm <- jags.fit(dat, "k", model, ...)
+        jm <- dclone::jags.fit(dat, "k", model, ...)
     } else {
-        jm <- jags.parfit(cl=cl, dat, "k", model, ...)
+        jm <- dclone::jags.parfit(cl=cl, dat, "k", model, ...)
     }
     mm <- as.matrix(jm)
     f <- function(x, K) {
