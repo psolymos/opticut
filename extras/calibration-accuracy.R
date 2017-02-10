@@ -13,58 +13,145 @@ source("~/repos/opticut/extras/calibrate.R")
 
 ## simple binary confusion matrix
 ## Might have to check valid levels (x, y, union)
-cmat <- function(x, y, drop=TRUE) {
-    out <- c(
-        tp=sum(x * y),
-        fp=sum((1-x) * y),
-        fn=sum(x * (1-y)),
-        tn=sum((1-x) * (1-y)))
-    if (drop)
-        out else array(out, c(2L, 2L),
-            list(data=c("t", "f"), class=c("p", "n")))
-}
 #cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0))
 #cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0), drop=FALSE)
 
-mcm <- function(x, y, beta=1) {
-    levs <- if (is.factor(x))
-        sort(levels(x)) else sort(unique(x))
-    N <- length(x)
-    if (length(y) != N)
-        stop("x and y lengths must match")
-    if (length(setdiff(y, levs)) > 0)
-        warning("y has more levels than x")
-    cm <- sapply(levs, function(z) {
-        xx <- ifelse(x == z, 1, 0)
-        yy <- ifelse(y == z, 1, 0)
-        cmat(xx, yy)
-    })
+ctable <- function(x, y) {
+    if (length(y) != length(x))
+        stop("Hey! x and y lengths must match")
+    x <- as.factor(x)
+    x <- droplevels(x)
+    levs <- sort(levels(x))
+    x <- factor(x, levels=levs)
+    y <- factor(y, levels=levs)
+    if (any(is.na(y)))
+        stop("NAs, and levels in y that are not in x are not allowed, sorry")
+    as.matrix(table(Reference=x, Prediction=y))
+}
+btable <- function(table) {
+    if (ncol(table) != nrow(table))
+        stop("dimension mismatch")
+    if (!all(colnames(table) == rownames(table)))
+        stop("dimnames must match")
+    f <- function(i, x) {
+        c(tp=sum(x[i,i]), fp=sum(x[-i,i]),
+        fn=sum(x[i,-i]), tn=sum(x[-i,-i]))
+    }
+    out <- sapply(seq_len(ncol(table)), f, x=table)
+    colnames(out) <- colnames(table)
+    out
+}
+untable <- function(table) {
+    x <- y <- integer(sum(table))
+    S <- c(0, cumsum(table))
+    i <- row(table)
+    j <- col(table)
+    for (k in 2:length(S)) {
+        if (S[k]-S[k-1] > 0) {
+            x[(S[k-1]+1):S[k]] <- i[k-1]
+            y[(S[k-1]+1):S[k]] <- j[k-1]
+        }
+    }
+    list(x = factor(rownames(table)[x], levels=rownames(table)),
+        y = factor(colnames(table)[y], levels=colnames(table)))
+}
+
+multiclass <- function(x, y=NULL, beta=1) {
+    if (!is.null(y))
+        x <- ctable(x, y)
+    cm <- btable(x)
     Stat <- c(
         Acc = mean((cm["tp",] + cm["tn",]) / N),
         Err = mean((cm["fp",] + cm["fn",]) / N),
-        Prc_m = sum(cm["tp",]) / sum(cm["tp",] + cm["fp",]),
-        Prc_M = mean(cm["tp",] / (cm["tp",] + cm["fp",])),
+        Prec_m = sum(cm["tp",]) / sum(cm["tp",] + cm["fp",]),
+        Prec_M = mean(cm["tp",] / (cm["tp",] + cm["fp",])),
+        Spec_m = sum(cm["tn",]) / sum(cm["fp",] + cm["tn",]),
+        Spec_M = mean(cm["tn",] / (cm["fp",] + cm["tn",])),
         Rec_m = sum(cm["tp",]) / sum(cm["tp",] + cm["fn",]),
         Rec_M = mean(cm["tp",] / (cm["tp",] + cm["fn",])))
     Stat <- c(Stat,
-        F_m = (beta^2 + 1) * Stat["Prc_m"] * Stat["Rec_m"] /
-            (beta^2 * Stat["Prc_m"] + Stat["Rec_m"]),
-        F_M = (beta^2 + 1) * Stat["Prc_M"] * Stat["Rec_M"] /
-            (beta^2 * Stat["Prc_M"] + Stat["Rec_M"]))
-    list(cmat=cm, stats=Stat,
-        accuracy=(cm["tp",] + cm["tn",]) / N,
-        error=(cm["fp",] + cm["fn",]) / N,
-        precision=cm["tp",] / (cm["tp",] + cm["fp",]),
-        recall=cm["tp",] / (cm["tp",] + cm["fn",]),
-        beta=beta)
+        ## F-score is harmonic mean
+        ## G-score is geometric mean sqrt(prec * recall)
+        F_m = unname((beta^2 + 1) * Stat["Prec_m"] * Stat["Rec_m"] /
+            (beta^2 * Stat["Prec_m"] + Stat["Rec_m"])),
+        F_M = unname((beta^2 + 1) * Stat["Prec_M"] * Stat["Rec_M"] /
+            (beta^2 * Stat["Prec_M"] + Stat["Rec_M"])))
+    Mat <- rbind(Accuracy=(cm["tp",] + cm["tn",]) / N,
+        Error=(cm["fp",] + cm["fn",]) / N,
+        Precision=cm["tp",] / (cm["tp",] + cm["fp",]),
+        Specificity=cm["tn",] / (cm["fp",] + cm["tn",]),
+        Recall=cm["tp",] / (cm["tp",] + cm["fn",])) # recall = sensitivity
+    #Mat <- rbind(Mat, jouden=Mat["Specificity",]+Mat["Recall",]-1)
+    out <- list(ctable=x, btable=cm, average=Stat, beta=beta,
+        single=Mat)
+    class(out) <- "multiclass"
+    out
 }
 
-#x <- sample(LETTERS[1:4], 20, replace=TRUE)
-#y <- x
-#for (i in 1:length(x))
-#    if (runif(1) > 0.1)
-#        y[i] <- sample(LETTERS[1:4], 1)
-#mcm(x, y)
+
+N <- 100
+K <- 5
+x <- sample(LETTERS[1:K], N, replace=TRUE, prob=sqrt(2^(0:(K-1))))
+y <- x
+for (i in 1:length(x))
+    if (runif(1) > 0.1)
+        y[i] <- sample(LETTERS[1:K], 1)
+(ct <- ctable(x, y))
+(cm <- btable(ct))
+untable(ct)
+stopifnot(all(ctable(untable(ct)$x, untable(ct)$y) == ctable(x, y)))
+(x <- multiclass(x, y))
+
+#https://en.wikipedia.org/wiki/Accuracy_paradox
+
+etable <- function(table, type="majority") {
+    type <- match.arg(type,
+        c("majority", "random", "weighted", "cohen"))
+    N <- sum(table)
+    K <- ncol(table)
+    p <- rowSums(table) / N
+    q <- colSums(table) / N
+    if (type == "majority") {
+        ## mcc: majority class classifier, No Information Rate (NIR)
+        ecm <- table
+        ecm[] <- 0
+        ecm[,which.max(p)] <- rowSums(table)
+    }
+    if (type == "random") {
+        ## rgc: random-guess classifier
+        ecm <- table
+        ecm[] <- N/K * p
+    }
+    if (type == "weighted") {
+        ## rwgc: random-weighted-guess classifier
+        ecm <- table
+        ecm[] <- N * p %*% t(p)
+    }
+    if (type == "cohen") {
+        ## Cohen
+        ecm <- table
+        ecm[] <- N * p %*% t(q)
+    }
+    ecm
+}
+rtable <- function(n, table) {
+    array(rmultinom(n, sum(table), table),
+        c(dim(table), n),
+        list(rownames(table), colnames(table), NULL))
+}
+
+etable(x$ctable)
+
+sum(diag(ecm))/N
+sum(p*q)
+sum(diag(table))/N
+kappa <- (sum(diag(table))/N - sum(diag(ecm))/N) / (1 - sum(diag(ecm))/N)
+
+rmn <- rmultinom(10^4, sum(aa), etable(aa, "c"))
+v <- apply(rmn, 2, function(z){
+    dim(z) <- dim(aa)
+    sum(diag(z))/sum(z)
+})
 
 
 ## LOO
