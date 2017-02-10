@@ -18,7 +18,10 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     ff <- formula
     ff[[2]] <- NULL
     mt <- terms(ff, data = data)
+    na.op <- options(na.action="na.pass")
+    on.exit(options(na.action=na.op))
     X <- model.matrix(mt, mf)
+    options(na.action=na.op)
 
     out <- opticut.default(Y=Y, X=X, strata=strata, dist=dist,
         comb=comb, sset=sset, cl=cl, ...)
