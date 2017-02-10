@@ -243,7 +243,8 @@ n <- 2000
 x <- sort(runif(n, -8, 8))
 p <- plogis(0.5 + -0.1 * x + -0.2 * x^2)
 y <- rbinom(n, 1, p)
-br <- seq(min(x), max(x), by=diff(range(x))/10)
+d <- diff(range(x))/10
+br <- seq(min(x), max(x), by=d)
 g <- cut(x, br, include.lowest=TRUE)
 levels(g) <- LETTERS[1:nlevels(g)]
 o <- opticut(y ~ 1, strata=g, dist="binomial")
@@ -255,9 +256,13 @@ bs <- bsmooth(u$uncertainty[[1]])
 stat <- cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
 plot(p ~ x, type="l", ylim=c(0,1))
 abline(v=br, col="grey", lty=3)
-lines(br[-1]-0.5, stat[,1], col=4)
-lines(br[-1]-0.5, stat[,2], col=4, lty=2)
-lines(br[-1]-0.5, stat[,3], col=4, lty=2)
+lines(br[-1]-0.5*d, stat[,1], col=4)
+lines(br[-1]-0.5*d, stat[,2], col=4, lty=2)
+lines(br[-1]-0.5*d, stat[,3], col=4, lty=2)
+lines(br[-1]-0.5*d, bs[,1], col=2)
+legend("topright", bty="n", lty=c(1,1,2,1), col=c(1,4,4,2),
+    legend=c("True response","bsmooth","95% CI","Best partition"))
+
 }
 }
 \keyword{ manip }
