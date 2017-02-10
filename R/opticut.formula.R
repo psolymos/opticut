@@ -20,6 +20,13 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     mt <- terms(ff, data = data)
     X <- model.matrix(mt, mf)
 
+    if (any(is.na(Y)))
+        stop("lhs of formula contains NA")
+    if (any(is.na(X)))
+        stop("rhs of formula contains NA")
+    if (any(is.na(strata)))
+        stop("strata argument contains NA")
+
     out <- opticut.default(Y=Y, X=X, strata=strata, dist=dist,
         comb=comb, sset=sset, cl=cl, ...)
     out$call <- match.call()

@@ -13,6 +13,12 @@ function(y, x, z = NULL, alpha=0, dist="gaussian", ...)
             stop("zombie (sum=0) columns in x")
         X <- as.matrix(x)
     }
+    if (any(is.na(y)))
+        stop("y contains NA")
+    if (any(is.na(x)))
+        stop("x contains NA")
+    if (any(is.na(z)))
+        stop("z contains NA")
     out <- .optilevels(Y=y, X=X, Z=z, alpha=alpha, dist=dist, ...)
     levs <- list()
     for (i in seq_len(length(out$ranklist))) {
