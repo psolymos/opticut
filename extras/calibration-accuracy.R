@@ -104,7 +104,7 @@ stopifnot(all(ctable(untable(ct)$x, untable(ct)$y) == ctable(x, y)))
 
 #https://en.wikipedia.org/wiki/Accuracy_paradox
 
-etable <- function(table, type="majority") {
+etable <- function(table, type="cohen", w=NULL) {
     type <- match.arg(type,
         c("majority", "random", "weighted", "cohen"))
     N <- sum(table)
@@ -125,6 +125,11 @@ etable <- function(table, type="majority") {
     if (type == "weighted") {
         ## rwgc: random-weighted-guess classifier
         ecm <- table
+        if (is.null(w)) {
+            w <- p
+        } else {
+            w <- w / sum(w)
+        }
         ecm[] <- N * p %*% t(p)
     }
     if (type == "cohen") {
@@ -134,10 +139,41 @@ etable <- function(table, type="majority") {
     }
     ecm
 }
-rtable <- function(n, table) {
-    array(rmultinom(n, sum(table), table),
-        c(dim(table), n),
-        list(rownames(table), colnames(table), NULL))
+rtable <- function(n, table, type=c("r", "rc")) {
+    type <- match.arg(type)
+    if (type == "rc") {
+        out <- array(unlist(r2dtable(n, rowSums(table), colSums(table))),
+            c(dim(table), n))
+    }
+    if (type == "r") {
+        r <- rowSums(table)
+        K <- length(r)
+        f <- function() {
+            t(sapply(seq_len(K), function(i)
+                rmultinom(1, r[i], table[i,])))
+        }
+        out <- replicate(n, f())
+    }
+    #out <- rmultinom(n, sum(table), table) # this does not keep margins
+    dimnames(out) <- list(rownames(table), colnames(table), NULL)
+    out
+}
+
+kappa <- function(predicted, reference) {
+    a <- sum(diag(predicted)) / sum(predicted)
+    a0 <- sum(diag(reference)) / sum(reference)
+    k <- (a - a0) / (1 - a0)
+    c(a=a, a0=a0, k=k)
+}
+
+eval_fun <- function(table, n=0, ptype="cohen", rtype="r", w=NULL) {
+    ref <- etable(table, type=ptype, w=w)
+    D <- c(dim(table), n+1)
+    rnd <- if (n > 0)
+        c(table, rtable(n, ref, type=rtype)) else c(table)
+    dim(rnd) <- D
+    k <- sapply(seq_len(n+1), function(i) kappa(table, rnd[,,i]))
+    k
 }
 
 etable(x$ctable)
