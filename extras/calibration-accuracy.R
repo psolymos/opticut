@@ -59,6 +59,7 @@ untable <- function(table) {
 multiclass <- function(x, y=NULL, beta=1) {
     if (!is.null(y))
         x <- ctable(x, y)
+    N <- sum(x)
     cm <- btable(x)
     Stat <- c(
         Acc = mean((cm["tp",] + cm["tn",]) / N),
