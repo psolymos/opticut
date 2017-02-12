@@ -171,7 +171,7 @@ eval_fun <- function(table, n=0, ptype="cohen", rtype="r", w=NULL) {
     ref <- etable(table, type=ptype, w=w)
     D <- c(dim(table), n+1)
     rnd <- if (n > 0)
-        c(table, rtable(n, ref, type=rtype)) else c(table)
+        c(ref, rtable(n, ref, type=rtype)) else c(ref)
     dim(rnd) <- D
     k <- sapply(seq_len(n+1), function(i) kappa(table, rnd[,,i]))
     k
