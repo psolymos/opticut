@@ -22,6 +22,13 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         colnames(X) <- "(Intercept)"
     }
 
+    if (any(is.na(Y)))
+        stop("Y contains NA")
+    if (any(is.na(X)))
+        stop("X contains NA")
+    if (any(is.na(strata)))
+        stop("strata argument contains NA")
+
     if (is.null(dim(strata))) {
         if (nchar(getOption("ocoptions")$collapse) < 1)
             stop("nchar(getOption('ocoptions')$collapse) must be > 0")
