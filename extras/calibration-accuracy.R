@@ -2,6 +2,7 @@ library(opticut)
 library(dclone)
 library(rjags)
 source("~/repos/opticut/extras/calibrate.R")
+source("~/repos/opticut/extras/multiclass.R")
 
 #Inverse prediction might be a good metric of overall accuracy and scaling species contribution (i.e. the real indicator power).
 #Implement binary-multinomial-continuous comparison.
