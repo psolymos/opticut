@@ -133,12 +133,36 @@ kappa <- function(predicted, reference) {
     c(a=a, a0=a0, k=k)
 }
 
-eval_fun <- function(table, n=0, ptype="cohen", rtype="r", w=NULL) {
+eval_fun <-
+function(table, FUN=kappa, n=0, ptype="cohen", rtype="r", w=NULL, ...)
+{
     ref <- etable(table, type=ptype, w=w)
     D <- c(dim(table), n+1)
     rnd <- if (n > 0)
         c(ref, rtable(n, ref, type=rtype)) else c(ref)
     dim(rnd) <- D
-    k <- sapply(seq_len(n+1), function(i) kappa(table, rnd[,,i]))
+    k <- sapply(seq_len(n+1), function(i, ...) FUN(table, rnd[,,i], ...))
     k
+}
+
+if (FALSE) {
+N <- 100
+K <- 5
+x <- sample(LETTERS[1:K], N, replace=TRUE, prob=sqrt(2^(0:(K-1))))
+y <- x
+for (i in 1:length(x))
+    if (runif(1) > 0.1)
+        y[i] <- sample(LETTERS[1:K], 1)
+(ct <- ctable(x, y))
+(cm <- btable(ct))
+untable(ct)
+stopifnot(all(ctable(untable(ct)$x, untable(ct)$y) == ctable(x, y)))
+(x <- multiclass(x, y))
+eval_fun(ct, n=10)
+f <- function(x, y) {
+    c(x=multiclass(x)$single["Precision",], y=multiclass(x)$single["Precision",])
+}
+eval_fun(ct, f, n=10)
+
+
 }
