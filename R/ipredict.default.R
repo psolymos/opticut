@@ -66,16 +66,17 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
         out
     }
     PI <- apply(mm, 2, f, K=K) / nrow(mm)
-    rownames(PI) <- paste0("Level", seq_len(K))
+    Levs <- paste0("Level", seq_len(K))
+    rownames(PI) <- Levs
     colnames(PI) <- rownames(ynew)
     gnew <- apply(PI, 2, which.max)
     out <- list(ynew=ynew,
         xnew=xnew,
         dist=Dist,
         data=dat,
-        model=model,
+        model=as.character(model),
         niter=nrow(mm),
-        gnew=gnew,
+        gnew=factor(Levs[gnew], Levs),
         pi=t(PI))
     class(out) <- c("ipredict.default", "ipredict")
     out

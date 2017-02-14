@@ -80,9 +80,9 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
         xnew=xnew,
         dist=object$dist,
         data=dat,
-        model=model,
+        model=as.character(model),
         niter=nrow(mm),
-        gnew=colnames(bp)[gnew],
+        gnew=factor(colnames(bp)[gnew], colnames(bp)),
         pi=t(PI))
     class(out) <- c("ipredict.opticut", "ipredict")
     out
