@@ -64,7 +64,8 @@ multiclass <- function(x, y=NULL, beta=1) {
         Precision=cm["tp",] / (cm["tp",] + cm["fp",]),
         Specificity=cm["tn",] / (cm["fp",] + cm["tn",]),
         Recall=cm["tp",] / (cm["tp",] + cm["fn",])) # recall = sensitivity
-    #Mat <- rbind(Mat, jouden=Mat["Specificity",]+Mat["Recall",]-1)
+    #Mat <- rbind(Mat, Jouden=Mat["Specificity",]+Mat["Recall",]-1)
+    Mat <- rbind(Mat, AUC=0.5*(Mat["Specificity",]+Mat["Recall",]))
     out <- list(ctable=x, btable=cm, average=Stat, beta=beta,
         single=Mat)
     class(out) <- "multiclass"
