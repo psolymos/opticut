@@ -53,7 +53,6 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
         model$mvn <- "    theta[r,1:2] ~ dmnorm(cf[1:2,r], prec[1:2,1:2,r])"
     }
     model$dist <- switch(object$dist,
-        #"gaussian:identity"="      y[i,r] ~ dnorm(mu[i,r])",
         "poisson"="      y[i,r] ~ dpois(exp(mu[i,r]))",
         "poisson:log"="      y[i,r] ~ dpois(exp(mu[i,r]))",
         "binomial"="      y[i,r] ~ dbern(ilogit(mu[i,r]))",
@@ -77,7 +76,7 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
     rownames(PI) <- colnames(bp)
     colnames(PI) <- rownames(ynew)
     gnew <- apply(PI, 2, which.max)
-    list(ynew=ynew,
+    out <- list(ynew=ynew,
         xnew=xnew,
         dist=object$dist,
         data=dat,
@@ -85,4 +84,6 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
         niter=nrow(mm),
         gnew=colnames(bp)[gnew],
         pi=t(PI))
+    class(out) <- c("ipredict.opticut", "ipredict")
+    out
 }

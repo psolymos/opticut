@@ -5,6 +5,7 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
     requireNamespace("dclone")
     fam <- family(object[[1L]])$family
     link <- family(object[[1L]])$link
+    Dist <- paste0(fam, ":", link)
     cf <- sapply(object, coef)
     prec <- array(sapply(object, function(z) solve(vcov(z))),
         dim = c(nrow(cf), nrow(cf), length(object)))
@@ -16,36 +17,42 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
         S=NCOL(ynew),
         cf=cf,
         prec=prec)
-    ## this needs to be able to run binomial as well based on family and link
-    ## also allow for missing xnew (take ipredict.opticut as example)
-    model <- dclone::custommodel(c(model="model {",
-        "  for (i in 1:n) {",
-        "    for (r in 1:S) {",
-        "      y[i,r] ~ dpois(exp(mu[i,r]))", # poisson
-        "      mu[i,r] <- b0[r] + b1[r,k[i]] + inprod(x[i,], a[r,])",
-        "    }",
-        "    k[i] ~ dcat(pi)",
-        "  }",
-        "  for (r in 1:S) {",
-        "    b1[r,1] <- 0",
-        "    for (k in 2:K) {",
-        "      b1[r,k] <- theta[r,k]",
-        "    }",
-        "    b0[r] <- theta[r,1]",
-        "    a[r,1:p] <- theta[r,(K+1):(K+p)]", # z & x
-        "    theta[r,1:(K+p)] ~ dmnorm(cf[1:(K+p),r], prec[1:(K+p),1:(K+p),r])",
-        "  }",
-        "}"))
+    model <- list(
+        head=c("model {",
+            "  for (i in 1:n) {",
+            "    for (r in 1:S) {"),
+        dist=NULL,
+        mu=NULL,
+        mid=c("    }",
+            "    k[i] ~ dcat(pi)",
+            "  }",
+            "  for (r in 1:S) {",
+            "    b1[r,1] <- 0",
+            "    for (k in 2:K) {",
+            "      b1[r,k] <- theta[r,k]",
+            "    }",
+            "    b0[r] <- theta[r,1]"),
+        mvn=NULL,
+        tail=c("  }",
+            "}"))
     if (!is.null(xnew)) {
-        if (is.data.frame(xnew)) {
-            ff <- formula(object)
-            ff[[2]] <- NULL
-            xnew <- model.matrix(ff, xnew)
-        }
-#        xnew <- xnew[,colnames(object$X),drop=FALSE]
         dat$p <- ncol(xnew) - 1L
         dat$x <- xnew[,-1,drop=FALSE] # drop intercept
+        model$mu <- "      mu[i,r] <- b0[r] + b1[r,k[i]] + inprod(x[i,], a[r,])"
+        model$mvn <- c("    a[r,1:p] <- theta[r,(K+1):(K+p)]",
+            "    theta[r,1:(K+p)] ~ dmnorm(cf[1:(K+p),r], prec[1:(K+p),1:(K+p),r])")
+    } else {
+        model$mu <- "      mu[i,r] <- b0[r] + b1[r,k[i]]"
+        model$mvn <- "    theta[r,1:K] ~ dmnorm(cf[1:K,r], prec[1:K,1:K,r])"
     }
+    model$dist <- switch(Dist,
+        "poisson"="      y[i,r] ~ dpois(exp(mu[i,r]))",
+        "poisson:log"="      y[i,r] ~ dpois(exp(mu[i,r]))",
+        "binomial"="      y[i,r] ~ dbern(ilogit(mu[i,r]))",
+        "binomial:logit"="      y[i,r] ~ dbern(ilogit(mu[i,r]))",
+        "binomial:cloglog"="      y[i,r] ~ dbern(icloglog(mu[i,r]))",
+        "binomial:probit"="      y[i,r] ~ dbern(phi(mu[i,r]))")
+    model <- dclone::custommodel(unlist(model))
     if (is.null(cl)) {
         jm <- dclone::jags.fit(dat, "k", model, ...)
     } else {
@@ -59,15 +66,17 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
         out
     }
     PI <- apply(mm, 2, f, K=K) / nrow(mm)
-    #rownames(PI) <- colnames(bp)
+    rownames(PI) <- paste0("Level", seq_len(K))
     colnames(PI) <- rownames(ynew)
     gnew <- apply(PI, 2, which.max)
-    list(ynew=ynew,
+    out <- list(ynew=ynew,
         xnew=xnew,
-#        dist=object$dist,
+        dist=Dist,
         data=dat,
         model=model,
         niter=nrow(mm),
         gnew=gnew,
         pi=t(PI))
+    class(out) <- c("ipredict.default", "ipredict")
+    out
 }
