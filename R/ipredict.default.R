@@ -1,6 +1,8 @@
 ipredict.default <-
 function(object, ynew, xnew=NULL, cl=NULL, K, ...)
 {
+    if (!all(names(object) == colnames(ynew)))
+        stop("names in object and ynew nust match")
     requireNamespace("rjags")
     requireNamespace("dclone")
     fam <- family(object[[1L]])$family

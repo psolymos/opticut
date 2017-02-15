@@ -3,7 +3,13 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
 {
     requireNamespace("rjags")
     requireNamespace("dclone")
-    ynew <- ynew[,colnames(object$Y),drop=FALSE]
+    #ynew <- ynew[,colnames(object$Y),drop=FALSE]
+    ## new and missing species treated as 0
+    ynew0 <- matrix(0, nrow(ynew), ncol(object$Y))
+    dimnames(ynew0) <- list(rownames(ynew), colnames(object$Y))
+    cn <- intersect(colnames(ynew), colnames(object$Y))
+    ynew0[,cn] <- ynew[,cn]
+    ynew <- ynew0
     if (!is.null(xnew) && ncol(object$X) < 2L)
         xnew <- NULL
     bp <- summary(object)$bestpart
