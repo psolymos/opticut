@@ -5,11 +5,17 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
     requireNamespace("dclone")
     #ynew <- ynew[,colnames(object$Y),drop=FALSE]
     ## new and missing species treated as 0
-    ynew0 <- matrix(0, nrow(ynew), ncol(object$Y))
-    dimnames(ynew0) <- list(rownames(ynew), colnames(object$Y))
-    cn <- intersect(colnames(ynew), colnames(object$Y))
-    ynew0[,cn] <- ynew[,cn]
-    ynew <- ynew0
+    sd1 <- setdiff(colnames(ynew), colnames(object$Y))
+    sd2 <- setdiff(colnames(object$Y), colnames(ynew))
+    if (length(s1) > 0)
+        warning(length(s1), " species found in ynew but not in object: dropped")
+    if (length(s2) > 0)
+        stop(length(s2), " original species not found in ynew")
+    ynew0 <- ynew
+    ynew <- matrix(0, nrow(ynew), ncol(object$Y))
+    dimnames(ynew) <- list(rownames(ynew0), colnames(object$Y))
+    cn <- intersect(colnames(ynew0), colnames(object$Y))
+    ynew[,cn] <- ynew0[,cn]
     if (!is.null(xnew) && ncol(object$X) < 2L)
         xnew <- NULL
     bp <- summary(object)$bestpart
@@ -82,7 +88,7 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
     rownames(PI) <- colnames(bp)
     colnames(PI) <- rownames(ynew)
     gnew <- apply(PI, 2, which.max)
-    out <- list(ynew=ynew,
+    out <- list(ynew=ynew0,
         xnew=xnew,
         dist=object$dist,
         data=dat,
