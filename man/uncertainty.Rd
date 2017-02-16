@@ -14,6 +14,7 @@
 \alias{bsmooth}
 \alias{bsmooth.uncertainty1}
 \alias{bsmooth.uncertainty}
+\alias{subset.uncertainty}
 \title{
 Quantifying uncertainty for fitted objects
 }
@@ -28,6 +29,7 @@ uncertainty(object, ...)
 
 check_strata(x, mat)
 \method{strata}{uncertainty}(object, ...)
+\method{subset}{uncertainty}(x, subset, ...)
 
 \method{bestpart}{uncertainty}(object, ...)
 \method{bestpart}{uncertainty1}(object, ...)
@@ -126,6 +128,8 @@ The summary method prints the name of the best supported split,
 selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
 reliability) and conficence interval for I (based on \code{level}).
+
+The \code{subset} method subsets the species in the uncertainty object.
 
 \code{\link{bestpart}} finds the selection frequencies for
 strata as best partitions (number of strata times number of species).

@@ -12,6 +12,7 @@
 \alias{wplot.opticut1}
 \alias{print.opticut}
 \alias{print.opticut1}
+\alias{subset.opticut}
 \alias{summary.opticut}
 \alias{print.summary.opticut}
 \alias{bestmodel.opticut}
@@ -43,6 +44,7 @@ strata(object, ...)
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, pos_only = FALSE, ...)
 \method{getMLE}{opticut}(object, which, ...)
+\method{subset}{opticut}(x, subset, ...)
 
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut, ylim = c(-1, 1),
@@ -205,6 +207,10 @@ recognizing the direction of the association.
 taken into account and \code{1} indicates strata of positive association.
 This is only important when \code{comb} is not \code{"rank"}.
 }
+  \item{subset}{
+logical, numeric, or character index indicating species to keep,
+missing values are not accepted.
+}
   \item{\dots}{
 other arguments passed to the underlying functions.
 }
@@ -320,6 +326,8 @@ The summary shows the following information:
 best supported split, strength and sign of association,
 indicator value (I), expected values (mu0, mu1), log likelihood ratio (logLR),
 and model weights(w).
+
+The \code{subset} method subsets the species in the opticut object.
 
 The \code{plot} method presents the contrasts by species and strata.
 
