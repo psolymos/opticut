@@ -5,6 +5,10 @@ function(object, ynew, xnew=NULL, cl=NULL, K, ...)
         stop("names in object and ynew nust match")
     requireNamespace("rjags")
     requireNamespace("dclone")
+    ## avoid clashes when running parallel
+    ow <- getOption("dcoptions")$overwrite
+    dclone::dcoptions("overwrite"=FALSE)
+    on.exit(dclone::dcoptions("overwrite"=ow))
     fam <- family(object[[1L]])$family
     link <- family(object[[1L]])$link
     Dist <- paste0(fam, ":", link)

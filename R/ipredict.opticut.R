@@ -3,6 +3,10 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
 {
     requireNamespace("rjags")
     requireNamespace("dclone")
+    ## avoid clashes when running parallel
+    ow <- getOption("dcoptions")$overwrite
+    dclone::dcoptions("overwrite"=FALSE)
+    on.exit(dclone::dcoptions("overwrite"=ow))
     #ynew <- ynew[,colnames(object$Y),drop=FALSE]
     ## new and missing species treated as 0
     sd1 <- setdiff(colnames(ynew), colnames(object$Y))
