@@ -6,7 +6,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         data <- parent.frame()
     Strata <- deparse(substitute(strata))
     if (Strata %in% names(data))
-    strata <- data[[Strata]]
+        strata <- data[[Strata]]
     mf <- match.call(expand.dots = FALSE)
     mm <- match(c("formula", "data"), names(mf), 0)
     mf <- mf[c(1, mm)]
@@ -32,9 +32,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     out$call <- match.call()
     if (is.function(dist)) {
         attr(out$dist, "dist") <- deparse(substitute(dist))
-        for (i in seq_len(length(out$species))) {
+        for (i in seq_len(length(out$species)))
             attr(out$species[[i]], "dist") <- deparse(substitute(dist))
-        }
     }
     out
 }
