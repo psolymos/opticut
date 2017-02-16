@@ -12,9 +12,12 @@ function(object, ynew, xnew=NULL, cl=NULL, ...)
     sd1 <- setdiff(colnames(ynew), colnames(object$Y))
     sd2 <- setdiff(colnames(object$Y), colnames(ynew))
     if (length(s1) > 0)
-        warning(length(s1), " species found in ynew but not in object: dropped")
-    if (length(s2) > 0)
-        stop(length(s2), " original species not found in ynew")
+        warning(length(s1), " in ynew not found in object: dropped")
+    if (length(s2) > 0) {
+        stop(length(s2), " original species not found in ynew: dropped")
+        object <- subset(object,
+            colnames(object$Y)[colnames(object$Y) %in% colnames(ynew)])
+    }
     ynew0 <- ynew
     ynew <- matrix(0, nrow(ynew), ncol(object$Y))
     dimnames(ynew) <- list(rownames(ynew0), colnames(object$Y))
