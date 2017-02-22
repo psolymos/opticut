@@ -1,6 +1,6 @@
 Package: opticut
 Type: Package
-Title: Likelihood Based Optimal Partitioning for Indicator Species Analysis
+Title: Likelihood Based Optimal Partitioning and Indicator Species Analysis
 Version: 0.1-1
 Date: 2016-12-17
 Author: Peter Solymos [cre, aut], Ermias T. Azeria [ctb]
