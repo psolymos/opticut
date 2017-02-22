@@ -159,9 +159,15 @@ wa.opticut <- function(object, ynew) {
     s <- summary(object)
     bp <- s$bestpart
     I <- s$summary$I
-    p <- t(apply(ynew, 1, function(z) z / sum(z)))
-    t(apply(p, 1, function(y)
-        colMeans(apply(bp, 2, function(z) y * z * I))))
+#    p <- t(apply(ynew, 1, function(z) z / sum(z)))
+#    t(apply(p, 1, function(y)
+#        colMeans(apply(bp, 2, function(z) y * z * I))))
+    t(apply(ynew, 1, function(y)
+        colSums(apply(bp, 2, function(z)
+            abs((I*z + (1-z)*(1-I)) - y)))))
+#    t(apply(ynew, 1, function(y)
+#        colSums(apply(bp, 2, function(z)
+#            abs((I*z + (1-z)*(-I)) - y)))))
 }
 object <- u
 wa.uncertainty <- function(object, ynew) {
@@ -192,7 +198,8 @@ wa.uncertainty <- function(object, ynew) {
 wa(o, y_new)
 wa(u, y_new)
 
-cl <- makeCluster(4)
+#cl <- makeCluster(4)
+cl <- NULL
 nn <- nrow(Y)
 mm <- ncol(Y)
 ## All species + LOO
@@ -209,21 +216,22 @@ for (i in 1:nn) {
     y_new <- Y[!ii,,drop=FALSE]
     x_trn <- X[ii,,drop=FALSE]
     o <- opticut(y_trn ~ 1, strata=x_trn[,s_col], dist=Dist, cl=cl)
-    u <- uncertainty(o, type="multi", B=100, cl=cl)
+#    u <- uncertainty(o, type="multi", B=100, cl=cl)
     cal <- wa(o, y_new)
-    calu <- wa(u, y_new)
+#    calu <- wa(u, y_new)
     if (!any(is.na(cal)))
         gnew0[i] <- colnames(cal)[which.max(cal)]
     pm0[i,] <- cal[1,]
-    if (!any(is.na(cal)))
-        gnew0u[i] <- colnames(calu)[which.max(calu)]
-    pm0u[i,] <- calu[1,]
+#    if (!any(is.na(cal)))
+#        gnew0u[i] <- colnames(calu)[which.max(calu)]
+#    pm0u[i,] <- calu[1,]
 }
-stopCluster(cl)
+#stopCluster(cl)
 iii <- gnew0 != ""
 mcm(X[iii,s_col], factor(gnew0[iii], levels(X[,s_col])))
 mcm(X[iii,s_col], factor(gnew0u[iii], levels(X[,s_col])))
 
+<<<<<<< HEAD
 
 ## example
 if (FALSE) {
@@ -269,3 +277,37 @@ mod2 <- lapply(1:ncol(y_trn), function(i) {
 ip4 <- ipredict(mod2, y_new, xnew=model.matrix(~ lmoist, x_new), K=4, n.iter=1000)
 
 }
+=======
+colnames(pm0) <- colnames(cal)
+gnew0 <- mefa4::find_min(pm0)
+mcm(X[iii,s_col], factor(gnew0[,1], levels(X[,s_col])))
+
+(tt <- table(data=X[iii,s_col], est=factor(gnew0[,1], levels(X[,s_col]))))
+
+load("~/Dropbox/collaborations/opticut/R/calibr-dolina-binomial.Rdata")
+(tt <- table(data=X[,s_col], class=factor(gnew0, levels(X[,s_col]))))
+
+## InvPred
+#    class
+#data LI DW TL RO
+#  LI 71 11 22  8
+#  DW 10 14 14 10
+#  TL 30  7  3  8
+#  RO  4  6  3 35
+
+## -I
+#    est
+#data LI DW TL RO
+#  LI 26  6  0 80
+#  DW  2  9  0 37
+#  TL  6  9  0 33
+#  RO  1  3  0 44
+
+## 1-I
+#    est
+#data  LI  DW  TL  RO
+#  LI   3   7 102   0
+#  DW   5  15  28   0
+#  TL   8   5  34   1
+#  RO   4  17  16  11
+>>>>>>> master
