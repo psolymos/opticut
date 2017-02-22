@@ -1,4 +1,4 @@
-# opticut: Likelihood Based Optimal Partitioning for Indicator Species Analysis
+# opticut: Likelihood Based Optimal Partitioning and Indicator Species Analysis
 
 [![CRAN version](http://www.r-pkg.org/badges/version/opticut)](https://CRAN.R-project.org/package=opticut)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/opticut)](http://www.rdocumentation.org/packages/opticut)
