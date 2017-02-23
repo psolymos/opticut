@@ -52,6 +52,6 @@ importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
 importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
            "vcov", "density", "quantile", ".MFclass", "nobs",
-           "as.dist", "hclust", "predict", "fitted")
+           "as.dist", "hclust", "predict", "fitted", "formula")
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")
