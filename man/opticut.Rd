@@ -456,7 +456,7 @@ getMLE(m2, which = 1)
 ## fitted values
 head(fitted(m2))
 ## prediction for new data
-head(predict(m2, gnew=x0, xnex=data.frame(x2=x2)))
+head(predict(m2, gnew=x0, xnew=data.frame(x2=x2)))
 
 \dontrun{
 ## --- Zero-inflated Negative Binomial
