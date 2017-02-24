@@ -8,7 +8,8 @@ help_pages <- c("opticut-package",
     "opticut", "optilevels", "sindex", "lorenz",
     "beta2i",
     "allComb", "rankComb",
-    "bestmodel", "uncertainty",
+    #"bestmodel",
+    "uncertainty",
     "occolors", "ocoptions")
 
 for (i in help_pages) {

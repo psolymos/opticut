@@ -46,12 +46,9 @@ strata(object, ...)
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, pos_only = FALSE, ...)
 \method{getMLE}{opticut}(object, which, ...)
-<<<<<<< HEAD
 \method{subset}{opticut}(x, subset, ...)
-=======
 \method{fitted}{opticut}(object, ...)
 \method{predict}{opticut}(object, gnew=NULL, xnew=NULL, ...)
->>>>>>> master
 
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut, ylim = c(-1, 1),
@@ -214,16 +211,14 @@ recognizing the direction of the association.
 taken into account and \code{1} indicates strata of positive association.
 This is only important when \code{comb} is not \code{"rank"}.
 }
-<<<<<<< HEAD
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
 missing values are not accepted.
-=======
+}
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
 to predict for, or \code{NULL}. If not \code{NULL}, both must be provided
 (available for \code{comb = "rank"} models only).
->>>>>>> master
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
@@ -453,6 +448,8 @@ wplot(m1, which = 1)
 
 ## rank based partitions, multiple species
 summary(m2 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
+## subset results
+summary(subset(m2, 1:2))
 
 ## best partition
 head(bestpart(m2))
