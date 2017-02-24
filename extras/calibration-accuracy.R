@@ -70,8 +70,8 @@ for (i in 1:nn) {
     o <- opticut(y_trn ~ 1, strata=x_trn[,s_col], dist=Dist, cl=cl)
     cal1 <- ipredict.opticut(o, y_new, n.chains=length(cl), type="mcmc", cl=cl)
     cal2 <- ipredict.opticut(o, y_new, type="analytic")
-    gnew1 <- c(factor(gnew0, levels(cal1$gnew)), cal1$gnew)
-    gnew2 <- c(factor(gnew0, levels(cal1$gnew)), cal1$gnew)
+    gnew1 <- c(gnew1, as.character(cal1$gnew))
+    gnew2 <- c(gnew2, as.character(cal2$gnew))
     pm1 <- rbind(pm1, cal1$pi)
 }
 ## -1 species + LOO
@@ -107,6 +107,14 @@ save(X, Y, s_col, gnew0, pm0, gnew_list, pm_list,
 mcm(X[1:nn,s_col], factor(gnew0, levels(X[,s_col])))
 (tt <- table(X[1:nn,s_col], factor(gnew0, levels(X[,s_col]))))
 sum(diag(tt))/sum(tt)
+
+multiclass(gnew2, gnew1)
+which(gnew1 != gnew2)
+pm1[which(gnew1 != gnew2),]
+cbind(mcmc=gnew1, an=gnew2)[which(gnew1 != gnew2),]
+
+multiclass(as.character(X[,s_col]), gnew1)
+multiclass(as.character(X[,s_col]), gnew2)
 
 MCM0 <- mcm(X[,s_col], factor(gnew0, levels(X[,s_col])))
 MCM <- lapply(gnew_list, function(z) mcm(X[,s_col], factor(z, levels(X[,s_col]))))
