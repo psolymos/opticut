@@ -107,6 +107,10 @@ logical. If \code{TRUE}, setting row names and converting column names
 (to syntactic names: see \code{\link{make.names}}) is optional.
 See \code{\link{as.data.frame}}.
 }
+  \item{subset}{
+logical, numeric, or character index indicating species to keep,
+missing values are not accepted.
+}
 \item{\dots}{
 other arguments passed to the underlying functions.
 }
@@ -265,8 +269,7 @@ lines(br[-1]-0.5*d, stat[,2], col=4, lty=2)
 lines(br[-1]-0.5*d, stat[,3], col=4, lty=2)
 lines(br[-1]-0.5*d, bs[,1], col=2)
 legend("topright", bty="n", lty=c(1,1,2,1), col=c(1,4,4,2),
-    legend=c("True response","bsmooth","95% CI","Best partition"))
-
+    legend=c("True response","bsmooth","0.95 CI","Best partition"))
 }
 }
 \keyword{ manip }
