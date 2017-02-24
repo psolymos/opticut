@@ -1,4 +1,4 @@
-ipredict.default <-
+ipredict.multicut <-
 function(object, ynew, xnew=NULL, cl=NULL, K, ...)
 {
     if (!all(names(object) == colnames(ynew)))
