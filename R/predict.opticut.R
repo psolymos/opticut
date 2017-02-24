@@ -1,20 +1,23 @@
 predict.opticut <-
 function (object, gnew=NULL, xnew=NULL, ...)
 {
-    if (is.null(xnew)) {
-        if (!is.null(gnew))
-            stop("gnew must be NULL if xnew=NULL")
+    if (is.null(xnew) && is.null(gnew)) {
         fit <- fitted(object)
     } else {
-        if (is.null(gnew))
-            stop("gnew must be provided")
         if (is.na(object$comb) || object$comb != "rank")
             stop("predict method for new data available only for comb=rank")
-        f <- formula(object)
-        f[[2]] <- NULL
+        if (is.null(gnew))
+            stop("gnew must be provided")
+        if (is.null(xnew)) {
+            xnew <- matrix(1, length(gnew), 1L)
+        }
         bp <- summary(object)$bestpart
-        X <- model.matrix(f, xnew)
-        linkinv <- .opticut1(object$Y[,1L], X, Z1=NULL, dist=object$dist)$linkinv
+        ff <- formula(object)
+        ff[[2]] <- NULL
+        X <- if (is.data.frame(xnew))
+            model.matrix(ff, xnew) else data.matrix(xnew)
+        linkinv <- .opticut1(object$Y[,1L], X=object$X, Z1=NULL,
+            dist=object$dist)$linkinv
         g <- factor(gnew, levels(object$strata))
         if (any(is.na(X)) || any(is.na(g)))
             stop("new data must not have any NA")
