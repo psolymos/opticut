@@ -56,8 +56,8 @@ cl <- makeCluster(4)
 nn <- nrow(Y)
 mm <- ncol(Y)
 ## All species + LOO
-gnew0 <- character(0)
-pm0 <- matrix(NA, 0, nlevels(X[,s_col]))
+gnew1 <- gnew2 <- character(0)
+pm1 <- matrix(NA, 0, nlevels(X[,s_col]))
 for (i in 1:nn) {
     if (interactive()) {
         cat("<<< All species --- Run", i, "of", nn, ">>>\n")
@@ -68,9 +68,11 @@ for (i in 1:nn) {
     x_trn <- X[ii,,drop=FALSE]
     #x_new <- X[!ii,,drop=FALSE]
     o <- opticut(y_trn ~ 1, strata=x_trn[,s_col], dist=Dist, cl=cl)
-    cal <- calibrate(o, y_new, n.chains=length(cl), cl=cl)
-    gnew0 <- c(gnew0, cal$gnew)
-    pm0 <- rbind(pm0, cal$pi)
+    cal1 <- ipredict.opticut(o, y_new, n.chains=length(cl), type="mcmc", cl=cl)
+    cal2 <- ipredict.opticut(o, y_new, type="analytic")
+    gnew1 <- c(factor(gnew0, levels(cal1$gnew)), cal1$gnew)
+    gnew2 <- c(factor(gnew0, levels(cal1$gnew)), cal1$gnew)
+    pm1 <- rbind(pm1, cal1$pi)
 }
 ## -1 species + LOO
 gnew_list <- list()
