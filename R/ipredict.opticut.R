@@ -36,7 +36,6 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             xnew <- data.matrix(xnew)
         }
     }
-
     if (type == "mcmc") {
         requireNamespace("rjags")
         requireNamespace("dclone")
@@ -104,15 +103,12 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
         rownames(PI) <- colnames(bp)
         colnames(PI) <- rownames(ynew)
         gnew <- apply(PI, 2, which.max)
-        PI <- t(PI)
-        ll <- NULL # loglik array
-        lls <- NULL
-        niter <- nrow(mm)
+        results <- list(
+            data=dat,
+            model=as.character(model),
+            niter=nrow(mm),
+            pi=t(PI))
     } else {
-        PI <- NULL
-        niter <- NA
-        model <- NA
-        dat <- NULL
         Dist <- strsplit(object$dist, ":")[[1L]][1L]
         ll <- array(NA, c(dim(ynew), K))
         lls <- matrix(NA, nrow(ynew), K)
@@ -128,18 +124,17 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             lls[,i] <- rowSums(ll[,,i,drop=FALSE])
         }
         gnew <- apply(lls, 1, which.max)
+        results <- list(
+            loglik_species=ll,
+            loglik=lls)
     }
-    out <- list(ynew=ynew0,
+    out <- list(
+        ynew=ynew0,
         xnew=xnew,
+        gnew=factor(LEV[gnew], LEV),
         dist=object$dist,
         type=type,
-        data=dat,
-        model=as.character(model),
-        niter=niter,
-        gnew=factor(LEV[gnew], LEV),
-        pi=PI,
-        ll=ll,
-        lls=lls)
+        results=results)
     class(out) <- c("ipredict.opticut", "ipredict")
     out
 }
