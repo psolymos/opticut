@@ -19,8 +19,13 @@ S3method("bestpart", "uncertainty1")
 S3method("bsmooth", "uncertainty1")
 S3method("bsmooth", "uncertainty")
 S3method("getMLE", "opticut")
+<<<<<<< HEAD
 S3method("ipredict", "default")
 S3method("ipredict", "opticut")
+=======
+S3method("predict", "opticut")
+S3method("fitted", "opticut")
+>>>>>>> master
 S3method("plot", "opticut")
 S3method("plot", "lorenz")
 S3method("wplot", "opticut")
@@ -55,6 +60,10 @@ importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
 importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
            "vcov", "density", "quantile", ".MFclass", "nobs",
+<<<<<<< HEAD
            "as.dist", "hclust", "formula")
+=======
+           "as.dist", "hclust", "predict", "fitted", "formula")
+>>>>>>> master
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")

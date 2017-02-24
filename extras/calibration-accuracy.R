@@ -231,7 +231,6 @@ iii <- gnew0 != ""
 mcm(X[iii,s_col], factor(gnew0[iii], levels(X[,s_col])))
 mcm(X[iii,s_col], factor(gnew0u[iii], levels(X[,s_col])))
 
-<<<<<<< HEAD
 
 ## example
 if (FALSE) {
@@ -277,7 +276,7 @@ mod2 <- lapply(1:ncol(y_trn), function(i) {
 ip4 <- ipredict(mod2, y_new, xnew=model.matrix(~ lmoist, x_new), K=4, n.iter=1000)
 
 }
-=======
+
 colnames(pm0) <- colnames(cal)
 gnew0 <- mefa4::find_min(pm0)
 mcm(X[iii,s_col], factor(gnew0[,1], levels(X[,s_col])))
@@ -310,4 +309,3 @@ load("~/Dropbox/collaborations/opticut/R/calibr-dolina-binomial.Rdata")
 #  DW   5  15  28   0
 #  TL   8   5  34   1
 #  RO   4  17  16  11
->>>>>>> master

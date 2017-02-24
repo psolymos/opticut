@@ -3,6 +3,8 @@
 \alias{opticut.default}
 \alias{opticut.formula}
 \alias{opticut1}
+\alias{fitted.opticut}
+\alias{predict.opticut}
 \alias{plot.opticut}
 \alias{wplot}
 \alias{fix_levels}
@@ -44,7 +46,12 @@ strata(object, ...)
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, pos_only = FALSE, ...)
 \method{getMLE}{opticut}(object, which, ...)
+<<<<<<< HEAD
 \method{subset}{opticut}(x, subset, ...)
+=======
+\method{fitted}{opticut}(object, ...)
+\method{predict}{opticut}(object, gnew=NULL, xnew=NULL, ...)
+>>>>>>> master
 
 wplot(x, ...)
 \method{wplot}{opticut1}(x, cut, ylim = c(-1, 1),
@@ -207,9 +214,16 @@ recognizing the direction of the association.
 taken into account and \code{1} indicates strata of positive association.
 This is only important when \code{comb} is not \code{"rank"}.
 }
+<<<<<<< HEAD
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
 missing values are not accepted.
+=======
+  \item{gnew, xnew}{
+new values for \code{strata} and modifiers (right-hand-side of formula)
+to predict for, or \code{NULL}. If not \code{NULL}, both must be provided
+(available for \code{comb = "rank"} models only).
+>>>>>>> master
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
@@ -347,6 +361,13 @@ model. The list has the following elements:
 \code{vcov} is the variance-covariance matrix for the MLE,
 \code{dist} is the distribution inherited from input \code{object}.
 
+\code{\link{fitted}} returns expected values on the predictor scale
+for the observations as a matrix (number of observations by number of species).
+\code{\link{predict}} returns \code{fitted} values when both \code{gnew}
+and \code{xnew} are \code{NULL}, or corresponding point predictions
+(expected values) on the predictor scale
+(available for \code{comb = "rank"} models only).
+
 The coercion method \code{\link{as.data.frame}} return a data frame.
 }
 \references{
@@ -440,11 +461,15 @@ head(bestpart(m2))
 mods <- bestmodel(m2)
 mods
 ## explore further
-str(predict(mods[[1]]))
 confint(mods[[1]])
 
 ## MLE and variance-covariance matrix (species 1)
 getMLE(m2, which = 1)
+
+## fitted values
+head(fitted(m2))
+## prediction for new data
+head(predict(m2, gnew=x0, xnew=data.frame(x2=x2)))
 
 \dontrun{
 ## --- Zero-inflated Negative Binomial
