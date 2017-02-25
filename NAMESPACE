@@ -1,4 +1,4 @@
-export("opticut", "optilevels", "opticut1",
+export("opticut", "optilevels", "opticut1", "multicut1", "multicut",
     "wrsi", "sindex",
     "lorenz",
     "ocoptions", "occolors", "col2gray",
@@ -11,6 +11,8 @@ export("opticut", "optilevels", "opticut1",
     "iquantile")
 S3method("opticut", "default")
 S3method("opticut", "formula")
+S3method("multicut", "default")
+S3method("multicut", "formula")
 S3method("bestmodel", "opticut")
 S3method("bestmodel", "optilevels")
 S3method("bestpart", "opticut")
