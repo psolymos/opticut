@@ -125,9 +125,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         collapse=getOption("ocoptions")$collapse)
     if (is.function(dist)) {
         attr(out$dist, "dist") <- deparse(substitute(dist))
-        for (i in which(!Failed)) {
-            attr(res[[i]], "dist") <- deparse(substitute(dist))
-        }
+        for (i in seq_len(length(out$species)))
+            attr(out$species[[i]], "dist") <- deparse(substitute(dist))
     }
     class(out) <- "opticut"
     out
