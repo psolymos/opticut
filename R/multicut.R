@@ -1,0 +1,2 @@
+multicut <- function (...)
+    UseMethod("multicut")
