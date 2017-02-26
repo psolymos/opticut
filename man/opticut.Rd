@@ -94,7 +94,8 @@ in the model. If not found in data, the variables are taken from
 from which \code{opticut} is called.
 }
   \item{strata}{
-vector (usually a factor), unique values define partitions.
+vector (usually a factor), unique values define partitions
+(must have at least 2 unique levels, empty levels are dropped).
 It can also be a matrix with rows as observations and
 binary partitions as columns.
 }
@@ -217,8 +218,8 @@ missing values are not accepted.
 }
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
-to predict for, or \code{NULL}. If not \code{NULL}, both must be provided
-(available for \code{comb = "rank"} models only).
+to predict for, or \code{NULL}.
+Predicting for new strata available for \code{comb = "rank"} models only.
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
@@ -363,7 +364,7 @@ and \code{xnew} are \code{NULL}, or corresponding point predictions
 (expected values) on the predictor scale
 (available for \code{comb = "rank"} models only).
 
-The coercion method \code{\link{as.data.frame}} return a data frame.
+The coercion methods \code{\link{as.data.frame}} return a data frame.
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
