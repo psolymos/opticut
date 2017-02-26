@@ -40,9 +40,8 @@ multicut(...)
 
 \method{plot}{multicut}(x, which = NULL, cut, sort,
     las, ylab = "Relative abundance", xlab = "Strata",
-    show_I = TRUE, show_S = TRUE, hr = TRUE, tick = TRUE,
-    theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
-    lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
+    hr = TRUE, tick = TRUE, theme, mar = c(5, 4, 4, 4) + 0.1,
+    bty = "o", lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
 
 \method{print}{multicut1}(x, digits, ...)
 \method{print}{multicut}(x, digits, ...)
@@ -117,12 +116,6 @@ should be meaningfully sorted, the default is \code{TRUE}.
 It can take numeric value when only species (\code{1})
 or partitions (\code{2}) are to be sorted (\code{1:2} is equivalent to
 \code{TRUE}, wile any other numeric value is equivalent to \code{FALSE}).
-}
-  \item{show_I}{
-logical, if indicator values should be shown.
-}
-  \item{show_S}{
-logical, if number of indicator species should be shown.
 }
   \item{hr, tick}{
 logical, if horizontal rules (\code{hr})
