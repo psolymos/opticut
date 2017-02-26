@@ -128,7 +128,7 @@ color theme as defined by \code{\link{occolors}}.
   \item{mar}{
 numeric, graphical parameters for plot margin \code{\link{par}}.
 }
-  \item{ylab, xlab, las, ylim}{
+  \item{ylab, xlab, las}{
 graphical arguments, see \code{\link{plot}}.
 By default, \code{las} is 1 when \code{horizontal = TRUE} and
 2 when \code{horizontal = FALSE}.
@@ -158,9 +158,6 @@ numeric or character (can be a vector) defining
 a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
 }
-  \item{sep}{
-a character string to separate the sub-strings in factor levels.
-}
 \item{row.names}{
 \code{NULL} or a character vector giving the row names for the data frame.
 Missing values are not allowed. See \code{\link{as.data.frame}}.
@@ -169,13 +166,6 @@ Missing values are not allowed. See \code{\link{as.data.frame}}.
 logical. If \code{TRUE}, setting row names and converting column names
 (to syntactic names: see \code{\link{make.names}}) is optional.
 See \code{\link{as.data.frame}}.
-}
-  \item{pos_only}{
-logical, best partition normally returns the original variable without
-recognizing the direction of the association.
-\code{pos_only = TRUE} returns values where negative associations are
-taken into account and \code{1} indicates strata of positive association.
-This is only important when \code{comb} is not \code{"rank"}.
 }
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
