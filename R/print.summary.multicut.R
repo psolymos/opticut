@@ -5,6 +5,7 @@ print.summary.multicut <- function(x, cut, sort, digits, ...) {
         digits <- max(3L, getOption("digits") - 3L)
     if (missing(sort))
         sort <- getOption("ocoptions")$sort
+
     if (is.logical(sort)) {
         sort_r <- sort[1L]
         sort_c <- sort[1L]
@@ -18,6 +19,7 @@ print.summary.multicut <- function(x, cut, sort, digits, ...) {
     if (sort_c)
         xx <- xx[, x$col.order]
     xx <- xx[x$logLR >= cut, , drop = FALSE]
+
     Missing <- nrow(x$summary) - nrow(xx)
     tmp <- if (nrow(xx) > 1L)
         "Species models" else "Species model"
