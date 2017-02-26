@@ -254,10 +254,12 @@ related to the presentation of the results in the package.
 }
 \examples{
 
+\dontrun{
+
 set.seed(1234)
 n <- 200
 x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 lam <- exp(0.5 + 0.5*x1 + -0.2*x2)
 Y1 <- rpois(n, lam)
@@ -281,7 +283,6 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
 rownames(spp) <- gr
 spp
 
-\dontrun{
 
 summary(ocall <- multicut(spp ~ 1, strata=gr, dist="gaussian"))
 summary(multicut(spp, strata=gr, dist="gaussian")) # alternative
