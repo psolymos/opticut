@@ -30,8 +30,8 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         null=res0$linkinv(res0$coef[1L]),
         mu=mu,
         coefficients=cf,
-        logL=ll,
-        logLR=ll-res0$logLik)
+        logL=res$logLik,
+        logLR=res$logLik-res0$logLik)
     attr(out, "logL_null") <- res0$logLik
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else dist
@@ -39,17 +39,3 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     out
 }
 
-
-#set.seed(1234)
-#n <- 200
-#x0 <- sample(1:4, n, TRUE)
-#x1 <- ifelse(x0 %in% 1:2, 1, 0)
-#x2 <- rnorm(n, 0.5, 1)
-#lam <- exp(0.5 + 0.5*x1 + -0.2*x2)
-#Y1 <- rpois(n, lam)
-#Y2 <- rpois(n, rev(lam))
-#Y <- cbind(Y1, Y2)
-#.opticut1=opticut:::.opticut1
-#rc <- multicut1(Y1, model.matrix(~x2), as.factor(x0), dist="poisson")
-#rc <- multicut(Y, model.matrix(~x2), as.factor(x0), dist="poisson")
-#rc <- multicut(Y~x2, strata=as.factor(x0), dist="poisson")

@@ -44,7 +44,7 @@ multicut(...)
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
     lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
 
-\method{print}{multicut1}(x, cut, sort, digits, ...)
+\method{print}{multicut1}(x, digits, ...)
 \method{print}{multicut}(x, digits, ...)
 \method{print}{summary.multicut}(x, cut, sort, digits, ...)
 \method{summary}{multicut}(object, ...)
@@ -260,6 +260,22 @@ Peter Solymos <solymos@ualberta.ca>
 related to the presentation of the results in the package.
 }
 \examples{
+
+set.seed(1234)
+n <- 200
+x0 <- sample(1:4, n, TRUE)
+x1 <- ifelse(x0 %in% 1:2, 1, 0)
+x2 <- rnorm(n, 0.5, 1)
+lam <- exp(0.5 + 0.5*x1 + -0.2*x2)
+Y1 <- rpois(n, lam)
+Y2 <- rpois(n, rev(lam))
+Y <- cbind(Y1, Y2)
+.opticut1=opticut:::.opticut1
+rc <- multicut1(Y1, model.matrix(~x2), as.factor(x0), dist="poisson")
+rc <- multicut(Y, model.matrix(~x2), as.factor(x0), dist="poisson")
+rc <- multicut(Y~x2, strata=as.factor(x0), dist="poisson")
+
+
 ## --- Gaussian
 ## simple example from Legendre 2013
 ## Indicator Species: Computation, in
