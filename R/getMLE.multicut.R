@@ -21,13 +21,18 @@ function(object, which, vcov=FALSE, ...)
             best=TRUE,
             Z=object$strata, ...)[[1L]]
     if (Dist == "ordered") {
-        est <- c(m1$coefficients, m1$zeta)
-        V <- vcov(m1)
-        id <- c(length(m1$coefficients)+1,
-            1:length(m1$coefficients),
-            (length(m1$coefficients)+2):(length(est)))
-        est <- est[id]
-        V <- V[id, id]
+        if (vcov) {
+            est <- c(m1$coefficients, m1$zeta)
+            V <- vcov(m1)
+            id <- c(length(m1$coefficients)+1,
+                1:length(m1$coefficients),
+                (length(m1$coefficients)+2):(length(est)))
+            est <- est[id]
+            V <- V[id, id]
+        } else {
+            est <- object$species[[which]]$coefficients
+            V <- NULL
+        }
     } else {
         est <- if (vcov)
             coef(m1) else object$species[[which]]$coefficients
