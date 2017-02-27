@@ -229,14 +229,6 @@ u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
 
-## ordered
-
-o <- opticut(Y[,3] ~ x2, strata=x0, dist="ordered", comb="rank")
-o$species
-u <- uncertainty(o, type="asymp", B=9)
-u <- uncertainty(o, type="boot", B=2)
-u <- uncertainty(o, type="multi", B=2)
-
 ## rsf
 
 library(ResourceSelection)

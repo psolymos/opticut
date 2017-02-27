@@ -27,24 +27,6 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             stop("Provide single integer for B.")
         niter <- B
         bm <- rownames(obj)[k]
-
-#        ## full model cannot be returned for dist=fun
-#        m1 <- .extractOpticut(object, which,
-#            boot=FALSE,
-#            internal=TRUE,
-#            full_model=TRUE,
-#            best=TRUE, ...)[[1L]]
-#        if (object$dist == "ordered") {
-#            xcoef <- c(m1$coefficients, m1$zeta)
-#            xid <- c(length(m1$coefficients)+1L, 1L)
-#            cf <- MASS::mvrnorm(niter, xcoef, vcov(m1))
-#            cf <- cf[,xid,drop=FALSE]
-#            cf <- rbind(xcoef[xid], cf)
-#        } else {
-#            cf <- MASS::mvrnorm(niter, coef(m1), vcov(m1))[,c(1L, 2L),drop=FALSE]
-#            cf <- rbind(coef(m1)[c(1L, 2L)], cf)
-#        }
-
         mle <- getMLE(object, which, ...)
         cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)[,c(1L, 2L),drop=FALSE]
         cf <- rbind(mle$coef[c(1L, 2L)], cf)

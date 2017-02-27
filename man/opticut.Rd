@@ -266,10 +266,6 @@ uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 1
 to be consistent with other methods regarding positive and negative effects.}
 
-\item{\code{"ordered"}}{response measured on ordinal scale,
-e.g. ordinal vegetation cover,
-uses \code{\link[MASS]{polr}} of the MASS package.}
-
 \item{\code{"rsf"}}{presence-only data using resource selection
 functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
 in the ResourceSelection package, assuming global availability (\code{m = 0}).

@@ -41,9 +41,8 @@ weighting factor for calculating information criteria for model selection
   \item{dist}{
 character, distribution argument passed to underlying functions,
 see listed on the help page of \code{\link{opticut}}
-(except for \code{dist = "rsf"} and \code{dist = "rspf"}
-which does not have a sound theoretical
-basis due to non-identifiability of piece-wise constant RSPF models).
+(except for \code{dist = "zip2"}, \code{dist = "zinb2"}
+\code{dist = "rsf"}, and \code{dist = "rspf"}).
 }
   \item{object}{
 fitted object.

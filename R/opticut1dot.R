@@ -25,8 +25,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             link <- NULL
         }
         dist <- match.arg(dist,
-            c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rsf", "rspf",
+            c("gaussian", "poisson", "binomial", "negbin",
+            "beta", "zip", "zinb", "rsf", "rspf",
             "zip2", "zinb2"))
         if (dist %in% c("gaussian", "poisson", "binomial")) {
             if (is.null(link))
@@ -92,35 +92,6 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             linv <- function(eta) binomial(link)$linkinv(eta)
             cf <- c(-coef(mod, "zero"), coef(mod, "count"))
             ll <- as.numeric(logLik(mod))
-        }
-        if (dist == "ordered") {
-            if (!is.null(list(...)$method))
-                if (list(...)$method != "logistic")
-                    stop("Sorry but only logisic model allowed for ordered.")
-            if (!is.null(link))
-                if (link != "logistic")
-                    stop("Sorry but only logisic model allowed for ordered.")
-            Y <- as.ordered(Y)
-            if (nlevels(Y) > 2) { # ordinal
-                ## need to keep the intercept
-                if (ncol(XX)==1) {
-                    if (!is.null(list(...)$data))
-                        stop("Note: data argument should not be provided as part of ...")
-                    ## Hess needed for uncertainty(type=asymp):
-                    ## that is when full_model is needed
-                    mod <- MASS::polr(Y ~ 1, method="logistic",
-                        Hess=full_model, ...)
-                } else {
-                    mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1L,drop=FALSE]),
-                        Hess=full_model, method="logistic", ...)
-                }
-                cf <- c(mod$zeta[1L], coef(mod), mod$zeta[-1L])
-            } else {
-                mod <- stats::glm(Y ~ .-1, data=XX, family=binomial("logit"), ...)
-                cf <- coef(mod)
-            }
-            ll <- as.numeric(logLik(mod))
-            linv <- binomial("logit")$linkinv
         }
         if (dist %in% c("rsf", "rspf")) {
             ## formula interface used (rsf, rspf, and not rsf.fit)
