@@ -33,7 +33,7 @@ multicut(...)
     sset=NULL, cl = NULL, ...)
 
 \method{strata}{multicut}(object, ...)
-\method{getMLE}{multicut}(object, which, ...)
+\method{getMLE}{multicut}(object, which, vcov=FALSE, ...)
 \method{subset}{multicut}(x, subset, ...)
 \method{fitted}{multicut}(object, ...)
 \method{predict}{multicut}(object, gnew=NULL, xnew=NULL, ...)
@@ -170,6 +170,9 @@ See \code{\link{as.data.frame}}.
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
 missing values are not accepted.
+}
+  \item{vcov}{
+logical, if variance-covariance matrix is needed to be returned.
 }
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
