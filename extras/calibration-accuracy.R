@@ -2,70 +2,15 @@ library(opticut)
 library(dclone)
 library(rjags)
 source("~/repos/opticut/extras/calibrate.R")
+#source("~/repos/opticut/R/ipredict.R")
+#source("~/repos/opticut/R/ipredict.default.R")
+#source("~/repos/opticut/R/ipredict.opticut.R")
+source("~/repos/opticut/extras/multiclass.R")
 
 #Inverse prediction might be a good metric of overall accuracy and scaling species contribution (i.e. the real indicator power).
 #Implement binary-multinomial-continuous comparison.
 #See how non-linear (unimodal, multimodal) responses affect inverse prediction
 #Somehow show how # species affects accuracy.
-
-## Multiclass classification measures
-## x is data class, y is classification
-
-## simple binary confusion matrix
-## Might have to check valid levels (x, y, union)
-cmat <- function(x, y, drop=TRUE) {
-    out <- c(
-        tp=sum(x * y),
-        fp=sum((1-x) * y),
-        fn=sum(x * (1-y)),
-        tn=sum((1-x) * (1-y)))
-    if (drop)
-        out else array(out, c(2L, 2L),
-            list(data=c("t", "f"), class=c("p", "n")))
-}
-#cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0))
-#cmat(c(1,0,0,1,1,1,0,0,0,0), c(1,1,1,0,0,0,0,0,0,0), drop=FALSE)
-
-mcm <- function(x, y, beta=1) {
-    levs <- if (is.factor(x))
-        sort(levels(x)) else sort(unique(x))
-    N <- length(x)
-    if (length(y) != N)
-        stop("x and y lengths must match")
-    if (length(setdiff(y, levs)) > 0)
-        warning("y has more levels than x")
-    cm <- sapply(levs, function(z) {
-        xx <- ifelse(x == z, 1, 0)
-        yy <- ifelse(y == z, 1, 0)
-        cmat(xx, yy)
-    })
-    Stat <- c(
-        Acc = mean((cm["tp",] + cm["tn",]) / N),
-        Err = mean((cm["fp",] + cm["fn",]) / N),
-        Prc_m = sum(cm["tp",]) / sum(cm["tp",] + cm["fp",]),
-        Prc_M = mean(cm["tp",] / (cm["tp",] + cm["fp",])),
-        Rec_m = sum(cm["tp",]) / sum(cm["tp",] + cm["fn",]),
-        Rec_M = mean(cm["tp",] / (cm["tp",] + cm["fn",])))
-    Stat <- c(Stat,
-        F_m = (beta^2 + 1) * Stat["Prc_m"] * Stat["Rec_m"] /
-            (beta^2 * Stat["Prc_m"] + Stat["Rec_m"]),
-        F_M = (beta^2 + 1) * Stat["Prc_M"] * Stat["Rec_M"] /
-            (beta^2 * Stat["Prc_M"] + Stat["Rec_M"]))
-    list(cmat=cm, stats=Stat,
-        accuracy=(cm["tp",] + cm["tn",]) / N,
-        error=(cm["fp",] + cm["fn",]) / N,
-        precision=cm["tp",] / (cm["tp",] + cm["fp",]),
-        recall=cm["tp",] / (cm["tp",] + cm["fn",]),
-        beta=beta)
-}
-
-#x <- sample(LETTERS[1:4], 20, replace=TRUE)
-#y <- x
-#for (i in 1:length(x))
-#    if (runif(1) > 0.1)
-#        y[i] <- sample(LETTERS[1:4], 1)
-#mcm(x, y)
-
 
 ## LOO
 
@@ -88,15 +33,15 @@ if (FALSE) {
 Proj <- "simul"
 Dist <- "binomial"
 set.seed(1)
-k <- 5
+K <- 5
 m <- 20
-g <- rep(LETTERS[1:k], each=20)
+g <- rep(LETTERS[1:K], each=20)
 n <- length(g)
 cf <- matrix(rnorm(2*m), 2, m)
-bp <- array(NA, c(k, m), list(LETTERS[1:k], paste0("Sp", 1:m)))
+bp <- array(NA, c(K, m), list(LETTERS[1:K], paste0("Sp", 1:m)))
 bpcf <- bp
 for (j in 1:m) {
-    bp[,j] <- rbinom(k, 1, rbeta(1,10,15))
+    bp[,j] <- rbinom(K, 1, rbeta(1,10,15))
     bpcf[,j] <- cf[bp[,j]+1,j]
 }
 mu <- bpcf[match(g, rownames(bp)),]
@@ -111,8 +56,8 @@ cl <- makeCluster(4)
 nn <- nrow(Y)
 mm <- ncol(Y)
 ## All species + LOO
-gnew0 <- character(0)
-pm0 <- matrix(NA, 0, nlevels(X[,s_col]))
+gnew1 <- gnew2 <- character(0)
+pm1 <- matrix(NA, 0, nlevels(X[,s_col]))
 for (i in 1:nn) {
     if (interactive()) {
         cat("<<< All species --- Run", i, "of", nn, ">>>\n")
@@ -123,9 +68,11 @@ for (i in 1:nn) {
     x_trn <- X[ii,,drop=FALSE]
     #x_new <- X[!ii,,drop=FALSE]
     o <- opticut(y_trn ~ 1, strata=x_trn[,s_col], dist=Dist, cl=cl)
-    cal <- calibrate(o, y_new, n.chains=length(cl), cl=cl)
-    gnew0 <- c(gnew0, cal$gnew)
-    pm0 <- rbind(pm0, cal$pi)
+    cal1 <- ipredict.opticut(o, y_new, n.chains=length(cl), type="mcmc", cl=cl)
+    cal2 <- ipredict.opticut(o, y_new, type="analytic")
+    gnew1 <- c(gnew1, as.character(cal1$gnew))
+    gnew2 <- c(gnew2, as.character(cal2$gnew))
+    pm1 <- rbind(pm1, cal1$pi)
 }
 ## -1 species + LOO
 gnew_list <- list()
@@ -160,6 +107,14 @@ save(X, Y, s_col, gnew0, pm0, gnew_list, pm_list,
 mcm(X[1:nn,s_col], factor(gnew0, levels(X[,s_col])))
 (tt <- table(X[1:nn,s_col], factor(gnew0, levels(X[,s_col]))))
 sum(diag(tt))/sum(tt)
+
+multiclass(gnew2, gnew1)
+which(gnew1 != gnew2)
+pm1[which(gnew1 != gnew2),]
+cbind(mcmc=gnew1, an=gnew2)[which(gnew1 != gnew2),]
+
+multiclass(as.character(X[,s_col]), gnew1)
+multiclass(as.character(X[,s_col]), gnew2)
 
 MCM0 <- mcm(X[,s_col], factor(gnew0, levels(X[,s_col])))
 MCM <- lapply(gnew_list, function(z) mcm(X[,s_col], factor(z, levels(X[,s_col]))))
@@ -285,6 +240,52 @@ for (i in 1:nn) {
 iii <- gnew0 != ""
 mcm(X[iii,s_col], factor(gnew0[iii], levels(X[,s_col])))
 mcm(X[iii,s_col], factor(gnew0u[iii], levels(X[,s_col])))
+
+
+## example
+if (FALSE) {
+
+library(opticut)
+library(dclone)
+library(rjags)
+#source("~/repos/opticut/extras/calibrate.R")
+source("~/repos/opticut/R/ipredict.R")
+source("~/repos/opticut/R/ipredict.default.R")
+source("~/repos/opticut/R/ipredict.opticut.R")
+source("~/repos/opticut/extras/multiclass.R")
+
+data(dolina)
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+Y <- dolina$xtab[dolina$samp$method=="Q",]
+X <- dolina$samp[dolina$samp$method=="Q",]
+Y <- ifelse(Y > 0, 1, 0)
+
+set.seed(i)
+i <- sample.int(nrow(Y), 100)
+ii <- seq_len(nrow(Y)) %in% i
+y_trn <- Y[ii,,drop=FALSE]
+y_trn <- y_trn[,colSums(y_trn > 0) >= 20,drop=FALSE]
+y_new <- Y[!ii,colnames(y_trn),drop=FALSE]
+x_trn <- X[ii,,drop=FALSE]
+x_new <- X[!ii,,drop=FALSE]
+
+oc1 <- opticut(y_trn ~ 1, strata=x_trn[,"mhab"], dist=Dist)
+ip1 <- ipredict(oc1, y_new, n.iter=1000)
+
+oc2 <- opticut(y_trn ~ lmoist, data=x_trn, strata=x_trn[,"mhab"], dist=Dist)
+ip2 <- ipredict(oc2, y_new, x_new, n.iter=1000)
+
+mod1 <- lapply(1:ncol(y_trn), function(i) {
+    glm(y_trn[,i] ~ mhab, data=x_trn, family=binomial)
+})
+ip3 <- ipredict(mod1, y_new, K=4, n.iter=1000)
+
+mod2 <- lapply(1:ncol(y_trn), function(i) {
+    glm(y_trn[,i] ~ mhab + lmoist, data=x_trn, family=binomial)
+})
+ip4 <- ipredict(mod2, y_new, xnew=model.matrix(~ lmoist, x_new), K=4, n.iter=1000)
+
+}
 
 colnames(pm0) <- colnames(cal)
 gnew0 <- mefa4::find_min(pm0)

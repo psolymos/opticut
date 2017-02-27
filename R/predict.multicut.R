@@ -1,4 +1,4 @@
-predict.opticut <-
+predict.multicut <-
 function (object, gnew=NULL, xnew=NULL, ...)
 {
     if (is.null(xnew) && is.null(gnew)) {
@@ -11,7 +11,6 @@ function (object, gnew=NULL, xnew=NULL, ...)
         if (is.null(xnew)) {
             xnew <- matrix(1, length(gnew), 1L)
         }
-        bp <- summary(object)$bestpart
         ff <- formula(object)
         ff[[2]] <- NULL
         X <- if (is.data.frame(xnew))
@@ -25,8 +24,9 @@ function (object, gnew=NULL, xnew=NULL, ...)
         fit <- matrix(0, nrow(X), ncol(cf))
         dimnames(fit) <- list(rownames(X), colnames(cf))
         for (i in seq_len(ncol(cf))) {
-            gg <- ifelse(g %in% colnames(bp)[bp[i,] == 1], 1, 0)
-            XX <- cbind(X[,1L,drop=FALSE], gg, X[,-1L,drop=FALSE])
+            ## change this --------- FIXME
+            #gg <- ifelse(g %in% colnames(bp)[bp[i,] == 1], 1, 0)
+            XX <- cbind(model.matrix(~g), X[,-1L,drop=FALSE])
             fit[,i] <- linkinv(drop(XX %*% cf[,i]))
         }
     }

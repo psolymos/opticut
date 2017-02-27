@@ -14,6 +14,7 @@
 \alias{wplot.opticut1}
 \alias{print.opticut}
 \alias{print.opticut1}
+\alias{subset.opticut}
 \alias{summary.opticut}
 \alias{print.summary.opticut}
 \alias{bestmodel.opticut}
@@ -45,6 +46,7 @@ strata(object, ...)
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, pos_only = FALSE, ...)
 \method{getMLE}{opticut}(object, which, ...)
+\method{subset}{opticut}(x, subset, ...)
 \method{fitted}{opticut}(object, ...)
 \method{predict}{opticut}(object, gnew=NULL, xnew=NULL, ...)
 
@@ -92,7 +94,8 @@ in the model. If not found in data, the variables are taken from
 from which \code{opticut} is called.
 }
   \item{strata}{
-vector (usually a factor), unique values define partitions.
+vector (usually a factor), unique values define partitions
+(must have at least 2 unique levels, empty levels are dropped).
 It can also be a matrix with rows as observations and
 binary partitions as columns.
 }
@@ -209,10 +212,14 @@ recognizing the direction of the association.
 taken into account and \code{1} indicates strata of positive association.
 This is only important when \code{comb} is not \code{"rank"}.
 }
+  \item{subset}{
+logical, numeric, or character index indicating species to keep,
+missing values are not accepted.
+}
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
-to predict for, or \code{NULL}. If not \code{NULL}, both must be provided
-(available for \code{comb = "rank"} models only).
+to predict for, or \code{NULL}.
+Predicting for new strata available for \code{comb = "rank"} models only.
 }
   \item{\dots}{
 other arguments passed to the underlying functions.
@@ -330,6 +337,8 @@ best supported split, strength and sign of association,
 indicator value (I), expected values (mu0, mu1), log likelihood ratio (logLR),
 and model weights(w).
 
+The \code{subset} method subsets the species in the opticut object.
+
 The \code{plot} method presents the contrasts by species and strata.
 
 The \code{wplot} (weight plot) shows model weights for partitions.
@@ -355,7 +364,7 @@ and \code{xnew} are \code{NULL}, or corresponding point predictions
 (expected values) on the predictor scale
 (available for \code{comb = "rank"} models only).
 
-The coercion method \code{\link{as.data.frame}} return a data frame.
+The coercion methods \code{\link{as.data.frame}} return a data frame.
 }
 \references{
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
@@ -440,6 +449,8 @@ wplot(m1, which = 1)
 
 ## rank based partitions, multiple species
 summary(m2 <- opticut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
+## subset results
+summary(subset(m2, 1:2))
 
 ## best partition
 head(bestpart(m2))

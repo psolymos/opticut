@@ -103,6 +103,11 @@ g[1:5]
 co$gnew
 round(co$pi, 2)
 
+v <- rnorm(n)
+xx <- lapply(1:ncol(yy), function(i) glm(y[,i] ~ as.factor(g) + v, family=poisson))
+xnew <- model.matrix( ~v, data.frame(v=rnorm(5)))
+cxx <- ipredict.default(xx, y[1:5,], xnew, K=4)
+
 ```
 
 

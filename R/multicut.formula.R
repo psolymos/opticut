@@ -1,6 +1,5 @@
-opticut.formula <-
-function(formula, data, strata, dist="gaussian",
-comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
+multicut.formula <-
+function(formula, data, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
 {
     if (missing(data))
         data <- parent.frame()
@@ -27,8 +26,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     if (any(is.na(strata)))
         stop("strata argument contains NA")
 
-    out <- opticut.default(Y=Y, X=X, strata=strata, dist=dist,
-        comb=comb, sset=sset, cl=cl, ...)
+    out <- multicut.default(Y=Y, X=X, strata=strata, dist=dist,
+        sset=sset, cl=cl, ...)
     out$call <- match.call()
     if (is.function(dist)) {
         attr(out$dist, "dist") <- deparse(substitute(dist))

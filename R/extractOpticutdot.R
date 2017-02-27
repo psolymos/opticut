@@ -1,6 +1,6 @@
 .extractOpticut <-
 function (object, which=NULL, boot=FALSE,
-internal=TRUE, best=TRUE, ...)
+internal=TRUE, best=TRUE, Z=NULL, ...)
 {
     if (is.null(which))
         which <- names(object$species)
@@ -20,12 +20,16 @@ internal=TRUE, best=TRUE, ...)
         if (internal) {
             if (!best)
                 stop("use best=TRUE when internal=TRUE")
+            ZZ <- if (is.null(Z))
+                bp[j,i] else Z[j]
             out[[i]] <- .opticut1(
                 Y=object$Y[j,i],
                 X=object$X[j,],
-                Z1=bp[j,i],
+                Z1=ZZ,
                 dist=object$dist, ...)
         } else {
+            if (!is.null(Z))
+                stop("Z used only for best=TRUE & internal=TRUE")
             if (best) {
                 out[[i]] <- opticut1(
                     Y=object$Y[j,i,drop=TRUE],

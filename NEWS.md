@@ -2,7 +2,7 @@
 
 ## Version 0.1-1 -- Dec 17, 2016
 
-*
+* Inverse prediction (`ipredict`) added.
 
 ## Version 0.1-0 -- Dec 16, 2016
 

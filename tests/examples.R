@@ -8,7 +8,8 @@ help_pages <- c("opticut-package",
     "opticut", "optilevels", "sindex", "lorenz",
     "beta2i",
     "allComb", "rankComb",
-    "bestmodel", "uncertainty",
+    #"bestmodel",
+    "uncertainty",
     "occolors", "ocoptions")
 
 for (i in help_pages) {
@@ -49,6 +50,10 @@ fun <- function(Y, X, linkinv, ...) {
 m4 <- opticut(Y ~ x2, strata=x0, dist=fun)
 ocoptions(try_error=FALSE)
 
+subset(m1, c(3,1))
+subset(m2, c(TRUE, FALSE, TRUE))
+subset(m3, c("Spp1", "Spp3"))
+
 str(m1$strata)
 str(m2$strata)
 str(m3$strata)
@@ -70,6 +75,10 @@ u1b <- uncertainty(m1, type="boot", B=9)
 u2b <- uncertainty(m2, type="boot", B=9)
 u3b <- uncertainty(m3, type="boot", B=9)
 u4b <- uncertainty(m4, type="boot", B=9)
+
+summary(subset(u1b, c(3,1)))
+summary(subset(u2b, c(TRUE, FALSE, TRUE)))
+summary(subset(u3b, c("Spp1", "Spp3")))
 
 u1c <- uncertainty(m1, type="multi", B=9)
 ## type=multi cannot use object with comb=all

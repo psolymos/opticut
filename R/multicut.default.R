@@ -1,8 +1,6 @@
-opticut.default <-
-function(Y, X, strata, dist="gaussian",
-comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
+multicut.default <-
+function(Y, X, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
 {
-    comb <- match.arg(comb)
     if (missing(strata))
         stop("It looks like that strata is missing")
     Y <- data.matrix(Y)
@@ -29,36 +27,15 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     if (any(is.na(strata)))
         stop("strata argument contains NA")
 
-    if (is.null(dim(strata))) {
-        if (nchar(getOption("ocoptions")$collapse) < 1)
-            stop("nchar(getOption('ocoptions')$collapse) must be > 0")
-        ## ordered treated as factor
-        if (is.ordered(strata)) {
-            warning("ordering in strata ignored")
-            class(strata) <- "factor"
-        }
-        ## factors are not coerced (level ordering remains intact)
-        if (!is.factor(strata))
-            strata <- as.factor(strata) # coerce to factor
-        strata <- droplevels(strata) # drop unused levels
-        ## make syntactically valid names
-        #levels(strata) <- make.names(levels(strata), unique = TRUE)
-        ## make sure that collapse is not in levels
-        if (any(grepl(getOption('ocoptions')$collapse, levels(strata), fixed=TRUE)))
-            stop("Collapse value found in levels")
-        if (comb == "rank") {
-            Z <- strata
-        }
-        if (comb == "all") {
-            Z <- allComb(strata) # matrix
-        }
-    } else {
-        Z <- as.matrix(strata) # matrix
-        if (getOption("ocoptions")$check_comb && !checkComb(Z))
-            stop("Guess what! Complementary design variables found:\nuse 'checkComb'")
-        #colnames(Z) <- make.names(colnames(Z), unique = TRUE)
-        comb <- NA # user supplied matrix, not checked
+    if (is.ordered(strata)) {
+        warning("ordering in strata ignored")
+        class(strata) <- "factor"
     }
+    ## factors are not coerced (level ordering remains intact)
+    if (!is.factor(strata))
+        strata <- as.factor(strata) # coerce to factor
+    strata <- droplevels(strata) # drop unused levels
+    Z <- strata
 
     if (!is.function(dist)) {
         Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1L]][1L]
@@ -89,7 +66,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     }
     if (getOption("ocoptions")$try_error) {
         res <- pbapply::pblapply(seq_len(ncol(Y)), function(i, ...)
-            try(opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)), cl=cl, ...)
+            try(multicut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...)), cl=cl, ...)
         names(res) <- colnames(Y)
         Failed <- sapply(res, inherits, "try-error")
         failed <- names(res)[Failed]
@@ -101,7 +78,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         }
     } else {
         res <- pbapply::pblapply(seq_len(ncol(Y)), function(i, ...)
-            opticut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...), cl=cl, ...)
+            multicut1(Y=Y[,i], X=X, Z=Z, dist=dist, sset=sset, ...), cl=cl, ...)
         names(res) <- colnames(Y)
         Failed <- logical(length(res))
         failed <- character(0)
@@ -116,18 +93,13 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         strata=Z,
         nobs=NOBS,
         sset=sset,
-        nsplit=if (is.factor(Z)) # strata as factor implies K-1 splits
-            (nlevels(Z) - 1L) else ncol(Z),
         dist=dist,
-        comb=comb,
-        scale=getOption("ocoptions")$scale,
-        failed=failed,
-        collapse=getOption("ocoptions")$collapse)
+        failed=failed)
     if (is.function(dist)) {
         attr(out$dist, "dist") <- deparse(substitute(dist))
         for (i in seq_len(length(out$species)))
             attr(out$species[[i]], "dist") <- deparse(substitute(dist))
     }
-    class(out) <- "opticut"
+    class(out) <- "multicut"
     out
 }

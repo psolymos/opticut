@@ -84,11 +84,14 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             Dist <- switch(dist,
                 "zip2"="poisson",
                 "zinb2"="negbin")
+            ## only symmetric function can be simply inverted on link scale
+            if (!(link %in% c("logit", "probit")))
+                stop("only logit and probit link allowed for zip2 and zinb2")
             mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist=Dist,
                 link=link, ...)
+            linv <- function(eta) binomial(link)$linkinv(eta)
             cf <- c(-coef(mod, "zero"), coef(mod, "count"))
             ll <- as.numeric(logLik(mod))
-            linv <- function(eta) binomial(link)$linkinv(eta)
         }
         if (dist == "ordered") {
             if (!is.null(list(...)$method))
@@ -108,10 +111,10 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                     mod <- MASS::polr(Y ~ 1, method="logistic",
                         Hess=full_model, ...)
                 } else {
-                    mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1,drop=FALSE]),
+                    mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1L,drop=FALSE]),
                         Hess=full_model, method="logistic", ...)
                 }
-                cf <- c(mod$zeta[1], coef(mod))
+                cf <- c(mod$zeta[1L], coef(mod), mod$zeta[-1L])
             } else {
                 mod <- stats::glm(Y ~ .-1, data=XX, family=binomial("logit"), ...)
                 cf <- coef(mod)
