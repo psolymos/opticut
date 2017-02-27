@@ -20,25 +20,10 @@ function(object, which, vcov=FALSE, ...)
             full_model=TRUE,
             best=TRUE,
             Z=object$strata, ...)[[1L]]
-    if (Dist == "ordered") {
-        if (vcov) {
-            est <- c(m1$coefficients, m1$zeta)
-            V <- vcov(m1)
-            id <- c(length(m1$coefficients)+1,
-                1:length(m1$coefficients),
-                (length(m1$coefficients)+2):(length(est)))
-            est <- est[id]
-            V <- V[id, id]
-        } else {
-            est <- object$species[[which]]$coefficients
-            V <- NULL
-        }
-    } else {
-        est <- if (vcov)
-            coef(m1) else object$species[[which]]$coefficients
-        V <- if (vcov)
-            vcov(m1) else NULL
-    }
+    est <- if (vcov)
+        coef(m1) else object$species[[which]]$coefficients
+    V <- if (vcov)
+        vcov(m1) else NULL
     if (Dist %in% c("zip2", "zinb2")) {
         est <- est[c((length(est)-(K-1L)):(length(est)), 1:(length(est)-K))]
         if (vcov)

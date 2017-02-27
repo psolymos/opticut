@@ -63,11 +63,11 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     if (!is.function(dist)) {
         Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1L]][1L]
         Dist <- match.arg(Dist,
-            c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rsf", "rspf",
+            c("gaussian", "poisson", "binomial", "negbin",
+            "beta", "zip", "zinb", "rsf", "rspf",
             "zip2", "zinb2"))
-        ## sanity check for ordered/rsf/rspf
-        if (Dist %in% c("ordered", "rsf", "rspf") && ncol(Y) > 1L)
+        ## sanity check for rsf/rspf
+        if (Dist %in% c("rsf", "rspf") && ncol(Y) > 1L)
             stop("'", Dist, "' is only available for single species in RHS")
     }
 

@@ -6,12 +6,8 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
 {
     if (!is.function(dist)) {
         dist <- match.arg(dist,
-            c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rspf"))
-        if (dist == "rspf")
-            stop("dist='rspf' not supported for optilevels")
-        if (dist == "rsf")
-            stop("dist='rsf' not supported for optilevels")
+            c("gaussian", "poisson", "binomial", "negbin",
+            "beta", "zip", "zinb"))
     }
     if (is.null(colnames(X)))
         colnames(X) <- paste0("X", seq_len(ncol(X)))
