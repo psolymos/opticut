@@ -230,41 +230,52 @@ Currently available distributions:
 
 \describe{
 \item{\code{"gaussian"}}{real valued continuous observations, e.g. biomass,
-uses \code{\link[stats]{lm}} of the stats package.}
+uses \code{\link[stats]{lm}} of the stats package.
+Identity link is assumed.}
 
 \item{\code{"poisson"}}{Poisson count data,
-uses \code{\link[stats]{glm}} of the stats package.}
+uses \code{\link[stats]{glm}} of the stats package.
+Exponential (log) link is assumed.}
 
 \item{\code{"binomial"}}{presence-absence (detection-nondetection) type data,
-uses \code{\link[stats]{glm}} of the stats package.}
+uses \code{\link[stats]{glm}} of the stats package.
+Logistic (logit) link is assumed.}
 
 \item{\code{"negbin"}}{overdispersed Negative Binomial count data,
-uses \code{\link[MASS]{glm.nb}} of the MASS package.}
+uses \code{\link[MASS]{glm.nb}} of the MASS package.
+Exponential (log) link is assumed.}
 
 \item{\code{"beta"}}{continuous response in the unit interval, e.g. percent cover,
-uses \code{\link[betareg]{betareg}}  of the betareg package.}
+uses \code{\link[betareg]{betareg}} of the betareg package.
+Logistic (logit) link for the mean model is assumed.}
 
 \item{\code{"zip"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the abundance model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
-The zero-inflation component refers to the probability of 0.}
+The zero-inflation component refers to the probability of 0.
+Exponential (log) link is assumed for count based analysis.}
 
 \item{\code{"zinb"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the abundance model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
-The zero-inflation component refers to the probability of 0.}
+The zero-inflation component refers to the probability of 0.
+Exponential (log) link is assumed for count based analysis.}
 
 \item{\code{"zip2"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the zero-model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 1
-to be consistent with other methods regarding positive and negative effects.}
+to be consistent with other methods regarding positive and negative effects.
+Logistic (logit) link is assumed for zero-nonzero based analysis.
+Only symmetric link functions (logit, probit) allowed.}
 
 \item{\code{"zinb2"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the zero-model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 1
-to be consistent with other methods regarding positive and negative effects.}
+to be consistent with other methods regarding positive and negative effects.
+Logistic (logit) link is assumed for zero-nonzero based analysis.
+Only symmetric link functions (logit, probit) allowed.}
 
 \item{\code{"rsf"}}{presence-only data using resource selection
 functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
@@ -272,7 +283,8 @@ in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rsf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model is accepted for \code{"rsf"}.}
+Intercept only model is accepted for \code{"rsf"}.
+Exponential (log) link is assumed.}
 
 \item{\code{"rspf"}}{presence-only data using resource selection
 probability functions (RSPF)
@@ -281,7 +293,8 @@ in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model is not accepted for \code{"rspf"}.}
+Intercept only model is not accepted for \code{"rspf"}.
+Logistic (logit) link is assumed.}
 }
 
 Custom distributions can be defined, see Examples.
