@@ -252,30 +252,35 @@ Logistic (logit) link for the mean model is assumed.}
 \item{\code{"zip"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the abundance model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
-The zero-inflation component refers to the probability of 0.
-Exponential (log) link is assumed for count based analysis.}
+Exponential (log) link is used for count based analysis,
+the second part of the \code{dist} argument following the colon
+is used as link function for the zero component (logistic link assumed).}
 
 \item{\code{"zinb"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the abundance model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 0.
-Exponential (log) link is assumed for count based analysis.}
+Exponential (log) link is used for count based analysis,
+the second part of the \code{dist} argument following the colon
+is used as link function for the zero component (logistic link assumed).}
 
 \item{\code{"zip2"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the zero-model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 1
 to be consistent with other methods regarding positive and negative effects.
-Logistic (logit) link is assumed for zero-nonzero based analysis.
-Only symmetric link functions (logit, probit) allowed.}
+Logistic (logit) link is assumed for zero-nonzero based analysis,
+only symmetric link functions (logit, probit) allowed.
+Exponential (log) link is used for the count data part which cannot be changed.}
 
 \item{\code{"zinb2"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the zero-model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 1
 to be consistent with other methods regarding positive and negative effects.
-Logistic (logit) link is assumed for zero-nonzero based analysis.
-Only symmetric link functions (logit, probit) allowed.}
+Logistic (logit) link is assumed for zero-nonzero based analysis,
+only symmetric link functions (logit, probit) allowed.
+Exponential (log) link is used for the count data part which cannot be changed.}
 
 \item{\code{"rsf"}}{presence-only data using resource selection
 functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
@@ -298,6 +303,7 @@ Logistic (logit) link is assumed.}
 }
 
 Custom distributions can be defined, see Examples.
+Note: not all downstream algorithms and methods work for custom distributions.
 
 \code{fix_levels} is a utility function for replacing characters in
 factor levels that are identical to the value of the
