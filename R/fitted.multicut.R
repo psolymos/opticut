@@ -5,8 +5,8 @@ function (object, ...)
         stop("fitted values not available for custom distriutions")
     if (!.opticut_dist(object$dist))
         stop("distribution not recognized")
-    Dist <- strsplit(dist, ":", fixed=TRUE)[[1L]][1L]
-    Link <- strsplit(dist, ":", fixed=TRUE)[[1L]][2L]
+    Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L]
+    Link <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][2L]
     linkinv <- .opticut1(object$Y[,1L], X=object$X, Z1=NULL,
         dist=object$dist)$linkinv
     Z <- model.matrix(~object$strata)
@@ -30,7 +30,7 @@ function (object, ...)
         }
         linkinv(drop(XX %*% cf))
     }
-    fit <- sapply(object$species, f, dist=Dist, link=Link)
+    fit <- sapply(object$species, fun, dist=Dist, link=Link)
     dimnames(fit) <- dimnames(object$Y)
     fit
 }
