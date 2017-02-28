@@ -63,3 +63,4 @@ importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "dbinom", "dpois")
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")
+importFrom("ResourceSelection", ".solvenear")

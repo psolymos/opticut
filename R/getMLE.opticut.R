@@ -19,6 +19,10 @@ function(object, which, ...)
         best=TRUE, ...)[[1L]]
     est <- coef(m1)
     V <- vcov(m1)
+    if (Dist == "rsf") {
+        est <- m1$results$par
+        V <- .solvenear(m1$results$hessian)
+    }
     if (Dist %in% c("zip2", "zinb2")) {
         est <- c(-est[(length(est)-1L):(length(est))],
             est[1:(length(est)-2L)])
