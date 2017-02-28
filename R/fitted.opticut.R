@@ -1,3 +1,5 @@
+## Note: zip2 and zinb2 returns correct fitted values based on bestmodel
+## no need to tweak the sign etc.
 fitted.opticut <-
 function (object, ...)
 {
