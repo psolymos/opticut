@@ -25,7 +25,6 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     mu <- res$linkinv(c(cf[1], cf[1] + cf[2:ncol(Z0)]))
     names(mu) <- levels(Z)
     ll <- res$logLik
-    cfnull <- res0$linkinv(res0$coef[1L])
     out <- list(
         null=res0$linkinv(res0$coef[1L]),
         mu=mu,

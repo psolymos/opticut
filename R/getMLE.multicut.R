@@ -29,5 +29,11 @@ function(object, which, vcov=FALSE, ...)
         if (vcov)
             V <- V[names(est), names(est)]
     }
+    if (Dist == "negbin")
+        attr(est, "theta") <- if (vcov)
+            attr(est, "theta") else m1$theta
+    if (Dist == "gaussian")
+        attr(est, "sigma") <- if (vcov)
+            attr(est, "sigma") else summary(m1)$sigma
     list(coef=est, vcov=V, dist=object$dist)
 }

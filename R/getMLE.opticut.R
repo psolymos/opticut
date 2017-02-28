@@ -23,5 +23,9 @@ function(object, which, ...)
         est <- est[c((length(est)-1L):(length(est)), 1:(length(est)-2L))]
         V <- V[names(est), names(est)]
     }
+    if (Dist == "negbin")
+        attr(est, "theta") <- m1$theta
+    if (Dist == "gaussian")
+        attr(est, "sigma") <- summary(m1)$sigma
     list(coef=est, vcov=V, dist=object$dist)
 }
