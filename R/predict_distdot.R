@@ -9,11 +9,11 @@
         return((1 - p) * linkinv(drop(XX %*% cf[-length(cf)])))
     }
     if (dist %in% c("zip2", "zinb2")) {
-        p <- linkinv(drop(Z %*% cf[seq_len(K)]))
+        p <- linkinv(drop(XX[,seq_len(K)] %*% cf[seq_len(K)]))
         lam <- poisson("log")$linkinv(X %*% cf[-seq_len(K)])
-        return(p * lam)
+        return(drop(p * lam))
     }
-    if (dist %in% c("zip2", "zinb2")) {
+    if (dist == "beta") {
         return(linkinv(drop(XX %*% cf[-length(cf)])))
     }
     linkinv(drop(XX %*% cf))
