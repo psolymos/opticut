@@ -285,6 +285,7 @@ Exponential (log) link is used for the count data part which cannot be changed.}
 \item{\code{"rsf"}}{presence-only data using resource selection
 functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
 in the ResourceSelection package, assuming global availability (\code{m = 0}).
+(The \code{\link{glm}} function is used for efficiency.)
 The \code{"rsf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
