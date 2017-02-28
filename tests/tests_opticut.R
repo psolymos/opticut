@@ -112,18 +112,18 @@ print(u1a)
 print(u2a)
 print(u3a)
 
-fitted(m1)
-fitted(m2)
-fitted(m3)
+summary(fitted(m1))
+summary(fitted(m2))
+summary(fitted(m3))
 f4 <- try(fitted(m4), silent=TRUE)
 stopifnot(inherits(f4, "try-error"))
 
-predict(m1)
-predict(m2)
-predict(m3)
+summary(predict(m1))
+summary(predict(m2))
+summary(predict(m3))
 p4 <- try(predict(m4), silent=TRUE)
 stopifnot(inherits(p4, "try-error"))
-predict(m1, gnew=x0, xnew=data.frame(x2=x2))
+summary(predict(m1, gnew=x0, xnew=data.frame(x2=x2)))
 pr2 <- try(predict(m2, gnew=x0, xnew=data.frame(x2=x2)), silent=TRUE)
 stopifnot(inherits(pr2, "try-error"))
 pr3 <- try(predict(m3, gnew=x0, xnew=data.frame(x2=x2)), silent=TRUE)
@@ -146,6 +146,9 @@ summary(o <- opticut(Y ~ x2, strata=x0, dist="gaussian"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## poisson
 
@@ -153,6 +156,9 @@ summary(o <- opticut(Y ~ x2, strata=x0, dist="poisson"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## binomial
 
@@ -161,6 +167,9 @@ summary(o <- opticut(Y1 ~ x2, strata=x0, dist="binomial"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## negbin
 
@@ -168,6 +177,9 @@ summary(o <- opticut(Y ~ x2, strata=x0, dist="negbin"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## beta
 
@@ -178,6 +190,9 @@ summary(o <- opticut(Y2 ~ x2, strata=x0, dist="beta"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## zip
 
@@ -190,6 +205,9 @@ summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zip"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## zinb
 
@@ -197,6 +215,9 @@ summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zinb"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## zip2
 
@@ -204,6 +225,9 @@ summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zip2"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## zinb2
 
@@ -211,6 +235,9 @@ summary(o <- opticut(Yzi ~ x2, strata=x0, dist="zinb2"))
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=B)
 u <- uncertainty(o, type="multi", B=B)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 
 ## rsf
 
@@ -228,17 +255,23 @@ Y <- dd$status
 X <- model.matrix(~ x1 + x2, dd)
 
 ## intercept + partition + covariates
-o <- opticut(Y ~ x1 + x2, dd, strata=x0, dist="rsf")
+o <- opticut(Y ~ x1 + x2, dd, strata=dd$x0, dist="rsf")
 o$species
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=object$strata, xnew=object$X)) # -- issue: log/logit
 ## intercept + partition
 o <- opticut(Y ~ 1, dd, strata=x0, dist="rsf")
 o$species
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=object$strata, xnew=NULL)) # -- issue: log/logit
 
 ## rspf
 
@@ -247,6 +280,9 @@ o$species
 u <- uncertainty(o, type="asymp", B=9)
 u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
+summary(fitted(o))
+summary(predict(o))
+summary(predict(o, gnew=object$strata, xnew=object$X))
 
 ## --- ... in uncertainty should produce an error ---
 
