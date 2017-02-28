@@ -262,7 +262,7 @@ u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
-summary(predict(o, gnew=object$strata, xnew=object$X)) # -- issue: log/logit
+summary(predict(o, gnew=o$strata, xnew=o$X)) # -- issue: log/logit
 ## intercept + partition
 o <- opticut(Y ~ 1, dd, strata=x0, dist="rsf")
 o$species
@@ -271,7 +271,7 @@ u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
-summary(predict(o, gnew=object$strata, xnew=NULL)) # -- issue: log/logit
+summary(predict(o, gnew=o$strata, xnew=NULL)) # -- issue: log/logit
 
 ## rspf
 
@@ -282,7 +282,7 @@ u <- uncertainty(o, type="boot", B=2)
 u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
-summary(predict(o, gnew=object$strata, xnew=object$X))
+summary(predict(o, gnew=o$strata, xnew=o$X))
 
 ## --- ... in uncertainty should produce an error ---
 
