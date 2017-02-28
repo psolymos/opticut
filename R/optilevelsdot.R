@@ -27,6 +27,7 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
 
     m_full <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf_full <- m_full$coef
+    ## drop phi and variance components
     if (dist %in% c("zip","zinb","beta"))
         cf_full <- cf_full[-length(cf_full)]
 
