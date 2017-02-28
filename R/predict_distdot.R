@@ -10,7 +10,7 @@
     }
     if (dist %in% c("zip2", "zinb2")) {
         p <- linkinv(drop(Z %*% cf[seq_len(K)]))
-        lam <- poisson("log")$linkinv(object$X %*% cf[-seq_len(K)])
+        lam <- poisson("log")$linkinv(X %*% cf[-seq_len(K)])
         return(p * lam)
     }
     if (dist %in% c("zip2", "zinb2")) {
