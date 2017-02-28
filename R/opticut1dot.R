@@ -17,17 +17,14 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
     }
     if (!is.function(dist)) {
         dist <- as.character(dist)
-        dist <- strsplit(dist, ":", fixed=TRUE)[[1]]
+        dist <- strsplit(dist, ":", fixed=TRUE)[[1L]]
         if (length(dist) > 1L) {
             link <- dist[2L]
             dist <- dist[1L]
         } else {
             link <- NULL
         }
-        dist <- match.arg(dist,
-            c("gaussian", "poisson", "binomial", "negbin",
-            "beta", "zip", "zinb", "rsf", "rspf",
-            "zip2", "zinb2"))
+        dist <- match.arg(dist, .opticut_dist())
         if (dist %in% c("gaussian", "poisson", "binomial")) {
             if (is.null(link))
                 link <- switch(dist,
@@ -40,12 +37,15 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 "binomial"=binomial(link))
             mod <- stats::glm(Y ~ .-1, data=XX, family=Family, ...)
             cf <- coef(mod)
+            if (dist == "gaussian")
+                attr(cf, "sigma") <- summary(mod)$sigma
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
         if (dist == "negbin") {
             mod <- MASS::glm.nb(Y ~ .-1, data=XX, ...)
             cf <- coef(mod)
+            attr(cf, "theta") <- mod$theta
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
@@ -65,7 +65,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 link=link, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
-            linv <- mod$linkinv
+            ## log link used for count based contrasts
+            linv <- poisson("log")$linkinv
         }
 ## zip2 & zinb2 implementation:
 ## - MLE returns unmodified coefs (P of 0 in ZI)
@@ -89,7 +90,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 stop("only logit and probit link allowed for zip2 and zinb2")
             mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist=Dist,
                 link=link, ...)
-            linv <- function(eta) binomial(link)$linkinv(eta)
+            ## logit/probit/etc used for (1-phi) based contrasts
+            linv <- binomial(link)$linkinv
             cf <- c(-coef(mod, "zero"), coef(mod, "count"))
             ll <- as.numeric(logLik(mod))
         }
