@@ -3,6 +3,7 @@
 \alias{multicut.default}
 \alias{multicut.formula}
 \alias{multicut1}
+\alias{getMLE.multicut}
 \alias{fitted.multicut}
 \alias{predict.multicut}
 \alias{plot.multicut}
