@@ -36,6 +36,13 @@ str(m1$strata)
 strata(m1)
 strata(m4)
 
+getMLE(m1, 1, vcov=FALSE)
+mle4 <- try(getMLE(m4, 1, vcov=FALSE), silent=TRUE)
+stopifnot(inherits(mle4, "try-error"))
+getMLE(m1, 1, vcov=TRUE)
+mle4 <- try(getMLE(m4, 1, vcov=TRUE), silent=TRUE)
+stopifnot(inherits(mle4, "try-error"))
+
 summary(m1)
 summary(m4)
 
@@ -66,6 +73,8 @@ summary(o <- multicut(Y ~ x2, strata=x0, dist="gaussian"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## poisson
 
@@ -73,6 +82,8 @@ summary(o <- multicut(Y ~ x2, strata=x0, dist="poisson"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## binomial
 
@@ -81,6 +92,8 @@ summary(o <- multicut(Y1 ~ x2, strata=x0, dist="binomial"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## negbin
 
@@ -88,6 +101,8 @@ summary(o <- multicut(Y ~ x2, strata=x0, dist="negbin"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## beta
 
@@ -98,18 +113,19 @@ summary(o <- multicut(Y2 ~ x2, strata=x0, dist="beta"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zip
 
 Yzi <- Y
 Yzi[1,] <- 0
-#B <- replicate(2, sample.int(n, replace=TRUE))
-B <- sapply(2:3, function(i) which((1:n) != i)) # jackknife
-B[1,] <- 1
 summary(o <- multicut(Yzi ~ x2, strata=x0, dist="zip"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zinb
 
@@ -117,6 +133,8 @@ summary(o <- multicut(Yzi ~ x2, strata=x0, dist="zinb"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zip2
 
@@ -124,6 +142,8 @@ summary(o <- multicut(Yzi ~ x2, strata=x0, dist="zip2"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2))) #--- FIXME!!!
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zinb2
 
@@ -131,6 +151,8 @@ summary(o <- multicut(Yzi ~ x2, strata=x0, dist="zinb2"))
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2))) # -- FIXME!!!
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## rsf
 
@@ -152,13 +174,18 @@ o <- multicut(Y ~ x1 + x2, dd, strata=dd$x0, dist="rsf")
 o$species
 summary(fitted(o))
 summary(predict(o))
-#summary(predict(o, gnew=o$strata, xnew=o$X)) # -- issue: log/logit FIXME!!!
+summary(predict(o, gnew=o$strata, xnew=o$X))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
+
 ## intercept + partition
 o <- multicut(Y ~ 1, dd, strata=x0, dist="rsf")
 o$species
 summary(fitted(o))
 summary(predict(o))
-#summary(predict(o, gnew=o$strata, xnew=NULL)) # -- issue: log/logit FIXME!!!
+summary(predict(o, gnew=o$strata, xnew=NULL))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## rspf
 
@@ -167,6 +194,8 @@ o$species
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=o$strata, xnew=o$X))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## --- testing ... passing ---
 
