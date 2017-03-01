@@ -27,7 +27,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             stop("Provide single integer for B.")
         niter <- B
         bm <- rownames(obj)[k]
-        mle <- getMLE(object, which, ...)
+        mle <- getMLE(object, which, vcov=TRUE, ...)
         cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)[,c(1L, 2L),drop=FALSE]
         cf <- rbind(mle$coef[c(1L, 2L)], cf)
 ## zip2 & zinb2 implementation:
