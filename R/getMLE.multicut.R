@@ -29,10 +29,9 @@ function(object, which, vcov=FALSE, ...)
         if (vcov)
             V <- rbind("(Intercept)"=NA, cbind("(Intercept)"=NA, V))
     }
-    if (Dist %in% c("zip2", "zinb2")) {
+    if (vcov && Dist %in% c("zip2", "zinb2")) {
         est <- est[c((length(est)-(K-1L)):(length(est)), 1:(length(est)-K))]
-        if (vcov)
-            V <- V[names(est), names(est)]
+        V <- V[names(est), names(est)]
     }
     if (Dist == "negbin")
         attr(est, "theta") <- if (vcov)
