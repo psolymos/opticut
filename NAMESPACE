@@ -5,7 +5,6 @@ export("opticut", "optilevels", "opticut1", "multicut1", "multicut",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "getMLE",
     "uncertainty", "bsmooth",
-    "ipredict",
     "wplot",
     "fix_levels", "strata", "check_strata", "beta2i",
     "iquantile")
