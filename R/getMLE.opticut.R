@@ -21,7 +21,7 @@ function(object, which, ...)
     V <- vcov(m1)
     if (Dist == "rsf") {
         est <- m1$results$par
-        V <- .solvenear(m1$results$hessian)
+        V <- solve(m1$results$hessian)
     }
     if (Dist %in% c("zip2", "zinb2")) {
         est <- c(-est[(length(est)-1L):(length(est))],

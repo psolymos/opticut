@@ -9,6 +9,7 @@ export("opticut", "optilevels", "opticut1", "multicut1", "multicut",
     "wplot",
     "fix_levels", "strata", "check_strata", "beta2i",
     "iquantile")
+
 S3method("opticut", "default")
 S3method("opticut", "formula")
 S3method("multicut", "default")
@@ -63,4 +64,3 @@ importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "dbinom", "dpois")
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")
-importFrom("ResourceSelection", ".solvenear")
