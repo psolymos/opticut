@@ -45,7 +45,7 @@ strata(object, ...)
 
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, pos_only = FALSE, ...)
-\method{getMLE}{opticut}(object, which, ...)
+\method{getMLE}{opticut}(object, which, vcov=FALSE, ...)
 \method{subset}{opticut}(x, subset, ...)
 \method{fitted}{opticut}(object, ...)
 \method{predict}{opticut}(object, gnew=NULL, xnew=NULL, ...)
@@ -215,6 +215,9 @@ This is only important when \code{comb} is not \code{"rank"}.
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
 missing values are not accepted.
+}
+  \item{vcov}{
+logical, if variance-covariance matrix is needed to be returned.
 }
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
