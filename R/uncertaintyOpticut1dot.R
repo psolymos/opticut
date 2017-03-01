@@ -30,11 +30,11 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         mle <- getMLE(object, which, vcov=TRUE, ...)
         if (strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L] == "rsf") {
             cf <- MASS::mvrnorm(niter, mle$coef[-1L],
-                mle$vcov[-1L,-1L,drop=FALSE])[,c(1L, 2L),drop=FALSE]
-            cf <- rbind(mle$coef[c(1L, 2L)], cf)
+                mle$vcov[-1L,-1L,drop=FALSE])
+            cf <- rbind(mle$coef[c(1L, 2L)], cbind(0, cf)[,c(1L, 2L)])
         } else {
-            cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)[,c(1L, 2L),drop=FALSE]
-            cf <- rbind(mle$coef[c(1L, 2L)], cbind(0, cf))
+            cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)
+            cf <- rbind(mle$coef[c(1L, 2L)], cf[,c(1L, 2L)])
         }
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
