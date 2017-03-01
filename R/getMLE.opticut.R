@@ -1,5 +1,5 @@
 getMLE.opticut <-
-function(object, which, ...)
+function(object, which, vcov=FALSE, ...)
 {
     if (missing(which))
         stop("specify which argument")
@@ -18,15 +18,19 @@ function(object, which, ...)
         full_model=TRUE,
         best=TRUE, ...)[[1L]]
     est <- coef(m1)
-    V <- vcov(m1)
+    V <- if (vcov)
+        vcov(m1) else NULL
+    # rsf: coef and vcov method returns no intercept
     if (Dist == "rsf") {
-        est <- m1$results$par
-        V <- solve(m1$results$hessian)
+        est <- c("(Intercept)"=0, est)
+        if (vcov)
+            V <- rbind("(Intercept)"=NA, cbind("(Intercept)"=NA, V))
     }
     if (Dist %in% c("zip2", "zinb2")) {
         est <- c(-est[(length(est)-1L):(length(est))],
             est[1:(length(est)-2L)])
-        V <- V[names(est), names(est)]
+        if (vcov)
+            V <- V[names(est), names(est)]
     }
     if (Dist == "negbin")
         attr(est, "theta") <- m1$theta
