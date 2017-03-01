@@ -1,8 +1,9 @@
 # User-visible changes in the opticut package
 
-## Version 0.1-1 -- Dec 17, 2016
+## Version 0.1-1 -- Mar 1, 2017
 
-* Inverse prediction (`ipredict`) added.
+* `multicut` added for multinomial-response model.
+* `fitted` and `predict` method added.
 
 ## Version 0.1-0 -- Dec 16, 2016
 
