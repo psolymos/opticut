@@ -105,22 +105,19 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 if (!is.null(link) && link != "log")
                     warning("link argument ignored for dist='rsf' (log link used by default)")
                 link <- "log" # this is needed for linkinv below
-
+                ## --- rsf implementation uses PL of Lele 2009 ---
                 ## note: the call uses link='log', no need to provide link=link here!
-#                mod <- ResourceSelection::rsf(Y ~ .,
-#                    data=XX[,-1,drop=FALSE], m=0, B=0, ...)
                 ## intercept is not reported by rsf
                 ## and this can cause problems in X %*% theta
-#                cf <- c(0, mod$coefficients)
-#                ll <- as.numeric(mod$loglik)
-#                linv <- binomial(link)$linkinv
                 mod <- if (ncol(XX) < 2L) {
                     ResourceSelection::rsf.null(Y, m=0, ...)
                 } else {
                     ResourceSelection::rsf(Y ~ .,
                         data=XX[,-1,drop=FALSE], m=0, B=0, ...)
                 }
-
+                cf <- mod$results$par
+                cf[1L] <- 0
+                ## --- glm implementation uses ML ---
                 ## can be used for null model as well
 #                mod <- stats::glm(Y ~ .-1, data=XX,
 #                    family=binomial("logit"), ...)
@@ -132,10 +129,9 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                     link <- "logit" # this is needed for linkinv below
                 mod <- ResourceSelection::rspf(Y ~ ., data=XX[,-1,drop=FALSE],
                     link=link, m=0, B=0, ...)
-#                cf <- mod$coefficients
+                cf <- mod$coefficients
 #                ll <- as.numeric(mod$loglik)
             }
-            cf <- mod$results$par
             ll <- as.numeric(mod$loglik)
             linv <- binomial(link)$linkinv
         }
