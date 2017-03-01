@@ -4,7 +4,8 @@ internal=TRUE, best=TRUE, Z=NULL, ...)
 {
     if (is.null(which))
         which <- names(object$species)
-    bp <- bestpart(object)
+    if (is.null(Z))
+        bp <- bestpart(object)
     spp <- names(object$species)
     names(spp) <- spp
     spp <- spp[which]

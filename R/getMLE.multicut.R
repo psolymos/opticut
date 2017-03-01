@@ -24,10 +24,9 @@ function(object, which, vcov=FALSE, ...)
         coef(m1) else object$species[[which]]$coefficients
     V <- if (vcov)
         vcov(m1) else NULL
-    if (Dist == "rsf") {
+    if (vcov && Dist == "rsf") {
         est <- c("(Intercept)"=0, est)
-        if (vcov)
-            V <- rbind("(Intercept)"=NA, cbind("(Intercept)"=NA, V))
+        V <- rbind("(Intercept)"=NA, cbind("(Intercept)"=NA, V))
     }
     if (vcov && Dist %in% c("zip2", "zinb2")) {
         est <- est[c((length(est)-(K-1L)):(length(est)), 1:(length(est)-K))]
