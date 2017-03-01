@@ -89,6 +89,17 @@ bestmodel(m3)
 bm4 <- try(bestmodel(m4), silent=TRUE) # dist=fun problem
 stopifnot(inherits(bm4, "try-error"))
 
+getMLE(m1, 1, vcov=FALSE)
+getMLE(m2, 1, vcov=FALSE)
+getMLE(m3, 1, vcov=FALSE)
+mle4 <- try(getMLE(m4, 1, vcov=FALSE), silent=TRUE)
+stopifnot(inherits(mle4, "try-error"))
+getMLE(m1, 1, vcov=TRUE)
+getMLE(m2, 1, vcov=TRUE)
+getMLE(m3, 1, vcov=TRUE)
+mle4 <- try(getMLE(m4, 1, vcov=TRUE), silent=TRUE)
+stopifnot(inherits(mle4, "try-error"))
+
 str(bestpart(m1))
 str(bestpart(m2))
 str(bestpart(m2, pos_only=TRUE))
@@ -149,6 +160,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## poisson
 
@@ -159,6 +172,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## binomial
 
@@ -170,6 +185,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## negbin
 
@@ -180,6 +197,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## beta
 
@@ -193,6 +212,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zip
 
@@ -208,6 +229,8 @@ u <- uncertainty(o, type="multi", B=B)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zinb
 
@@ -218,6 +241,8 @@ u <- uncertainty(o, type="multi", B=B)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zip2
 
@@ -228,6 +253,8 @@ u <- uncertainty(o, type="multi", B=B)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## zinb2
 
@@ -238,6 +265,8 @@ u <- uncertainty(o, type="multi", B=B)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## rsf
 
@@ -263,6 +292,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=o$strata, xnew=o$X))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 ## intercept + partition
 o <- opticut(Y ~ 1, dd, strata=x0, dist="rsf")
 o$species
@@ -272,6 +303,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=o$strata, xnew=NULL))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## rspf
 
@@ -283,6 +316,8 @@ u <- uncertainty(o, type="multi", B=2)
 summary(fitted(o))
 summary(predict(o))
 summary(predict(o, gnew=o$strata, xnew=o$X))
+getMLE(o, 1, vcov=FALSE)
+getMLE(o, 1, vcov=TRUE)
 
 ## --- ... in uncertainty should produce an error ---
 
