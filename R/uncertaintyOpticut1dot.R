@@ -28,16 +28,13 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         niter <- B
         bm <- rownames(obj)[k]
         mle <- getMLE(object, which, vcov=TRUE, ...)
-        cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)[,c(1L, 2L),drop=FALSE]
-        cf <- rbind(mle$coef[c(1L, 2L)], cf)
-## zip2 & zinb2 implementation:
-## - MLE returns unmodified coefs (P of 0 in ZI)
-## - .opticut1 returns:
-##       -1*coef[1:2]
-##       linkinv: binomial(link)$linkinv(eta)
-## - asymp uncertainty uses MLE, thus have to invert and use linkinv after
-        if (!is.function(object$dist) && object$dist %in% c("zip2", "zinb2")) {
-            cf[,1L:2L] <- -cf[,1L:2L]
+        if (strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L] == "rsf") {
+            cf <- MASS::mvrnorm(niter, mle$coef[-1L],
+                mle$vcov[-1L,-1L,drop=FALSE])[,c(1L, 2L),drop=FALSE]
+            cf <- rbind(mle$coef[c(1L, 2L)], cf)
+        } else {
+            cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)[,c(1L, 2L),drop=FALSE]
+            cf <- rbind(mle$coef[c(1L, 2L)], cbind(0, cf))
         }
         cf0 <- linkinv(cf[,1L])
         cf1 <- linkinv(cf[,1L] + cf[,2L])
