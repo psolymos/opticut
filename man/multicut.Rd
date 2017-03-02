@@ -289,6 +289,49 @@ getMLE(m1, which = 1, vcov=TRUE)
 head(fitted(m1))
 ## prediction for new data
 head(predict(m1, gnew=x0, xnew=data.frame(x2=x2)))
+
+\dontrun{
+## --- Zero-inflated Negative Binomial
+## dolina example
+data(dolina)
+## stratum as ordinal
+dolina$samp$stratum <- as.integer(dolina$samp$stratum)
+## filter species to speed up things a bit
+Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
+## opticut results, note the cloglog link function
+dol <- multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zinb:cloglog")
+summary(dol)
+## vertical plot orientation
+plot(dol, horizontal=FALSE, pos=1, upper=0.8)
+
+## parallel
+library(parallel)
+cl <- makeCluster(2)
+multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist="zip",cl=cl)
+stopCluster(cl)
+
+## --- Customizing distributions
+## we may want to expand the Zero-inflation component in a ZIP model
+## see how the return value needs to be structured
+fun <- function(Y, X, linkinv, zi_term, ...) {
+    X <- as.matrix(X)
+    mod <- pscl::zeroinfl(Y ~ X-1 | zi_term, dist = "poisson", ...)
+    list(coef=coef(mod),
+        logLik=logLik(mod),
+        linkinv=mod$linkinv)
+}
+Xdol <- model.matrix(~ stratum + lmoist + method, data=dolina$samp)
+## this fits the null model (i.e. no partitions added)
+fun(Y[,"amin"], Xdol, zi_term=dolina$samp$method)
+## now we can use dist=fun
+multicut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
+    dist=fun, zi_term=dolina$samp$method)
+dol2 <- multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
+    strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
+summary(dol2)
+}
 }
 \keyword{ models }
 \keyword{ utilities }
