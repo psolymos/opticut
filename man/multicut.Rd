@@ -247,24 +247,6 @@ Peter Solymos <solymos@ualberta.ca>
 related to the presentation of the results in the package.
 }
 \examples{
-
-\dontrun{
-
-set.seed(1234)
-n <- 200
-x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
-x2 <- rnorm(n, 0.5, 1)
-lam <- exp(0.5 + 0.5*x1 + -0.2*x2)
-Y1 <- rpois(n, lam)
-Y2 <- rpois(n, rev(lam))
-Y <- cbind(Y1, Y2)
-.opticut1=opticut:::.opticut1
-rc <- multicut1(Y1, model.matrix(~x2), as.factor(x0), dist="poisson")
-rc <- multicut(Y, model.matrix(~x2), as.factor(x0), dist="poisson")
-rc <- multicut(Y~x2, strata=as.factor(x0), dist="poisson")
-
-
 ## --- Gaussian
 ## simple example from Legendre 2013
 ## Indicator Species: Computation, in
@@ -276,7 +258,6 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
 spp
-
 
 summary(ocall <- multicut(spp ~ 1, strata=gr, dist="gaussian"))
 summary(multicut(spp, strata=gr, dist="gaussian")) # alternative
@@ -297,106 +278,21 @@ Y3 <- rbinom(n, 1, p3)
 Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
 X <- model.matrix(~x2)
 
-## all partitions, single species
-Z <- allComb(x0)
-multicut1(Y1, X, Z, dist="binomial")
-
-## rank based partitions, single species
 multicut1(Y1, X, as.factor(x0), dist="binomial")
 
-## all partitions, multiple species
-(m1 <- multicut(Y ~ x2, strata=x0, dist="poisson", comb="all"))
-summary(m1)
-## show all species
-summary(m1, cut=0)
-## plot best partitions and indicator values
+summary(m1 <- multicut(Y ~ x2, strata=x0, dist="poisson"))
 plot(m1)
-## model weights for all species
-wplot(m1)
-## different ways of plotting weights for single species
-wplot(m1$species[[1]])
-wplot(m1, which = 1)
 
-## rank based partitions, multiple species
-summary(m2 <- multicut(Y ~ x2, strata=x0, dist="poisson", comb="rank"))
 ## subset results
-summary(subset(m2, 1:2))
-
-## best partition
-head(bestpart(m2))
-
-## best model
-mods <- bestmodel(m2)
-mods
-## explore further
-confint(mods[[1]])
+summary(subset(m1, 1:2))
 
 ## MLE and variance-covariance matrix (species 1)
-getMLE(m2, which = 1)
+getMLE(m1, which = 1, vcov=TRUE)
 
 ## fitted values
-head(fitted(m2))
+head(fitted(m1))
 ## prediction for new data
-head(predict(m2, gnew=x0, xnew=data.frame(x2=x2)))
-
-## --- Zero-inflated Negative Binomial
-## dolina example
-data(dolina)
-## stratum as ordinal
-dolina$samp$stratum <- as.integer(dolina$samp$stratum)
-## filter species to speed up things a bit
-Y <- dolina$xtab[,colSums(dolina$xtab > 0) >= 20]
-## multicut results, note the cloglog link function
-dol <- multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="zinb:cloglog")
-summary(dol)
-## vertical plot orientation
-plot(dol, horizontal=FALSE, pos=1, upper=0.8)
-
-## parallel computing comparisons
-library(parallel)
-cl <- makeCluster(2)
-## sequential, all combinations (2^(K-1) - 1)
-system.time(multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="zinb", comb="all", cl=NULL))
-## sequential, rank based combinations (K - 1)
-system.time(multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="zinb", comb="rank", cl=NULL))
-## parallel, all combinations (2^(K-1) - 1)
-system.time(multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="zinb", comb="all", cl=cl))
-## parallel, rank based combinations (K - 1)
-system.time(multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist="zinb", comb="rank", cl=cl))
-stopCluster(cl)
-
-## --- Customizing distributions
-## we may want to expand the Zero-inflation component in a ZIP model
-## see how the return value needs to be structured
-fun <- function(Y, X, linkinv, zi_term, ...) {
-    X <- as.matrix(X)
-    mod <- pscl::zeroinfl(Y ~ X-1 | zi_term, dist = "poisson", ...)
-    list(coef=coef(mod),
-        logLik=logLik(mod),
-        linkinv=mod$linkinv)
-}
-Xdol <- model.matrix(~ stratum + lmoist + method, data=dolina$samp)
-## this fits the null model (i.e. no partitions added)
-fun(Y[,"amin"], Xdol, zi_term=dolina$samp$method)
-## now we can use dist=fun
-multicut1(Y[,"amin"], Xdol, Z=dolina$samp$mhab,
-    dist=fun, zi_term=dolina$samp$method)
-dol2 <- multicut(Y ~ stratum + lmoist + method, data=dolina$samp,
-    strata=dolina$samp$mhab, dist=fun, zi_term=dolina$samp$method)
-summary(dol2)
-}
-
-## current collapse value
-getOption("ocoptions")$collapse
-## factor levels sometimes need to be manipulated
-## before feeding it to multicut
-fix_levels(as.factor(c("A b", "C d")), sep=":")
-fix_levels(as.factor(c("A b", "C d")), sep="")
+head(predict(m1, gnew=x0, xnew=data.frame(x2=x2)))
 }
 \keyword{ models }
 \keyword{ utilities }

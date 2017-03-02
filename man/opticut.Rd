@@ -480,7 +480,7 @@ mods
 confint(mods[[1]])
 
 ## MLE and variance-covariance matrix (species 1)
-getMLE(m2, which = 1)
+getMLE(m2, which=1, vcov=TRUE)
 
 ## fitted values
 head(fitted(m2))
