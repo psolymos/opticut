@@ -372,7 +372,7 @@ use the best partition returned by \code{bestpart} to refit the model.
 \code{getMLE} returns a named list corresponding to the best supported
 model. The list has the following elements:
 \code{coef} is the Maximum Likelihood Estimate (MLE),
-\code{vcov} is the variance-covariance matrix for the MLE,
+\code{vcov} is the variance-covariance matrix for the MLE or \code{NULL},
 \code{dist} is the distribution inherited from input \code{object}.
 
 \code{\link{fitted}} returns expected values on the predictor scale
@@ -406,6 +406,7 @@ for manipulating fitted objects.
 \code{\link{ocoptions}} on how to set some of the global options
 related to the presentation of the results in the package.
 
+\code{\link{multicut}} for multinomial-response model,
 \code{\link{optilevels}} for finding the optimal number of factor levels.
 }
 \examples{

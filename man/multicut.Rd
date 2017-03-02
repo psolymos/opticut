@@ -212,10 +212,7 @@ The \code{strata} method extracts the \code{strata} argument
 as factor.
 
 The \code{print} and \code{summary} methods are called for their side effects.
-The summary shows the following information:
-best supported split, strength and sign of association,
-indicator value (I), expected values (mu0, mu1), log likelihood ratio (logLR),
-and model weights(w).
+showing expected values, and log likelihood ratio (logLR).
 
 The \code{subset} method subsets the species in the multicut object.
 
@@ -224,15 +221,14 @@ The \code{plot} method presents the estimates by species and strata.
 \code{getMLE} returns a named list corresponding to the best supported
 model. The list has the following elements:
 \code{coef} is the Maximum Likelihood Estimate (MLE),
-\code{vcov} is the variance-covariance matrix for the MLE,
+\code{vcov} is the variance-covariance matrix for the MLE or \code{NULL},
 \code{dist} is the distribution inherited from input \code{object}.
 
 \code{\link{fitted}} returns expected values on the predictor scale
 for the observations as a matrix (number of observations by number of species).
 \code{\link{predict}} returns \code{fitted} values when both \code{gnew}
 and \code{xnew} are \code{NULL}, or corresponding point predictions
-(expected values) on the predictor scale
-(available for \code{comb = "rank"} models only).
+(expected values) on the predictor scale.
 
 The coercion methods \code{\link{as.data.frame}} return a data frame.
 }
