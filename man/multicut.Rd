@@ -4,6 +4,7 @@
 \alias{multicut.formula}
 \alias{multicut1}
 \alias{getMLE.multicut}
+\alias{bestmodel.multicut}
 \alias{fitted.multicut}
 \alias{predict.multicut}
 \alias{plot.multicut}
@@ -33,6 +34,7 @@ multicut(...)
 \method{multicut}{formula}(formula, data, strata, dist = "gaussian",
     sset=NULL, cl = NULL, ...)
 
+\method{bestmodel}{multicut}(object, which = NULL, ...)
 \method{strata}{multicut}(object, ...)
 \method{getMLE}{multicut}(object, which, vcov=FALSE, ...)
 \method{subset}{multicut}(x, subset, ...)
