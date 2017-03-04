@@ -21,11 +21,15 @@ internal=TRUE, best=TRUE, Z=NULL, ...)
         if (internal) {
             if (!best)
                 stop("use best=TRUE when internal=TRUE")
-            ZZ <- if (is.null(Z))
-                bp[j,i] else Z[j]
+            if (is.null(Z)) {
+                ZZ <- bp[j,i]
+            } else {
+                ZZ <- if (is.null(dim(Z)))
+                    Z[j] else Z[j,,drop=FALSE]
+            }
             out[[i]] <- .opticut1(
                 Y=object$Y[j,i],
-                X=object$X[j,],
+                X=object$X[j,,drop=FALSE],
                 Z1=ZZ,
                 dist=object$dist, ...)
         } else {
@@ -34,7 +38,7 @@ internal=TRUE, best=TRUE, Z=NULL, ...)
             if (best) {
                 out[[i]] <- opticut1(
                     Y=object$Y[j,i,drop=TRUE],
-                    X=object$X[j,],
+                    X=object$X[j,,drop=FALSE],
                     Z=bp[j,i,drop=FALSE],
                     dist=object$dist, ...)
             } else {
@@ -46,7 +50,7 @@ internal=TRUE, best=TRUE, Z=NULL, ...)
                 }
                 out[[i]] <- opticut1(
                     Y=object$Y[j,i,drop=TRUE],
-                    X=object$X[j,],
+                    X=object$X[j,,drop=FALSE],
                     Z=zz,
                     dist=object$dist, ...)
             }
