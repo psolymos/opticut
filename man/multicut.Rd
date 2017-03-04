@@ -220,6 +220,16 @@ The \code{subset} method subsets the species in the multicut object.
 
 The \code{plot} method presents the estimates by species and strata.
 
+\code{\link{bestpart}} returns a matrix with the best supported
+partitions for each species (samples and rows, species as columns).
+Binary partitions are based on Lorenz-tangent based optimal threshold
+(see \code{\link{lorenz}}).
+
+\code{\link{bestmodel}} returns the best supported model for further
+manipulation (e.g. prediction). Note: custom distribution
+functions are designed to return only point estimates,
+thus the best model cannot be returned. In this case,
+use the best partition returned by \code{bestpart} to refit the model.
 \code{getMLE} returns a named list corresponding to the best supported
 model. The list has the following elements:
 \code{coef} is the Maximum Likelihood Estimate (MLE),
@@ -238,6 +248,9 @@ The coercion methods \code{\link{as.data.frame}} return a data frame.
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
+\code{\link{lorenz}} for how multi-level partitions are binarized
+using the Lorenz-tangent approach.
+
 \code{\link{opticut}} for a binary-response model,
 \code{\link{optilevels}} for finding the optimal number of factor levels.
 

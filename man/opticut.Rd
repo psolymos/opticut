@@ -362,7 +362,7 @@ The \code{plot} method presents the contrasts by species and strata.
 The \code{wplot} (weight plot) shows model weights for partitions.
 
 \code{\link{bestpart}} returns a matrix with the best supported
-partitions for each species (species as columns).
+partitions for each species (samples and rows, species as columns).
 
 \code{\link{bestmodel}} returns the best supported model for further
 manipulation (e.g. prediction). Note: custom distribution

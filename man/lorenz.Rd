@@ -148,6 +148,19 @@ abline(0, 1, lty=2, col="grey")
 abline(1, -1, lty=2, col="grey")
 plot(l, type="x", lwd=2, h=3, v=4)
 par(op)
+
+## Lorenz-tangent approach to binarize a multi-level problem
+
+n <- 1000
+g <- as.factor(rep(LETTERS[1:4], each=n/4))
+x1 <- rpois(n, 5)
+x2 <- rpois(n, exp(as.integer(g)))
+
+plot(lorenz(x1), col=2)
+lines(lorenz(x2), col=4)
+
+prop.table(table(g, x1 > summary(lorenz(x1))["x(t)"]), margin=1)
+prop.table(table(g, x2 > summary(lorenz(x2))["x(t)"]), margin=1)
 }
 \keyword{ manip }
 \keyword{ misc }
