@@ -14,7 +14,7 @@ function(object, which, vcov=FALSE, ...)
     }
     K <- nlevels(object$strata)
     if (vcov)
-        m1 <- bestmodel(object, which, ...)
+        m1 <- bestmodel(object, which, ...)[[1L]]
     est <- if (vcov)
         coef(m1) else object$species[[which]]$coefficients
     V <- if (vcov)
