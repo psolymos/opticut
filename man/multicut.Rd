@@ -265,7 +265,7 @@ summary(multicut(spp, strata=gr, dist="gaussian")) # alternative
 set.seed(1234)
 n <- 200
 x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
+x1 <- ifelse(x0 <= 2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 p1 <- plogis(-0.5 + 2*x1 + -0.8*x2)
 Y1 <- rbinom(n, 1, p1)
@@ -283,6 +283,12 @@ plot(m1)
 
 ## subset results
 summary(subset(m1, 1:2))
+
+## best model
+mods <- bestmodel(m1)
+mods
+## explore further
+confint(mods[[1]])
 
 ## MLE and variance-covariance matrix (species 1)
 getMLE(m1, which = 1, vcov=TRUE)
