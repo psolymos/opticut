@@ -13,15 +13,8 @@ function(object, which, vcov=FALSE, ...)
         Dist <- ""
     }
     K <- nlevels(object$strata)
-    if (vcov) {
-        Z <- model.matrix(~Z, data.frame(Z=object$strata))[,-1L]
-        m1 <- .extractOpticut(object, which,
-            boot=FALSE,
-            internal=TRUE,
-            full_model=TRUE,
-            best=TRUE,
-            Z=Z, ...)[[1L]]
-    }
+    if (vcov)
+        m1 <- bestmodel(object, which, ...)
     est <- if (vcov)
         coef(m1) else object$species[[which]]$coefficients
     V <- if (vcov)

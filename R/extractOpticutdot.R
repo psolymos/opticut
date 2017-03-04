@@ -24,8 +24,15 @@ internal=TRUE, best=TRUE, Z=NULL, ...)
             if (is.null(Z)) {
                 ZZ <- bp[j,i]
             } else {
-                ZZ <- if (is.null(dim(Z)))
-                    Z[j] else Z[j,,drop=FALSE]
+                if (is.null(dim(Z))) {
+                    if (is.factor(Z)) {
+                        ZZ <- model.matrix(~Z, data.frame(Z=Z))[j,-1L,drop=FALSE]
+                    } else {
+                        ZZ <- Z[j]
+                    }
+                } else {
+                    ZZ <- Z[j,,drop=FALSE]
+                }
             }
             out[[i]] <- .opticut1(
                 Y=object$Y[j,i],
