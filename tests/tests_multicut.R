@@ -36,6 +36,11 @@ str(m1$strata)
 strata(m1)
 strata(m4)
 
+bestmodel(m1)
+## dist=fun cannot return the best model (--> uncertainty(type=asymm) fails)
+bm4 <- try(bestmodel(m4), silent=TRUE) # dist=fun problem
+stopifnot(inherits(bm4, "try-error"))
+
 getMLE(m1, 1, vcov=FALSE)
 mle4 <- try(getMLE(m4, 1, vcov=FALSE), silent=TRUE)
 stopifnot(inherits(mle4, "try-error"))
