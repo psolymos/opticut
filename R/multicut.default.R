@@ -98,5 +98,10 @@ function(Y, X, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
             attr(out$species[[i]], "dist") <- deparse(substitute(dist))
     }
     class(out) <- "multicut"
+    fit <- fitted(out)
+    if (any(fit) < 0) {
+        warning("Negative fitted values found for ",
+            sum(colSums(fit < 0) > 0), " species.")
+    }
     out
 }

@@ -1,12 +1,7 @@
 summary.multicut <- function(object, ...)
 {
 
-    bp <- bestpart(object)
-    bp <- mefa4::groupSums(bp, 1, rownames(bp))
-    bp <- bp[levels(strata(object)),,drop=FALSE]
-    ntot <- as.numeric(table(strata(object))[levels(strata(object))])
-    bp <- bp / ntot
-    bp <- ifelse(bp > 0.5, 1, 0)
+    bp <- .lorenz_cut(object, force=TRUE)
     lab1 <- character(ncol(bp))
     lab0 <- character(ncol(bp))
     for (i in seq_len(ncol(bp))) {
