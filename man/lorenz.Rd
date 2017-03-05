@@ -31,7 +31,7 @@ iquantile(x, ...)
   \item{x}{a vector of nonnegative numbers for \code{lorenz}, or
 an object to plot or summarized.
 }
-  \item{x}{a vector of frequencies, must be same length as \code{x}.
+  \item{n}{a vector of frequencies, must be same length as \code{x}.
 }
 
   \item{na.last}{for controlling the treatment of \code{NA}s.
