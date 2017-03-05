@@ -12,6 +12,8 @@ summary.multicut <- function(object, ...)
     }
     logLR <- sapply(object$species, "[[", "logLR")
     fit <- fitted(object)
+    if (getOption("ocoptions")$fix_fitted)
+        fit <- fit + abs(min(fit))
     lc <- t(apply(fit, 2, function(z) summary(lorenz(z))))
     res <- data.frame(
         split=lab1,

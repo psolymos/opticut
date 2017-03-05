@@ -286,8 +286,11 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
 rownames(spp) <- gr
 spp
 
+## negative expected values are not good
+oco <- ocoptions(fix_fitted=TRUE)
 summary(ocall <- multicut(spp ~ 1, strata=gr, dist="gaussian"))
 summary(multicut(spp, strata=gr, dist="gaussian")) # alternative
+ocoptions(oco) # reset options
 
 ## --- Binomial
 ## simulated binary data
