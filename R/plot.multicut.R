@@ -29,19 +29,23 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
     }
     ss <- summary(x)
     xx <- ss$summary
-#    bp <- t(apply(xx, 1, function(z) z / max(z)))
-    bp <- t(apply(xx, 1, function(z) (z-min(z)) / max(z-min(z))))
-    if (!any(ss$logLR >= cut)) {
+    bp <- ss$mu
+    bp <- t(apply(bp, 1, function(z) (z-min(z)) / max(z-min(z))))
+    bp01 <- ss$bestpart
+    if (!any(xx$logLR >= cut)) {
         warning("All logLR < cut: cut ignored")
         rkeep <- rep(TRUE, nrow(xx))
     } else {
-        rkeep <- ss$logLR >= cut
+        rkeep <- xx$logLR >= cut
         #bp <- bp[rkeep, , drop=FALSE]
         #xx <- xx[rkeep, , drop=FALSE]
     }
     if (sort_r) {
-        bp <- bp[ss$row.order[rkeep],,drop=FALSE]
-        xx <- xx[ss$row.order[rkeep],,drop=FALSE]
+        bp <- bp[attr(ss$bestpart, "row.order")[rkeep],,drop=FALSE]
+        bp01 <- bp01[attr(ss$bestpart, "row.order")[rkeep],,drop=FALSE]
+        xx <- xx[attr(ss$bestpart, "row.order")[rkeep],,drop=FALSE]
+#        bp <- bp[ss$row.order[rkeep],,drop=FALSE]
+#        xx <- xx[ss$row.order[rkeep],,drop=FALSE]
     }
     if (sort_c) {
         ## richness based ordering
@@ -107,5 +111,6 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
         }
     }
     box(col="grey", bty=bty)
-    invisible(list(summary=xx, bestpart=bp))
+    invisible(list(summary=xx, bestpart=bp01, mu=bp))
 }
+

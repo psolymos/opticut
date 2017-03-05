@@ -1,4 +1,4 @@
-.opticut_dist <- function(x) {
+.opticut_dist <- function(x, make_dist=FALSE) {
     List <-c(
         "gaussian",
         "poisson",
@@ -15,7 +15,11 @@
         return(List)
     if (is.function(x))
         return(FALSE)
-    if (is.character(x))
-        return(strsplit(x, ":", fixed=TRUE)[[1L]][1L] %in% List)
+    if (is.character(x)) {
+        x <- strsplit(x, ":", fixed=TRUE)[[1L]][1L]
+        x <- match.arg(x, List)
+        if (make_dist)
+            return(x) else return(x %in% List)
+    }
     FALSE
 }
