@@ -21,8 +21,10 @@ summary.multicut <- function(object, ...)
         split=lab1,
         assoc=.parseAssoc(data.frame(logLR=logLR, assoc=1)),
         lc[,c("J", "G")],
+        null=sapply(object$species, "[[", "null"),
         logLR=logLR,
-        logL_null=attr(object$species[[1L]], "logL_null"))
+        logL=sapply(object$species, "[[", "logL"),
+        logL_null=sapply(object$species, function(z) attr(z, "logL_null")))
     bp <- t(bp)
     attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
     attr(bp, "row.order") <- order(ncol(bp) - rowSums(bp),
