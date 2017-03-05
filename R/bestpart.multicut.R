@@ -1,6 +1,6 @@
 ## this returns an n x #spp matrix
 bestpart.multicut <-
-function (object, pos_only=FALSE, ...)
+function (object, ...)
 {
     fit <- fitted(object)
     lc <- t(apply(fit, 2, function(z) summary(lorenz(z))))
