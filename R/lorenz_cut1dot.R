@@ -1,10 +1,11 @@
 .lorenz_cut1 <-
 function(x, g, fix_fitted=FALSE)
 {
-    requireNamespace("Matrix", quietly=TRUE)
+    g <- as.factor(g)
     sum_by <- function(x, by) {
-        mm <- as(factor(by, levels=unique(by)), "sparseMatrix")
-        cbind(x=as.numeric(mm %*% x), by=rowSums(mm))
+        X <- t(model.matrix(~g-1))
+        rownames(X) <- levels(g)
+        cbind(x=as.numeric(X %*% x), by=rowSums(X))
     }
     if (fix_fitted)
         x <- x + abs(min(x))
