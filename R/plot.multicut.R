@@ -1,7 +1,7 @@
 plot.multicut <-
 function(x, which = NULL, cut, sort,
 las, ylab="Relative abundance", xlab="Strata",
-hr=TRUE, tick=TRUE,
+show_I=TRUE, show_S=TRUE, hr=TRUE, tick=TRUE,
 theme, mar=c(5, 4, 4, 4) + 0.1, bty="o",
 lower=0, upper=1, pos=0, horizontal=TRUE, ...)
 {
@@ -61,6 +61,7 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
         }
         corder <- hclust(as.dist(1 - dm), method = "ward.D2")$order # R (>= 3.1.0)
         bp <- bp[,corder,drop=FALSE]
+        bp01 <- bp01[,corder,drop=FALSE]
     }
     n <- nrow(bp)
     p <- ncol(bp)
@@ -76,6 +77,12 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
             labels=colnames(bp), tick=tick, ...)
         axis(2, at=seq_len(n)-0.5, lwd=0, lwd.ticks=1,
             labels=rownames(bp), tick=tick, ...)
+        if (show_S)
+            axis(3, at=seq_len(ncol(bp))-0.5,
+                labels=colSums(bp01), tick=FALSE, ...)
+        if (show_I)
+            axis(4, at=seq_len(n)-0.5,
+                labels=format(round(xx$G, 2), nsmall=2), tick=FALSE, ...)
         if (hr)
             abline(h=1:n-0.5, col=Cols[1L], lwd=0.45)
     } else {
@@ -86,6 +93,12 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
             labels=colnames(bp), tick=tick, ...)
         axis(1, at=seq_len(n)-0.5, lwd=0, lwd.ticks=1,
             labels=rownames(bp), tick=tick, ...)
+        if (show_S)
+            axis(4, at=seq_len(ncol(bp))-0.5,
+                labels=colSums(bp01), tick=FALSE, ...)
+        if (show_I)
+            axis(3, at=seq_len(n)-0.5,
+                labels=format(round(xx$G, 2), nsmall=2), tick=FALSE, ...)
         if (hr)
             abline(v=1:n-0.5, col=Cols[1L], lwd=0.45)
     }
