@@ -13,7 +13,7 @@ Lorenz curve based thresholds and partitions
 Lorenz curve based thresholds and partitions.
 }
 \usage{
-lorenz(x, na.last = TRUE)
+lorenz(x, n = rep(1, length(x)), na.last = TRUE)
 
 \method{quantile}{lorenz}(x, probs = seq(0, 1, 0.25),
     type = c("L", "p"), ...)
@@ -31,6 +31,9 @@ iquantile(x, ...)
   \item{x}{a vector of nonnegative numbers for \code{lorenz}, or
 an object to plot or summarized.
 }
+  \item{x}{a vector of frequencies, must be same length as \code{x}.
+}
+
   \item{na.last}{for controlling the treatment of \code{NA}s.
 If \code{TRUE}, missing values in the data are put last;
 if \code{FALSE}, they are put first; if \code{NA}, they are removed
@@ -151,16 +154,17 @@ par(op)
 
 ## Lorenz-tangent approach to binarize a multi-level problem
 
-n <- 1000
-g <- as.factor(rep(LETTERS[1:4], each=n/4))
+n <- 100
+g <- as.factor(sort(sample(LETTERS[1:4], n, replace=TRUE, prob=4:1)))
 x1 <- rpois(n, 5)
 x2 <- rpois(n, exp(as.integer(g)))
 
 plot(lorenz(x1), col=2)
 lines(lorenz(x2), col=4)
+abline(0, 1, lty=2)
 
-prop.table(table(g, x1 > summary(lorenz(x1))["x(t)"]), margin=1)
-prop.table(table(g, x2 > summary(lorenz(x2))["x(t)"]), margin=1)
+prop.table(table(g, x1 >= summary(lorenz(x1))["x(t)"]), margin=1)
+prop.table(table(g, x2 >= summary(lorenz(x2))["x(t)"]), margin=1)
 }
 \keyword{ manip }
 \keyword{ misc }
