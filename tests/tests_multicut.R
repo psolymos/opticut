@@ -221,3 +221,45 @@ wo <- multicut(Y ~ x2, strata=x0, dist="poisson",
 no$species[[1]]
 wo$species[[1]]
 
+
+## lorenz based thresholdhing vs rsf based
+if (FALSE) {
+
+sum_by <- function(x, by) {
+    mm <- as(factor(by, levels=unique(by)), "sparseMatrix")
+    cbind(x=as.numeric(mm %*% x), by=rowSums(mm))
+}
+
+n <- 100
+g <- as.factor(sort(sample(LETTERS[1:4], n, replace=TRUE, prob=4:1)))
+x1 <- rpois(n, 5)
+x2 <- rpois(n, exp(as.integer(g)))
+
+plot(lorenz(x1), col=2)
+lines(lorenz(x2), col=4)
+abline(0, 1, lty=2)
+
+prop.table(table(g, x1 >= summary(lorenz(x1))["x(t)"]), margin=1)
+prop.table(table(g, x2 >= summary(lorenz(x2))["x(t)"]), margin=1)
+
+x <- x2
+
+if (getOption("ocoptions")$fix_fitted)
+    x <- x + abs(min(x))
+if (any(x) < 0)
+    stop("Negative fitted values found.")
+
+lc <- summary(lorenz(x))
+sb0 <- sum_by(x >= lc["x(t)"], g)
+plc <- sb0[,"x"] / sb0[,"by"]
+bp0 <- ifelse(plc >= lc["p(t)"], 1, 0)
+sb1 <- sum_by(x, g)
+pU <- sb1[,"x"] / sum(sb1[,"x"])
+pA <- sb1[,"by"] / sum(sb1[,"by"])
+bp1 <- ifelse(pU >= pA, 1, 0)
+
+cbind(n=sb0[,"by"], p_lc=plc, p_t=lc["p(t)"], bp_lc=bp0, p_U=pU, p_A=pA, s=pU/pA, bp_rsf=bp1)
+
+
+
+}

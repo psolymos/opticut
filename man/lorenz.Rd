@@ -163,8 +163,13 @@ plot(lorenz(x1), col=2)
 lines(lorenz(x2), col=4)
 abline(0, 1, lty=2)
 
-prop.table(table(g, x1 >= summary(lorenz(x1))["x(t)"]), margin=1)
-prop.table(table(g, x2 >= summary(lorenz(x2))["x(t)"]), margin=1)
+slc1 <- summary(lorenz(x1))
+slc2 <- summary(lorenz(x2))
+prop.table(table(g, x1 >= slc1["x(t)"]), margin=1)
+prop.table(table(g, x2 >= slc2["x(t)"]), margin=1)
+## proportions can be compared to 1-p(t) values
+1-slc1["p(t)"]
+1-slc2["p(t)"]
 }
 \keyword{ manip }
 \keyword{ misc }

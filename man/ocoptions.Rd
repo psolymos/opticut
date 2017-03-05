@@ -42,6 +42,11 @@ Tags are the following:
   \item{scale}{the scaling factor used to calculate indicator value (I)
   based on the estimated coefficient (b): I = abs(tanh(b*scale)),
   the default is 0.5.}
+  \item{fix_fitted}{\code{\link{bestpart}} method for multicut object
+  uses \code{\link{lorenz}} which required nonnegative fitted values,
+  however models with identity link can lead to negative espected values.
+  When \code{TRUE} the fitted values (x) are adjusted as x' = x + abs(min(x))
+  to ensure nonnegativity. The default is \code{FALSE}.}
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

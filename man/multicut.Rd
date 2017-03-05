@@ -233,6 +233,13 @@ The \code{plot} method presents the estimates by species and strata.
 partitions for each species (samples and rows, species as columns).
 Binary partitions are based on Lorenz-tangent based optimal threshold
 (see \code{\link{lorenz}}).
+This definition of best partition does not directly matches
+\code{strata}, as opposed to \code{\{link{bestpart.opticut}}}.
+\code{\link{lorenz}} requires nonnegative fitted values
+which is not guaranteed under \code{dist = "gaussian"} with identity
+link, see \code{fis_fitted} \code{\link{ocoptions}} setting
+for how to resolve this (choosing a different link function
+or distribution is advised however).
 
 \code{\link{bestmodel}} returns the best supported model for further
 manipulation (e.g. prediction). Note: custom distribution

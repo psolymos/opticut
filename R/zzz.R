@@ -10,7 +10,8 @@
             theme="br",
             check_comb=TRUE,
             try_error=FALSE,
-            scale=0.5))
+            scale=0.5,
+            fix_fitted=FALSE))
     options("pboptions" = list(
         type = if (interactive()) "timer" else "none",
         char = "[=-]",

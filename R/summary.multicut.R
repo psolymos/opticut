@@ -1,7 +1,7 @@
 summary.multicut <- function(object, ...)
 {
 
-    bp <- .lorenz_cut(object, force=TRUE)
+    bp <- .lorenz_cut(object, type="lc", force=FALSE)
     lab1 <- character(ncol(bp))
     lab0 <- character(ncol(bp))
     for (i in seq_len(ncol(bp))) {
@@ -31,10 +31,6 @@ summary.multicut <- function(object, ...)
     object$bestpart <- bp
     object$mu <- t(sapply(object$species, "[[", "mu"))
     object$species <- NULL
-#    tmp <- t(apply(object$mu, 1, function(z)
-#        ifelse((z-min(z)) / max(z-min(z)) > 0.5, 1, 0)))
-#    object$col.order <- order(-colSums(tmp), colnames(tmp))
-#    object$row.order <- order(ncol(tmp) - rowSums(tmp), decreasing=FALSE)
     class(object) <- c("summary.multicut")
     object
 }
