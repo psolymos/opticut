@@ -18,6 +18,7 @@ summary.multicut <- function(object, ...)
     res <- data.frame(
         split=lab1,
         assoc=.parseAssoc(data.frame(logLR=logLR, assoc=1)),
+        I=sapply(object$species, "[[", "I"),
         lc[,c("J", "G")],
         null=sapply(object$species, "[[", "null"),
         logLR=logLR,

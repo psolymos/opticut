@@ -22,12 +22,14 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     res <- .opticut1(Y, X, Z1=Z0[,-1L,drop=FALSE],
         linkinv=TRUE, dist=dist, ...)
     cf <- res$coef
-    mu <- res$linkinv(c(cf[1], cf[1] + cf[2:ncol(Z0)]))
+    mulink <- c(cf[1], cf[1] + cf[2:ncol(Z0)])
+    mu <- res$linkinv(mulink)
     names(mu) <- levels(Z)
     ll <- res$logLik
     out <- list(
         null=res0$linkinv(res0$coef[1L]),
         mu=mu,
+        I=max(mulink)-min(mulink),
         coefficients=cf,
         logL=res$logLik,
         logLR=res$logLik-res0$logLik)

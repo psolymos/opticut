@@ -99,9 +99,8 @@ function(Y, X, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
     }
     class(out) <- "multicut"
     fit <- fitted(out)
-    if (any(fit < 0)) {
+    if (any(fit < 0))
         warning("Negative fitted values found for ",
             sum(colSums(fit < 0) > 0), " species.")
-    }
     out
 }
