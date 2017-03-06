@@ -27,7 +27,7 @@ summary.multicut <- function(object, ...)
     bp <- t(bp)
     attr(bp, "col.order") <- order(-colSums(bp), colnames(bp))
     attr(bp, "row.order") <- order(ncol(bp) - rowSums(bp),
-        lab1, 1 - ifelse(is.na(res$G), 0, res$G), decreasing=FALSE)
+        lab1, 1 - ifelse(is.na(res$I), 0, res$I), decreasing=FALSE)
     res$lablo <- lab0
     res$labhi <- lab1
     object$summary <- res
