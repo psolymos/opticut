@@ -82,7 +82,7 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
                 labels=colSums(bp01), tick=FALSE, ...)
         if (show_I)
             axis(4, at=seq_len(n)-0.5,
-                labels=format(round(xx$G, 2), nsmall=2), tick=FALSE, ...)
+                labels=format(round(xx$I, 2), nsmall=2), tick=FALSE, ...)
         if (hr)
             abline(h=1:n-0.5, col=Cols[1L], lwd=0.45)
     } else {
@@ -98,13 +98,22 @@ lower=0, upper=1, pos=0, horizontal=TRUE, ...)
                 labels=colSums(bp01), tick=FALSE, ...)
         if (show_I)
             axis(3, at=seq_len(n)-0.5,
-                labels=format(round(xx$G, 2), nsmall=2), tick=FALSE, ...)
+                labels=format(round(xx$I, 2), nsmall=2), tick=FALSE, ...)
         if (hr)
             abline(v=1:n-0.5, col=Cols[1L], lwd=0.45)
     }
     for (i in seq_len(n)) {
         for (j in seq_len(p)) {
-            h0 <- bp[i,j]
+
+            Max <- 0.5*xx$I[i]+0.5
+            Min <- 0.5*(1-xx$I[i])
+            h0 <- bp[i,j] * (Max - Min) + Min
+
+#            h0 <- if (bp[i,j] == 1)
+#                0.5*xx$I[i]+0.5 else 0.5*(1-xx$I[i])
+
+#            h0 <- bp[i,j]
+
             ## need to tweak the 50/50 to be higher than 0
             ## which is rare for logLR > 2 species
             h <- h0 * c(1 - lower) + lower

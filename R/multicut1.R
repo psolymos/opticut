@@ -29,7 +29,8 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     out <- list(
         null=res0$linkinv(res0$coef[1L]),
         mu=mu,
-        I=max(mulink)-min(mulink),
+        #I=max(mulink)-min(mulink),
+        I=beta2i(max(mulink) - min(mulink), scale=getOption("ocoptions")$scale),
         coefficients=cf,
         logL=res$logLik,
         logLR=res$logLik-res0$logLik)
