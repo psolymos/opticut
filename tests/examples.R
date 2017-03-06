@@ -5,7 +5,8 @@ library(opticut)
 
 help_pages <- c("opticut-package",
     "dolina",
-    "opticut", "optilevels", "sindex", "lorenz",
+    "opticut", "optilevels", "multicut",
+    "sindex", "lorenz",
     "beta2i",
     "allComb", "rankComb",
     #"bestmodel",
