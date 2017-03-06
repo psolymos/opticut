@@ -61,8 +61,8 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
     }
 
     if (!is.function(dist)) {
+        dist <- .opticut_dist(dist, make_dist=TRUE)
         Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1L]][1L]
-        Dist <- match.arg(Dist, .opticut_dist())
         ## sanity check for rsf/rspf
         if (Dist %in% c("rsf", "rspf") && ncol(Y) > 1L)
             stop("'", Dist, "' is only available for single species in RHS")

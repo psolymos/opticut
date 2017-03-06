@@ -97,7 +97,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
 #    attr(out, "penalty") <- getOption("ocoptions")$penalty
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
-        deparse(substitute(dist)) else dist
+        deparse(substitute(dist)) else .opticut_dist(dist, make_dist=TRUE)
     attr(out, "comb") <- Comb
     attr(out, "est") <- Est
     attr(out, "scale") <- scale

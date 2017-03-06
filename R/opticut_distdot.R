@@ -16,10 +16,13 @@
     if (is.function(x))
         return(FALSE)
     if (is.character(x)) {
+        link <- strsplit(x, ":", fixed=TRUE)[[1L]][2L]
         x <- strsplit(x, ":", fixed=TRUE)[[1L]][1L]
         x <- match.arg(x, List)
+        full <- if (is.na(link))
+            x else paste(x, link, sep=":")
         if (make_dist)
-            return(x) else return(x %in% List)
+            return(full) else return(x %in% List)
     }
     FALSE
 }

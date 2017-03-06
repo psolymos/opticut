@@ -33,7 +33,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         logLR=res$logLik-res0$logLik)
     attr(out, "logL_null") <- res0$logLik
     attr(out, "dist") <- if (is.function(dist))
-        deparse(substitute(dist)) else dist
+        deparse(substitute(dist)) else .opticut_dist(dist, make_dist=TRUE)
     class(out) <- c("multicut1")
     out
 }
