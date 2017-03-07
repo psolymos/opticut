@@ -7,7 +7,7 @@
         stop("Negative fitted values found.")
     f <- function(x, n, fix_fitted=FALSE) {
         l <- lorenz(x, n)
-        out <- structure(numeric(length(out)), names=names(out))
+        out <- structure(numeric(length(x)), names=names(x))
         out[rownames(l)[-seq_len(which.max(l[,"p"] - l[,"L"]))]] <- 1
         out
     }
