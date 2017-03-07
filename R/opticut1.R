@@ -83,9 +83,9 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     ## thus comparable across species AND across studies
 #    I <- tanh(abs(cf[,2L]))
 
-#    scale <- getOption("ocoptions")$scale
+    scale <- getOption("ocoptions")$scale
     out <- data.frame(assoc=h,
-        I=beta2i(cf[,2L], scale=getOption("ocoptions")$scale),
+        I=beta2i(cf[,2L], scale=scale),
 #        I=abs(tanh(cf[,2L] * scale)),
         #I=tanh(abs(cf[,2L])),
 #        I=2*(plogis(abs(cf[,2L]))-0.5),
@@ -95,7 +95,6 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         logL=ll, logLR=ll-res0$logLik, w=w)
     rownames(out) <- colnames(Z)
     attr(out, "logL_null") <- res0$logLik
-#    attr(out, "penalty") <- getOption("ocoptions")$penalty
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else .opticut_dist(dist, make_dist=TRUE)

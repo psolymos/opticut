@@ -26,18 +26,19 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     mu <- res$linkinv(mulink)
     names(mu) <- levels(Z)
     ll <- res$logLik
+    scale <- getOption("ocoptions")$scale
     out <- list(
         null=res0$linkinv(res0$coef[1L]),
         mu=mu,
         #I=max(mulink)-min(mulink),
-        I=beta2i(max(mulink) - min(mulink), scale=getOption("ocoptions")$scale),
+        I=beta2i(max(mulink) - min(mulink), scale=scale),
         coefficients=cf,
         logL=res$logLik,
         logLR=res$logLik-res0$logLik)
+    attr(out, "scale") <- scale
     attr(out, "logL_null") <- res0$logLik
     attr(out, "dist") <- if (is.function(dist))
         deparse(substitute(dist)) else .opticut_dist(dist, make_dist=TRUE)
     class(out) <- c("multicut1")
     out
 }
-

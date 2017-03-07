@@ -91,6 +91,7 @@ function(Y, X, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
         nobs=NOBS,
         sset=sset,
         dist=dist,
+        scale=getOption("ocoptions")$scale,
         failed=failed)
     if (is.function(dist)) {
         attr(out$dist, "dist") <- deparse(substitute(dist))
