@@ -29,7 +29,7 @@ uncertainty(object, ...)
 
 check_strata(x, mat)
 \method{strata}{uncertainty}(object, ...)
-\method{subset}{uncertainty}(x, subset, ...)
+\method{subset}{uncertainty}(x, subset=NULL, ...)
 
 \method{bestpart}{uncertainty}(object, ...)
 \method{bestpart}{uncertainty1}(object, ...)
