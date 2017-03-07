@@ -1,6 +1,8 @@
 subset.multicut <-
-function(x, subset, ...)
+function(x, subset=NULL, ...)
 {
+    if (is.null(subset))
+        return(x)
     if (any(is.na(subset)))
         stop("subset should not contain NA")
     out <- x

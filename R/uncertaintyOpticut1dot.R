@@ -19,33 +19,34 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         dist=object$dist, ...)$linkinv
     scale <- object$scale
     obj <- object$species[[which]]
-    k <- which.max(obj$logLR)
-    bm <- rownames(obj)[k]
     n <- nobs(object)
+    k <- which.max(obj$logLR) # opticut1
+    bm <- rownames(obj)[k] # opticut1
     if (type == "asymp") {
         if (length(B) > 1)
             stop("Provide single integer for B.")
         niter <- B
-        bm <- rownames(obj)[k]
+        bm <- rownames(obj)[k] # opticut1
         mle <- getMLE(object, which, vcov=TRUE, ...)
-        if (strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L] == "rsf") {
+        if (!is.function(object$dist) &&
+            .opticut_dist(object$dist, make_dist=TRUE) == "rsf") {
             cf <- MASS::mvrnorm(niter, mle$coef[-1L],
                 mle$vcov[-1L,-1L,drop=FALSE])
-            cf <- rbind(mle$coef[c(1L, 2L)], cbind(0, cf)[,c(1L, 2L)])
+            cf <- rbind(mle$coef[c(1L, 2L)], cbind(0, cf)[,c(1L, 2L)]) # opticut1
         } else {
             cf <- MASS::mvrnorm(niter, mle$coef, mle$vcov)
-            cf <- rbind(mle$coef[c(1L, 2L)], cf[,c(1L, 2L)])
+            cf <- rbind(mle$coef[c(1L, 2L)], cf[,c(1L, 2L)]) # opticut1
         }
-        cf0 <- linkinv(cf[,1L])
-        cf1 <- linkinv(cf[,1L] + cf[,2L])
-        #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-        I <- abs(tanh(cf[,2L] * scale))
-        out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
+        cf0 <- linkinv(cf[,1L]) # opticut1
+        cf1 <- linkinv(cf[,1L] + cf[,2L]) # opticut1
+        I <- abs(tanh(cf[,2L] * scale)) # opticut1
+        out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1) # opticut1
     } else {
         if (length(B) == 1) {
             niter <- B
             ## RSF/RSPF requires only used points to be resampled
-            if (!is.function(object$dist) && object$dist %in% c("rsf", "rspf")) {
+            if (!is.function(object$dist) &&
+                .opticut_dist(object$dist, make_dist=TRUE) %in% c("rsf", "rspf")) {
                 avail <- which(object$Y[,1]==0)
                 used <- which(object$Y[,1]==1)
                 nused <- length(used)
@@ -73,7 +74,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                     boot=z,
                     internal=TRUE,
                     full_model=FALSE,
-                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
+                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)] # opticut1
             }))
         } else {
             t(apply(BB, 2, function(z, ...) {
@@ -81,16 +82,15 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
                     boot=z,
                     internal=TRUE,
                     full_model=FALSE,
-                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)]
+                    best=TRUE, ...)[[1L]]$coef[c(1L, 2L)] # opticut1
             }))
         }
         #cf <- rbind(coef(m1)[c(1L, 2L)], cf)
-        cf <- rbind(m1$coef[c(1L, 2L)], cf)
-        cf0 <- linkinv(cf[,1L])
-        cf1 <- linkinv(cf[,1L] + cf[,2L])
-        #I <- 1 - (pmin(cf0, cf1) / pmax(cf0, cf1))
-        I <- abs(tanh(cf[,2L] * scale))
-        out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1)
+        cf <- rbind(m1$coef[c(1L, 2L)], cf) # opticut1
+        cf0 <- linkinv(cf[,1L]) # opticut1
+        cf1 <- linkinv(cf[,1L] + cf[,2L]) # opticut1
+        I <- abs(tanh(cf[,2L] * scale)) # opticut1
+        out <- data.frame(best=bm, I=I, mu0=cf0, mu1=cf1) # opticut1
     }
     if (type == "multi") {
         bm <- character(niter + 1L)
