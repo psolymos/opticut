@@ -88,7 +88,7 @@ is defined as L = x * n.
 The following charactersitics of the Lorenz curve are calculated:
 \code{"t"}: index where tangent (slope 1) touches the curve;
 \code{"x(t)"}, \code{"p(t)"}, and \code{"L(t)"} are values corresponding to
-index t. (x(t) is the unmodified input.)
+index t, x(t) is the unmodified input.
 \code{"S"}: Lorenz asymmetry coefficient (S = p(t) + L(t)),
 S = 1 indicates symmetry.
 \code{"G"}: Gini coefficient. 0 is perfect equality,
