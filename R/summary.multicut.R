@@ -1,7 +1,7 @@
 summary.multicut <- function(object, ...)
 {
 
-    bp <- .lorenz_cut(object, type="lc", force=FALSE)
+    bp <- .lc_cut(object, fix_fitted=getOption("ocoptions")$fix_fitted)
     lab1 <- character(ncol(bp))
     lab0 <- character(ncol(bp))
     for (i in seq_len(ncol(bp))) {
@@ -11,15 +11,10 @@ summary.multicut <- function(object, ...)
             collapse=getOption("ocoptions")$collapse)
     }
     logLR <- sapply(object$species, "[[", "logLR")
-    fit <- fitted(object)
-    if (getOption("ocoptions")$fix_fitted)
-        fit <- fit + abs(min(fit))
-    lc <- t(apply(fit, 2, function(z) summary(lorenz(z))))
     res <- data.frame(
         split=lab1,
         assoc=.parseAssoc(data.frame(logLR=logLR, assoc=1)),
         I=sapply(object$species, "[[", "I"),
-        lc[,c("J", "G")],
         null=sapply(object$species, "[[", "null"),
         logLR=logLR,
         logL=sapply(object$species, "[[", "logL"),

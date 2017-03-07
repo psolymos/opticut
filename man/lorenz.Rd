@@ -82,10 +82,13 @@ cumulative portion of wealth: L_i = sum_{j=1}^{i} x_j / sum_{j=1}^{n} x_j,
 where x_i are indexed in non-decreasing order (x_i <= x_{i+1}).
 By convention, p_0 = L_0 = 0.
 
+When \code{n} is provided as unequal frequencies, cumulative wealth
+is defined as L = x * n.
+
 The following charactersitics of the Lorenz curve are calculated:
 \code{"t"}: index where tangent (slope 1) touches the curve;
 \code{"x(t)"}, \code{"p(t)"}, and \code{"L(t)"} are values corresponding to
-index t.
+index t. (x(t) is the unmodified input.)
 \code{"S"}: Lorenz asymmetry coefficient (S = p(t) + L(t)),
 S = 1 indicates symmetry.
 \code{"G"}: Gini coefficient. 0 is perfect equality,
@@ -104,6 +107,9 @@ The \code{iquantile} (inverse quantile) method
 finds quantiles of L_i or p_i corresponding to values of x_i.
 
 The \code{plot} method draws a Lorenz curve.
+Because the object is a matrix, \code{\link{lines}}
+and \code{\link{points}} will work for adding multiple lines.
+
 The \code{summary} method returns characteristics of the Lorenz curve.
 }
 \references{
@@ -153,23 +159,16 @@ plot(l, type="x", lwd=2, h=3, v=4)
 par(op)
 
 ## Lorenz-tangent approach to binarize a multi-level problem
-
 n <- 100
 g <- as.factor(sort(sample(LETTERS[1:4], n, replace=TRUE, prob=4:1)))
-x1 <- rpois(n, 5)
-x2 <- rpois(n, exp(as.integer(g)))
+x <- rpois(n, exp(as.integer(g)))
+mu <- aggregate(x, list(g), mean)
+(l <- lorenz(mu$x, table(g)))
+(s <- summary(l))
 
-plot(lorenz(x1), col=2)
-lines(lorenz(x2), col=4)
+plot(l)
 abline(0, 1, lty=2)
-
-slc1 <- summary(lorenz(x1))
-slc2 <- summary(lorenz(x2))
-prop.table(table(g, x1 >= slc1["x(t)"]), margin=1)
-prop.table(table(g, x2 >= slc2["x(t)"]), margin=1)
-## proportions can be compared to 1-p(t) values
-1-slc1["p(t)"]
-1-slc2["p(t)"]
+lines(rep(s["p(t)"], 2), c(s["p(t)"], s["L(t)"]), col=2)
 }
 \keyword{ manip }
 \keyword{ misc }
