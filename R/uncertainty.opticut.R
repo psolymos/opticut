@@ -29,7 +29,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
         niter <- ncol(B)
     }
     ## subset
-    object <- subset(object, subset)
+    object <- subset(object, subset=which)
     spp <- names(object$species)
 
     ## template for return value
