@@ -4,7 +4,7 @@ function(x, cut=2, sort=TRUE, multi=FALSE)
     sort <- if (is.logical(sort))
         sort[1L] else 1 %in% sort
     if (multi) {
-        cn <- c("split", "assoc", "I", "G", "J", "logLR")
+        cn <- c("split", "assoc", "I", "logLR")
     } else {
         cn <- c("split", "assoc", "I", "mu0", "mu1", "logLR", "w")
     }

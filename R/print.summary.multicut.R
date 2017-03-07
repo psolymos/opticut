@@ -18,7 +18,6 @@ print.summary.multicut <- function(x, cut, sort, digits, ...) {
         "\n", sep="")
     cat("\nCall:\n", paste(deparse(x$call), sep = "\n", collapse = "\n"),
             "\n\n", TXT, "\n", sep = "")
-#    print(format(as.data.frame(round(xx, digits)), scientific=FALSE), ...)
     print(format.data.frame(xx, digits=digits), ...)
     if (Missing)
         cat(Missing, "species not shown\n")
