@@ -31,6 +31,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
     ## subset
     object <- subset(object, subset=which)
     spp <- names(object$species)
+#    names(spp) <- spp
 
     ## template for return value
     out <- summary(object)
@@ -52,6 +53,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
         .uncertaintyOpticut1(object=object, i, type=type, B=B,
             pb = FALSE, ...), cl=cl, ...)
 
+    names(res) <- spp
     out$uncertainty <- res
     out
 }
