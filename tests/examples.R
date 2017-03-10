@@ -4,7 +4,7 @@ library(opticut)
 ## --- run examples with \dontrun sections ---
 
 help_pages <- c("opticut-package",
-    "dolina",
+    "dolina", "birdrec",
     "opticut", "optilevels", "multicut",
     "sindex", "lorenz",
     "beta2i",
