@@ -4,6 +4,7 @@
 
 * `multicut` added for multi-level response model.
 * `fitted` and `predict` methods added.
+* New data set: `birdrec` bird detections.
 
 ## Version 0.1-0 -- Dec 16, 2016
 
