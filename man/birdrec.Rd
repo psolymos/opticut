@@ -7,7 +7,8 @@ Bird species detections
 \description{
 Data set listing 156 species (birds, amphibians, mammals) detected
 at 127 sites (367 point locations) in Alberta, Canada in 2015,
-using autonomous reconding technology (ARU) for sound recodings.
+using autonomous reconding technology (ARU; Wildlife Acoustic Song Meter)
+for sound recodings.
 }
 \usage{data("birdrec")}
 \format{
@@ -75,16 +76,20 @@ selection of dates. 8 intervals divied into 3 major units
 \code{TOD}: time of day, midnight (\code{HOUR} = 0) or
 morning (\code{HOUR} > 0).
 
-Methodology and metadata is described in Lankau et al. (2015).
+Methodology and metadata is described in ABMI (2016), and Lankau et al. (2015).
 }
 \source{
 Alberta Biodiversity Monitoring Institute (ABMI, www.abmi.ca)
 }
 \references{
+Alberta Biodiversity Monitoring Institute (ABMI), 2016.
+Terrestrial field data collection protocols (abridged version) 2016-05-18.
+Alberta Biodiversity Monitoring Institute; Edmonton, Alberta, Canada.
+
 Lankau, H.E., MacPhail, A., Knaggs, M. & Bayne, E., 2015.
 Acoustic recording analysis protocol.
-Bioacoustic Unit, University of Alberta and
-Alberta Biodiversity Monitoring Institute. Edmonton, Alberta, Canada.
+Bioacoustic Unit, University of Alberta, and
+Alberta Biodiversity Monitoring Institute; Edmonton, Alberta, Canada.
 }
 \examples{
 data(birdrec)
