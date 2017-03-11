@@ -21,7 +21,6 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
     obj <- object$species[[which]]
     n <- nobs(object)
     k <- which.max(obj$logLR) # opticut1
-    bm <- rownames(obj)[k] # opticut1
     if (type == "asymp") {
         if (length(B) > 1)
             stop("Provide single integer for B.")
@@ -63,6 +62,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
             stop("Not all strata represented in resampling")
     }
     if (type == "boot") {
+        bm <- rownames(obj)[k] # opticut1
         m1 <- .extractOpticut(object, which,
             boot=FALSE,
             internal=TRUE,
