@@ -30,5 +30,6 @@ summary.multicut <- function(object, ...)
     object$mu <- t(sapply(object$species, "[[", "mu"))
     object$species <- NULL
     class(object) <- c("summary.multicut")
+    attr(object, "collapse") <- getOption("ocoptions")$collapse
     object
 }
