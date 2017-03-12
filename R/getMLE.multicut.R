@@ -5,12 +5,14 @@ function(object, which, vcov=FALSE, ...)
         stop("specify which argument")
     if (!length(which))
         stop("which argument must have length 1")
-        ## full model cannot be returned for dist=fun
+    ## full model cannot be returned for dist=fun
     if (!is.function(object$dist)) {
         Dist <- as.character(object$dist)
         Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L]
+        dist <- object$dist
     } else {
         Dist <- ""
+        dist <- attr(object$dist, "dist")
     }
     K <- nlevels(object$strata)
     if (vcov)
@@ -33,5 +35,5 @@ function(object, which, vcov=FALSE, ...)
     if (Dist == "gaussian")
         attr(est, "sigma") <- if (vcov)
             attr(est, "sigma") else summary(m1)$sigma
-    list(coef=est, vcov=V, dist=object$dist)
+    list(coef=est, vcov=V, dist=dist)
 }

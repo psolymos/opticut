@@ -9,11 +9,14 @@ function(object, which, vcov=FALSE, ...)
     if (!is.function(object$dist)) {
         Dist <- as.character(object$dist)
         Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L]
+        dist <- object$dist
     } else {
         Dist <- ""
         ## full model cannot be returned for dist=fun with vcov=TRUE
         if (vcov)
             stop("vcov=TRUE cannot be used with custom distribution")
+        full_model <- FALSE
+        dist <- attr(object$dist, "dist")
     }
     m1 <- .extractOpticut(object, which,
         boot=FALSE,
@@ -44,5 +47,5 @@ function(object, which, vcov=FALSE, ...)
         attr(est, "theta") <- m1$theta
     if (Dist == "gaussian")
         attr(est, "sigma") <- summary(m1)$sigma
-    list(coef=est, vcov=V, dist=object$dist)
+    list(coef=est, vcov=V, dist=dist)
 }
