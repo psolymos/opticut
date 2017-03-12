@@ -9,7 +9,7 @@ function(x, sort, digits, ...)
         cls <- "opticut"
     inherits(x, "uncertainty_multi")
         cls <- "multicut"
-    cat("Multivariate", cls, "uncertainty results",
+    cat("Multivariate ", cls, " uncertainty results",
         "\ntype = ", x$type, ", B = ", x$B,
         ", level = ", format(round(x$level, 2), nsmall=2),
         "\n\n", sep="")

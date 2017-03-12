@@ -5,7 +5,7 @@ function(x, ...)
         cls <- "opticut"
     inherits(x, "uncertainty_multi")
         cls <- "multicut"
-    cat("Univariate", cls, "uncertainty results",
+    cat("Univariate ", cls, " uncertainty results",
         ", type = ", attr(x, "type"), ", B = ", attr(x, "B"),
         "\n\n", sep="")
     print(summary(x), ...)
