@@ -59,8 +59,7 @@ bm4 <- try(bestmodel(m4), silent=TRUE) # dist=fun problem
 stopifnot(inherits(bm4, "try-error"))
 
 getMLE(m1, 1, vcov=FALSE)
-mle4 <- try(getMLE(m4, 1, vcov=FALSE), silent=TRUE)
-stopifnot(inherits(mle4, "try-error"))
+getMLE(m4, 1, vcov=FALSE)
 getMLE(m1, 1, vcov=TRUE)
 mle4 <- try(getMLE(m4, 1, vcov=TRUE), silent=TRUE)
 stopifnot(inherits(mle4, "try-error"))
