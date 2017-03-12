@@ -82,6 +82,7 @@ type=c("asymp", "boot"), B=99, pb=FALSE, ...)
                     Z=object$strata, ...)[[1L]]$coef
             }))
         }
+        cf <- rbind(m1$coef, cf)
     }
 
     mulink <- cf[,seq_len(K),drop=FALSE]
@@ -96,12 +97,10 @@ type=c("asymp", "boot"), B=99, pb=FALSE, ...)
                 n=table(strata(object)), fix_fitted=fix))
     if (type == "boot")
         bp <- cbind(.lc_cut1(x=structure(mu[1L,], names=names(obj$mu)),
-                n=table(object$strata),
-                fix_fitted=getOption("ocoptions")$fix_fitted),
+                n=table(object$strata), fix_fitted=fix),
             sapply(seq_len(niter), function(i)
                 .lc_cut1(x=structure(mu[i+1L,], names=names(obj$mu)),
                 n=table(object$strata[BB[,i]]),fix_fitted=fix)))
-    bp <- .lc_cut(object, fix_fitted=getOption("ocoptions")$fix_fitted)
     lab1 <- character(ncol(bp))
     for (i in seq_len(ncol(bp))) {
         lab1[i] <- paste(rownames(bp)[bp[,i] == 1],
