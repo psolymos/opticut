@@ -3,8 +3,8 @@ bestpart.uncertainty1 <-
 function (object, ...)
 {
     x <- attr(object, "est")
-    if (is.null(x))
-        stop("type = 'multi' is required")
+    if (inherits(object, "uncertainty_opti") && is.null(x))
+            stop("type = 'multi' is required")
     cm <- oComb(x)
     mat <- matrix(0L, nrow(cm), nrow(object))
     rownames(mat) <- rownames(cm)

@@ -1,6 +1,12 @@
 bsmooth.uncertainty1 <- function (object, ...) {
-    if (attr(object,"type") != "multi")
-        stop("type='multi' required for bsmooth")
-    bp <- bestpart(object)
-    t(t(bp) * object$mu1 + (1 - t(bp)) * object$mu0)
+    if (inherits(object, "uncertainty_opti")) {
+        if (attr(object,"type") != "multi")
+            stop("type='multi' required for bsmooth")
+        bp <- bestpart(object)
+        out <- t(t(bp) * object$mu1 + (1 - t(bp)) * object$mu0)
+    }
+    if (inherits(object, "uncertainty_opti")) {
+        out <- NULL
+    }
+    out
 }

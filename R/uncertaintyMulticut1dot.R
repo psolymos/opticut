@@ -107,6 +107,7 @@ type=c("asymp", "boot"), B=99, pb=FALSE, ...)
             collapse=getOption("ocoptions")$collapse)
     }
     out <- data.frame(best=lab1, I=I, mu)
+    attr(out, "est") <- obj$mu
     class(out) <- c("uncertainty1_multi", "uncertainty1", "data.frame")
     attr(out, "B") <- niter
     attr(out, "type") <- type
