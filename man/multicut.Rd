@@ -317,6 +317,9 @@ plot(m1)
 ## subset results
 summary(subset(m1, 1:2))
 
+## best partition
+head(bestpart(m1))
+
 ## best model
 mods <- bestmodel(m1)
 mods
