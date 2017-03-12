@@ -1,6 +1,7 @@
 \name{uncertainty}
 \alias{uncertainty}
 \alias{uncertainty.opticut}
+\alias{uncertainty.multicut}
 \alias{print.uncertainty1}
 \alias{print.uncertainty}
 \alias{print.summary.uncertainty}
@@ -25,6 +26,9 @@ Quantifying uncertainty for fitted objects.
 uncertainty(object, ...)
 \method{uncertainty}{opticut}(object,
     which = NULL, type = c("asymp", "boot", "multi"),
+    B = 99, cl = NULL, ...)
+\method{uncertainty}{multicut}(object,
+    which = NULL, type = c("asymp", "boot"),
     B = 99, cl = NULL, ...)
 
 check_strata(x, mat)
@@ -59,18 +63,8 @@ a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
 }
   \item{type}{
-character, describing the type of uncertainty calculation for
-indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}.
-\code{"asymp"}: asymptotic distribution is based on best partition
-found for the input object (this option
-is unavailable for custom distribution functions).
-\code{"boot"}: non-parametric bootstrap distribution
-based on best partition found for the input object.
-\code{"multi"}: non-parametric bootstrap distribution
-based on best partition found for the bootstrap data (i.e.
-the model ranking is re-evaluated each time).
-\code{"multi"} works only if \code{comb = "rank"} in the
-\code{\link{opticut}} call.
+character, describing the type of uncertainty calculation.
+See Details.
 }
   \item{B}{
 numeric, number of iterations. For \code{type = "boot"} and
@@ -115,6 +109,19 @@ missing values are not accepted.
 other arguments passed to the underlying functions.
 }
 }
+\details{
+Uncertainty is calculated for
+indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}.
+\code{"asymp"}: asymptotic distribution is based on best partition
+found for the input object (this option
+is unavailable for custom distribution functions).
+\code{"boot"}: non-parametric bootstrap distribution
+based on best partition found for the input object.
+\code{"multi"}: non-parametric bootstrap distribution
+based on best partition found for the bootstrap data (i.e.
+the model ranking is re-evaluated each time).
+\code{"multi"} works only if \code{comb = "rank"} in the
+\code{\link{opticut}} call.}
 \value{
 \code{uncertainty} returns an object of class 'uncertainty'.
 The \code{uncertainty} element of the object is a list with species specific
