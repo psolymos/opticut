@@ -277,6 +277,7 @@ boxplot(t(bs), ylab="Expected value")
 cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
 
 ## A more interesting simulated example for bootstrap smoothing
+## and comparing opticut vs. multicut
 set.seed(1)
 n <- 2000
 x <- sort(runif(n, -8, 8))
@@ -287,13 +288,23 @@ br <- seq(min(x), max(x), by=d)
 g <- cut(x, br, include.lowest=TRUE)
 levels(g) <- LETTERS[1:nlevels(g)]
 o <- opticut(y ~ 1, strata=g, dist="binomial")
+m <- multicut(y ~ 1, strata=g, dist="binomial")
 library(parallel)
 cl <- makeCluster(2)
-u <- uncertainty(o, type="multi", B=99, cl=cl)
+uo <- uncertainty(o, type="multi", B=99, cl=cl)
+um <- uncertainty(m, type="boot", B=99, cl=cl)
 stopCluster(cl)
-bs <- bsmooth(u$uncertainty[[1]])
-stat <- cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
-plot(p ~ x, type="l", ylim=c(0,1))
+## bootstrap average for opticut
+bs <- bsmooth(uo$uncertainty[[1]])
+stat <- cbind(Mean=rowMeans(bs),
+    t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
+## bootstrap average for multicut
+bsm <- as.matrix(um$uncertainty[[1]][,-(1:2)])
+statm <- cbind(Mean=colMeans(bsm),
+    t(apply(bsm, 2, quantile, probs=c(0.025, 0.975))))
+
+op <- par(mfrow=c(2,1))
+plot(p ~ x, type="l", ylim=c(0,1), main="Binary partitions (opticut)")
 abline(v=br, col="grey", lty=3)
 lines(br[-1]-0.5*d, stat[,1], col=4)
 lines(br[-1]-0.5*d, stat[,2], col=4, lty=2)
@@ -301,6 +312,15 @@ lines(br[-1]-0.5*d, stat[,3], col=4, lty=2)
 lines(br[-1]-0.5*d, bs[,1], col=2)
 legend("topright", bty="n", lty=c(1,1,2,1), col=c(1,4,4,2),
     legend=c("True response","bsmooth","0.95 CI","Best partition"))
+
+plot(p ~ x, type="l", ylim=c(0,1), main="Multi-level model (multicut)")
+abline(v=br, col="grey", lty=3)
+lines(br[-1]-0.5*d, statm[,1], col=4)
+lines(br[-1]-0.5*d, statm[,2], col=4, lty=2)
+lines(br[-1]-0.5*d, statm[,3], col=4, lty=2)
+legend("topright", bty="n", lty=c(1,1,2), col=c(1,4,4),
+    legend=c("True response","bsmooth","0.95 CI"))
+par(op)
 }
 }
 \keyword{ manip }
