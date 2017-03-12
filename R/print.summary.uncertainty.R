@@ -5,9 +5,9 @@ function(x, sort, digits, ...)
         digits <- max(3L, getOption("digits") - 3L)
     if (missing(sort))
         sort <- getOption("ocoptions")$sort
-    inherits(object, "uncertainty_opti")
+    inherits(x, "uncertainty_opti")
         cls <- "opticut"
-    inherits(object, "uncertainty_multi")
+    inherits(x, "uncertainty_multi")
         cls <- "multicut"
     cat("Multivariate", cls, "uncertainty results",
         "\ntype = ", x$type, ", B = ", x$B,

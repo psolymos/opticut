@@ -1,9 +1,9 @@
 print.uncertainty1 <-
 function(x, ...)
 {
-    inherits(object, "uncertainty_opti")
+    inherits(x, "uncertainty_opti")
         cls <- "opticut"
-    inherits(object, "uncertainty_multi")
+    inherits(x, "uncertainty_multi")
         cls <- "multicut"
     cat("Univariate", cls, "uncertainty results",
         ", type = ", attr(x, "type"), ", B = ", attr(x, "B"),
