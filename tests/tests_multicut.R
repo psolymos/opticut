@@ -24,7 +24,7 @@ fun <- function(Y, X, linkinv, ...) {
         logLik=logLik(mod),
         linkinv=family(mod)$linkinv)
 }
-m4 <- opticut(Y ~ x2, strata=x0, dist=fun)
+m4 <- multicut(Y ~ x2, strata=x0, dist=fun)
 ocoptions(try_error=FALSE)
 
 subset(m1, c(3,1))
@@ -33,38 +33,25 @@ subset(m1, c("Spp1", "Spp3"))
 
 str(m1$strata)
 
-opticut:::.extractOpticut(m1)
-opticut:::.extractOpticut(m2)
-opticut:::.extractOpticut(m3)
-opticut:::.extractOpticut(m4)
+opticut:::.extractOpticut(m1, Z=model.matrix(~m1$strata)[,-1])
+opticut:::.extractOpticut(m4, Z=model.matrix(~m1$strata)[,-1])
 
 u1a <- uncertainty(m1, type="asymp", B=99)
-u2a <- uncertainty(m2, type="asymp", B=99)
-u3a <- uncertainty(m3, type="asymp", B=99)
-## asymp needs Hessian: dist=fun cannot provide that
 u4a <- try(uncertainty(m4, type="asymp", B=999), silent=TRUE)
 stopifnot(inherits(u4a, "try-error"))
 
 u1b <- uncertainty(m1, type="boot", B=9)
-u2b <- uncertainty(m2, type="boot", B=9)
-u3b <- uncertainty(m3, type="boot", B=9)
 u4b <- uncertainty(m4, type="boot", B=9)
 
-summary(subset(u1b, c(3,1)))
-summary(subset(u2b, c(TRUE, FALSE, TRUE)))
-summary(subset(u3b, c("Spp1", "Spp3")))
-
-u1c <- uncertainty(m1, type="multi", B=9)
-## type=multi cannot use object with comb=all
-u2c <- try(uncertainty(m2, type="multi", B=9), silent=TRUE)
-stopifnot(inherits(u2c, "try-error"))
-## type=multi cannot use object with comb=NA (custom partitions)
-u3c <- try(uncertainty(m3, type="multi", B=9), silent=TRUE)
-stopifnot(inherits(u3c, "try-error"))
-u4c <- uncertainty(m4, type="multi", B=9)
+summary(subset(u1a, c(3,1)))
+summary(subset(u1b, c(TRUE, FALSE, TRUE)))
+summary(subset(u1b, c("Spp1", "Spp3")))
 
 strata(m1)
 strata(m4)
+strata(u1b)
+strata(u4b)
+
 
 bestmodel(m1)
 ## dist=fun cannot return the best model (--> uncertainty(type=asymm) fails)
@@ -80,9 +67,16 @@ stopifnot(inherits(mle4, "try-error"))
 
 summary(m1)
 summary(m4)
+summary(u1a)
+summary(u1b)
+summary(u4b)
 
 print(m1)
 print(m4)
+print(u1a)
+print(u1b)
+print(u4a)
+print(u4b)
 
 summary(fitted(m1))
 f4 <- try(fitted(m4), silent=TRUE)
@@ -98,6 +92,9 @@ stopifnot(inherits(pr4, "try-error"))
 as.data.frame(m1)
 as.data.frame(summary(m1))
 
+as.data.frame(u1a)
+as.data.frame(summary(u1a))
+
 ## --- testing distributions ---
 
 ocoptions(cut=-Inf)
@@ -110,6 +107,10 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+ocoptions(fix_fitted=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
+ocoptions(fix_fitted=FALSE)
 
 ## poisson
 
@@ -119,6 +120,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## binomial
 
@@ -129,6 +132,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## negbin
 
@@ -138,6 +143,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## beta
 
@@ -150,6 +157,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## zip
 
@@ -161,6 +170,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## zinb
 
@@ -170,6 +181,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## zip2
 
@@ -179,6 +192,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2))) #--- FIXME!!!
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## zinb2
 
@@ -188,6 +203,8 @@ summary(predict(o))
 summary(predict(o, gnew=x0, xnew=data.frame(x2=x2))) # -- FIXME!!!
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## rsf
 
@@ -212,6 +229,8 @@ summary(predict(o))
 summary(predict(o, gnew=o$strata, xnew=o$X))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## intercept + partition
 o <- multicut(Y ~ 1, dd, strata=x0, dist="rsf")
@@ -221,6 +240,8 @@ summary(predict(o))
 summary(predict(o, gnew=o$strata, xnew=NULL))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## rspf
 
@@ -231,6 +252,8 @@ summary(predict(o))
 summary(predict(o, gnew=o$strata, xnew=o$X))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
+u <- uncertainty(o, type="asymp", B=9)
+u <- uncertainty(o, type="boot", B=2)
 
 ## --- testing ... passing ---
 
@@ -250,46 +273,3 @@ wo <- multicut(Y ~ x2, strata=x0, dist="poisson",
     offset=log(A), weights=rep(1,n))
 no$species[[1]]
 wo$species[[1]]
-
-
-## lorenz based thresholdhing vs rsf based
-if (FALSE) {
-
-sum_by <- function(x, by) {
-    mm <- as(factor(by, levels=unique(by)), "sparseMatrix")
-    cbind(x=as.numeric(mm %*% x), by=rowSums(mm))
-}
-
-n <- 100
-g <- as.factor(sort(sample(LETTERS[1:4], n, replace=TRUE, prob=4:1)))
-x1 <- rpois(n, 5)
-x2 <- rpois(n, exp(as.integer(g)))
-
-plot(lorenz(x1), col=2)
-lines(lorenz(x2), col=4)
-abline(0, 1, lty=2)
-
-prop.table(table(g, x1 >= summary(lorenz(x1))["x(t)"]), margin=1)
-prop.table(table(g, x2 >= summary(lorenz(x2))["x(t)"]), margin=1)
-
-x <- x2
-
-if (getOption("ocoptions")$fix_fitted)
-    x <- x + abs(min(x))
-if (any(x) < 0)
-    stop("Negative fitted values found.")
-
-lc <- summary(lorenz(x))
-sb0 <- sum_by(x >= lc["x(t)"], g)
-plc <- sb0[,"x"] / sb0[,"by"]
-bp0 <- ifelse(plc >= lc["p(t)"], 1, 0)
-sb1 <- sum_by(x, g)
-pU <- sb1[,"x"] / sum(sb1[,"x"])
-pA <- sb1[,"by"] / sum(sb1[,"by"])
-bp1 <- ifelse(pU >= pA, 1, 0)
-
-cbind(n=sb0[,"by"], p_lc=plc, p_t=lc["p(t)"], bp_lc=bp0, p_U=pU, p_A=pA, s=pU/pA, bp_rsf=bp1)
-
-
-
-}
