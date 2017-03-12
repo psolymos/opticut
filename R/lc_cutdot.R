@@ -5,11 +5,5 @@
         mu <- mu + abs(min(mu))
     if (any(mu < 0))
         stop("Negative fitted values found.")
-    f <- function(x, n, fix_fitted=FALSE) {
-        l <- lorenz(x, n)
-        out <- structure(numeric(length(x)), names=names(x))
-        out[rownames(l)[-seq_len(which.max(l[,"p"] - l[,"L"]))]] <- 1
-        out
-    }
-    bp <- apply(mu, 2, f, n=n, fix_fitted=fix_fitted)
+    bp <- apply(mu, 2, .lc_cut1, n=n, fix_fitted=FALSE)
 }
