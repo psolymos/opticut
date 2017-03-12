@@ -111,24 +111,34 @@ other arguments passed to the underlying functions.
 }
 \details{
 Uncertainty is calculated for
-indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}.
+indicator value \code{I}, and expected values
+(\code{mu0}, and \code{mu1} for opticut, and \code{mu_*} for multicut objects).
+
 \code{"asymp"}: asymptotic distribution is based on best partition
 found for the input object (this option
-is unavailable for custom distribution functions).
+is unavailable for custom distribution functions because
+it requires the Hessian matrix).
+This type is available for both opticut and multicut objects.
+
 \code{"boot"}: non-parametric bootstrap distribution
 based on best partition found for the input object.
+This type is available for both opticut and multicut objects.
+
 \code{"multi"}: non-parametric bootstrap distribution
 based on best partition found for the bootstrap data (i.e.
 the model ranking is re-evaluated each time).
 \code{"multi"} works only if \code{comb = "rank"} in the
-\code{\link{opticut}} call.}
+\code{\link{opticut}} call.
+This type is not available for multicut objects.
+}
 \value{
 \code{uncertainty} returns an object of class 'uncertainty'.
 The \code{uncertainty} element of the object is a list with species specific
 output as elements (object class 'uncertainty1').
 Each 'uncertainty1' output is a data frame with 4 columns:
 \code{best} partition, indicator value \code{I},
-and expected values \code{mu0}, and \code{mu1}.
+and expected values
+(\code{mu0}, and \code{mu1} for opticut, and \code{mu_*} for multicut objects).
 
 \code{check_strata} returns a logical vector checking if
 all original strata from the input object are represented
@@ -148,7 +158,7 @@ strata as best partitions (number of strata times number of species).
 The coercion method \code{\link{as.data.frame}} returns a data frame.
 
 The \code{bsmooth} method returns bootstrap smoothed results
-for each strata.
+for each strata (not available for multicut based uncertainty objects).
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata
@@ -162,7 +172,8 @@ via \code{\link{set.seed}} can resolve the issue.
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{opticut}} for the user interface.
+\code{\link{opticut}} and \code{\link{multicut}} for the
+user interface of the input objects.
 }
 \examples{
 set.seed(2345)
@@ -220,6 +231,21 @@ summary(uncertainty(oc, type="multi", B=B))
 B <- sapply(1:n, function(i) which((1:n) != i))
 check_strata(oc, B) # check representation
 summary(uncertainty(oc, type="multi", B=B))
+
+## multicut based uncertainty
+mc <- opticut(Y ~ x2, strata=x0, dist="poisson")
+
+## asymptotic confidence intervals
+(muc1 <- uncertainty(mc, type="asymp", B=999))
+summary(muc1)
+## bootstrap-based confidence intervals
+(muc2 <- uncertainty(mc, type="boot", B=19))
+summary(muc2)
+
+## best partitions:
+## selection frequencies for strata and species
+bestpart(muc2)
+
 
 \dontrun{
 ## dolina example
