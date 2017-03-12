@@ -19,7 +19,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         dist=object$dist, ...)$linkinv
     scale <- object$scale
     obj <- object$species[[which]]
-    n <- nobs(object)
+    #n <- nobs(object)
     k <- which.max(obj$logLR) # opticut1
     if (type == "asymp") {
         if (length(B) > 1)
@@ -121,7 +121,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         out <- data.frame(best=bm, mat)
         attr(out, "est") <- attr(obj, "est")
     }
-    class(out) <- c("uncertainty1", "data.frame")
+    class(out) <- c("uncertainty1opti", "uncertainty1", "data.frame")
     attr(out, "B") <- niter
     attr(out, "type") <- type
     attr(out, "scale") <- scale
