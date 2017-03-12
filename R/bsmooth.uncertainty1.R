@@ -6,7 +6,7 @@ bsmooth.uncertainty1 <- function (object, ...) {
         out <- t(t(bp) * object$mu1 + (1 - t(bp)) * object$mu0)
     }
     if (inherits(object, "uncertainty_opti")) {
-        out <- NULL
+        stop("bsmooth is not available for multicut based objects.")
     }
     out
 }
