@@ -1,5 +1,5 @@
 bsmooth.uncertainty1 <- function (object, ...) {
-    if (inherits(object, "uncertainty1_opti"))
+    if (inherits(object, "uncertainty1_multi"))
         stop("bsmooth is not available for multicut based objects.")
     if (inherits(object, "uncertainty1_opti")) {
         if (attr(object,"type") != "multi")

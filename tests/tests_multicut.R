@@ -33,6 +33,36 @@ subset(m1, c("Spp1", "Spp3"))
 
 str(m1$strata)
 
+opticut:::.extractOpticut(m1)
+opticut:::.extractOpticut(m2)
+opticut:::.extractOpticut(m3)
+opticut:::.extractOpticut(m4)
+
+u1a <- uncertainty(m1, type="asymp", B=99)
+u2a <- uncertainty(m2, type="asymp", B=99)
+u3a <- uncertainty(m3, type="asymp", B=99)
+## asymp needs Hessian: dist=fun cannot provide that
+u4a <- try(uncertainty(m4, type="asymp", B=999), silent=TRUE)
+stopifnot(inherits(u4a, "try-error"))
+
+u1b <- uncertainty(m1, type="boot", B=9)
+u2b <- uncertainty(m2, type="boot", B=9)
+u3b <- uncertainty(m3, type="boot", B=9)
+u4b <- uncertainty(m4, type="boot", B=9)
+
+summary(subset(u1b, c(3,1)))
+summary(subset(u2b, c(TRUE, FALSE, TRUE)))
+summary(subset(u3b, c("Spp1", "Spp3")))
+
+u1c <- uncertainty(m1, type="multi", B=9)
+## type=multi cannot use object with comb=all
+u2c <- try(uncertainty(m2, type="multi", B=9), silent=TRUE)
+stopifnot(inherits(u2c, "try-error"))
+## type=multi cannot use object with comb=NA (custom partitions)
+u3c <- try(uncertainty(m3, type="multi", B=9), silent=TRUE)
+stopifnot(inherits(u3c, "try-error"))
+u4c <- uncertainty(m4, type="multi", B=9)
+
 strata(m1)
 strata(m4)
 
