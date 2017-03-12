@@ -233,19 +233,17 @@ check_strata(oc, B) # check representation
 summary(uncertainty(oc, type="multi", B=B))
 
 ## multicut based uncertainty
-mc <- opticut(Y ~ x2, strata=x0, dist="poisson")
+mc <- multicut(Y ~ x2, strata=x0, dist="poisson")
 
 ## asymptotic confidence intervals
 (muc1 <- uncertainty(mc, type="asymp", B=999))
 summary(muc1)
+bestpart(muc1)
+
 ## bootstrap-based confidence intervals
 (muc2 <- uncertainty(mc, type="boot", B=19))
 summary(muc2)
-
-## best partitions:
-## selection frequencies for strata and species
 bestpart(muc2)
-
 
 \dontrun{
 ## dolina example
