@@ -1,4 +1,7 @@
 strata.uncertainty <-
 function (object, ...) {
-    strata.opticut(object, ...)
+    if (inherits(object, "uncertainty_opti"))
+        strata.opticut(object, ...)
+    if (inherits(object, "uncertainty_multi"))
+        strata.multicut(object, ...)
 }
