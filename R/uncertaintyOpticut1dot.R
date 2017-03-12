@@ -121,7 +121,7 @@ type=c("asymp", "boot", "multi"), B=99, pb=FALSE, ...)
         out <- data.frame(best=bm, mat)
         attr(out, "est") <- attr(obj, "est")
     }
-    class(out) <- c("uncertainty1opti", "uncertainty1", "data.frame")
+    class(out) <- c("uncertainty1_opti", "uncertainty1", "data.frame")
     attr(out, "B") <- niter
     attr(out, "type") <- type
     attr(out, "scale") <- scale

@@ -37,7 +37,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
     out <- summary(object)
     out$B <- niter
     out$type <- type
-    class(out) <- c("uncertaintyOpti", "uncertainty")
+    class(out) <- c("uncertainty_opti", "uncertainty")
 
     if (inherits(cl, "cluster")) {
         parallel::clusterEvalQ(cl, library(opticut))
