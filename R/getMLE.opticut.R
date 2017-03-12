@@ -15,11 +15,16 @@ function(object, which, vcov=FALSE, ...)
     m1 <- .extractOpticut(object, which,
         boot=FALSE,
         internal=TRUE,
-        full_model=TRUE,
+        full_model=vcov,
+        #full_model=TRUE,
         best=TRUE, ...)[[1L]]
-    est <- coef(m1)
-    V <- if (vcov)
-        vcov(m1) else NULL
+    if (vcov) {
+        est <- coef(m1)
+        V <- vcov(m1)
+    } else {
+        est <- m1$coef
+        V <- NULL
+    }
     # rsf: coef and vcov method returns no intercept
     if (Dist == "rsf") {
         est <- c("(Intercept)"=0, est)
