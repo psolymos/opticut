@@ -163,6 +163,8 @@ u <- uncertainty(o, type="boot", B=2)
 
 Yzi <- Y
 Yzi[1,] <- 0
+B <- sapply(2:3, function(i) which((1:n) != i)) # jackknife
+B[1,] <- 1
 summary(o <- multicut(Yzi ~ x2, strata=x0, dist="zip"))
 summary(fitted(o))
 summary(predict(o))
@@ -170,7 +172,7 @@ summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
 u <- uncertainty(o, type="asymp", B=9)
-u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="boot", B=B)
 
 ## zinb
 
@@ -181,7 +183,7 @@ summary(predict(o, gnew=x0, xnew=data.frame(x2=x2)))
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
 u <- uncertainty(o, type="asymp", B=9)
-u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="boot", B=B)
 
 ## zip2
 
@@ -192,7 +194,7 @@ summary(predict(o, gnew=x0, xnew=data.frame(x2=x2))) #--- FIXME!!!
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
 u <- uncertainty(o, type="asymp", B=9)
-u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="boot", B=B)
 
 ## zinb2
 
@@ -203,7 +205,7 @@ summary(predict(o, gnew=x0, xnew=data.frame(x2=x2))) # -- FIXME!!!
 getMLE(o, 1, vcov=FALSE)
 getMLE(o, 1, vcov=TRUE)
 u <- uncertainty(o, type="asymp", B=9)
-u <- uncertainty(o, type="boot", B=2)
+u <- uncertainty(o, type="boot", B=B)
 
 ## rsf
 
@@ -270,5 +272,7 @@ no <- multicut(Y ~ x2, strata=x0, dist="poisson")
 ## with offsets: log Area
 wo <- multicut(Y ~ x2, strata=x0, dist="poisson",
     offset=log(A), weights=rep(1,n))
-no$species[[1]]
-wo$species[[1]]
+agg <- aggregate(data.frame(lam=lam), list(x0=x0), mean)
+agg$wout_off <- no$species[[1]]$mu
+agg$with_off <- wo$species[[1]]$mu
+agg
