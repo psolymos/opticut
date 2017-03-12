@@ -276,3 +276,4 @@ agg <- aggregate(data.frame(lam=lam), list(x0=x0), mean)
 agg$wout_off <- no$species[[1]]$mu
 agg$with_off <- wo$species[[1]]$mu
 agg
+

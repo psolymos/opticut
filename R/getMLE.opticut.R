@@ -23,13 +23,11 @@ function(object, which, vcov=FALSE, ...)
         internal=TRUE,
         full_model=full_model,
         best=TRUE, ...)[[1L]]
-    if (vcov) {
-        est <- coef(m1)
-        V <- vcov(m1)
-    } else {
-        est <- m1$coef
-        V <- NULL
-    }
+    V <- if (vcov)
+        vcov(m1) else NULL
+    ## use m1$coef when dist=fun, coef(m1) otherwise
+    est <- if (full_model)
+        coef(m1) else m1$coef
     # rsf: coef and vcov method returns no intercept
     if (Dist == "rsf") {
         est <- c("(Intercept)"=0, est)
