@@ -5,18 +5,20 @@ function(object, which, vcov=FALSE, ...)
         stop("specify which argument")
     if (!length(which))
         stop("which argument must have length 1")
-        ## full model cannot be returned for dist=fun
+    full_model <- TRUE
     if (!is.function(object$dist)) {
         Dist <- as.character(object$dist)
         Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L]
     } else {
         Dist <- ""
+        ## full model cannot be returned for dist=fun with vcov=TRUE
+        if (vcov)
+            stop("vcov=TRUE cannot be used with custom distribution")
     }
     m1 <- .extractOpticut(object, which,
         boot=FALSE,
         internal=TRUE,
-        full_model=vcov,
-        #full_model=TRUE,
+        full_model=full_model,
         best=TRUE, ...)[[1L]]
     if (vcov) {
         est <- coef(m1)
@@ -37,6 +39,7 @@ function(object, which, vcov=FALSE, ...)
         if (vcov)
             V <- V[names(est), names(est)]
     }
+    ## these require full model, which is given by full_model
     if (Dist == "negbin")
         attr(est, "theta") <- m1$theta
     if (Dist == "gaussian")
