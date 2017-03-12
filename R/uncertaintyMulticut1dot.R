@@ -19,7 +19,7 @@ type=c("asymp", "boot"), B=99, pb=FALSE, ...)
         dist=object$dist, ...)$linkinv
     scale <- object$scale
     obj <- object$species[[which]]
-    #n <- nobs(object)
+    n <- nobs(object)
     K <- length(obj$mu)
     if (type == "asymp") {
         if (length(B) > 1)
