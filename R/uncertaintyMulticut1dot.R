@@ -112,6 +112,6 @@ type=c("asymp", "boot"), B=99, pb=FALSE, ...)
     attr(out, "B") <- niter
     attr(out, "type") <- type
     attr(out, "scale") <- scale
-    attr(out, "collapse") <- object$collapse
+    attr(out, "collapse") <- getOption("ocoptions")$collapse
     out
 }
