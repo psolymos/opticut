@@ -37,6 +37,7 @@ S3method("subset", "opticut")
 S3method("subset", "multicut")
 S3method("subset", "uncertainty")
 S3method("uncertainty", "opticut")
+S3method("uncertainty", "multicut")
 
 S3method("plot", "opticut")
 S3method("plot", "multicut")
