@@ -1,5 +1,4 @@
 export("opticut", "optilevels", "opticut1", "multicut1", "multicut",
-    "wrsi", "sindex",
     "lorenz",
     "ocoptions", "occolors", "col2gray",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",

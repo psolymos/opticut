@@ -5,6 +5,7 @@
 * `multicut` added for multi-level response model.
 * `fitted` and `predict` methods added.
 * New data set: `birdrec` bird detections.
+* `wrsi` and `sindex` functions migrated to ResourceSelection package.
 
 ## Version 0.1-0 -- Dec 16, 2016
 
