@@ -17,7 +17,7 @@
 \alias{bsmooth.uncertainty}
 \alias{subset.uncertainty}
 \title{
-Quantifying uncertainty for fitted objects
+Quantifying Uncertainty for Fitted Objects
 }
 \description{
 Quantifying uncertainty for fitted objects.
@@ -53,9 +53,9 @@ check_strata(x, mat)
 }
 \arguments{
   \item{object}{
-fitted model object from \code{\link{opticut}}
-which does not contain extra arguments as part of \code{...}
-(or an output from \code{uncertainty} for the \code{summary} method).
+fitted model object
+(which should not contain extra arguments as part of \code{...}),
+or an output from \code{uncertainty} for the \code{summary} method.
 }
   \item{which}{
 numeric or character (can be a vector) defining
@@ -73,7 +73,7 @@ resampling with dimensions length of observations times B.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel computations
-(this does nothing on Windows).
+(integer value for forking is ignored on Windows).
 }
   \item{x}{
 an object to be printed.
@@ -111,12 +111,11 @@ other arguments passed to the underlying functions.
 }
 \details{
 Uncertainty is calculated for
-indicator value \code{I}, and expected values
+indicator potential \code{I}, and expected values
 (\code{mu0}, and \code{mu1} for opticut, and \code{mu_*} for multicut objects).
 
-\code{"asymp"}: asymptotic distribution is based on best partition
-found for the input object (this option
-is unavailable for custom distribution functions because
+\code{"asymp"}: asymptotic distribution is based on best supported model
+(this option is unavailable for custom distribution functions because
 it requires the Hessian matrix).
 This type is available for both opticut and multicut objects.
 
@@ -135,8 +134,8 @@ This type is not available for multicut objects.
 \code{uncertainty} returns an object of class 'uncertainty'.
 The \code{uncertainty} element of the object is a list with species specific
 output as elements (object class 'uncertainty1').
-Each 'uncertainty1' output is a data frame with 4 columns:
-\code{best} partition, indicator value \code{I},
+Each 'uncertainty1' output is a data frame with columns:
+\code{best} partition, indicator potential \code{I},
 and expected values
 (\code{mu0}, and \code{mu1} for opticut, and \code{mu_*} for multicut objects).
 
@@ -153,20 +152,22 @@ reliability) and conficence interval for I (based on \code{level}).
 The \code{subset} method subsets the species in the uncertainty object.
 
 \code{\link{bestpart}} finds the selection frequencies for
-strata as best partitions (number of strata times number of species).
+strata as best partitions (number of strata x number of species).
 
 The coercion method \code{\link{as.data.frame}} returns a data frame.
 
 The \code{bsmooth} method returns bootstrap smoothed results
-for each strata (not available for multicut based uncertainty objects).
+for each strata (not available for multicut based uncertainty objects,
+check uncertainty results instead).
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata
 when sample size is small. Try revising the stratification of the
 input object, or provide custom resampling indices via the \code{B}
 argument using stratified (block) bootstrap, jackknife (leave-one-out),
-or similar techniques. Sometimes finding a suitable random seed
-via \code{\link{set.seed}} can resolve the issue.
+or similar techniques. Finding a suitable random seed
+via \code{\link{set.seed}} or dropping unsuitable iterations
+can also resolve the issue.
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
