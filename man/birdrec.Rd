@@ -78,7 +78,9 @@ as threshold between the major units).
 morning (\code{HOUR} > 0).
 
 Variables in \code{birdrec$taxa} are the following:
-FIXME
+\code{Species}, \code{CommonName}, \code{ScientificName},
+\code{Family}, \code{Order}, \code{Class},
+and \code{MigratoryBehaviour}.
 
 Methodology and metadata is described in ABMI (2016), and Lankau et al. (2015).
 }
@@ -99,11 +101,9 @@ Alberta Biodiversity Monitoring Institute; Edmonton, Alberta, Canada.
 data(birdrec)
 str(birdrec)
 
-aggregate(rowSums(birdrec$y),
-    list(TOY=birdrec$x$TOY, TOD=birdrec$x$TOD), mean)
-boxplot(rowSums(birdrec$y) ~ TOD + TOY, birdrec$x,
+aggregate(rowSums(birdrec$xtab),
+    list(TOY=birdrec$samp$TOY, TOD=birdrec$samp$TOD), mean)
+boxplot(rowSums(birdrec$xtab) ~ TOD + TOY, birdrec$samp,
     col=c("gold", "tomato"), ylab="# detections")
-
-#FIXME -- add more stuff here
 }
 \keyword{datasets}
