@@ -1,7 +1,7 @@
 \name{ocoptions}
 \alias{ocoptions}
 \title{
-Options for the opticut package
+Options for the opticut Package
 }
 \description{
 A convenient way of handling options related to the opticut package.
@@ -21,29 +21,30 @@ returned in an invisible named list. Such a list can be passed as an
 argument to \code{ocoptions} to restore the parameter values.
 Tags are the following:
 
-  \item{collapse}{character value to be used when merging factor levels,
+\item{collapse}{character value to be used when merging factor levels,
   the default is \code{"+"}.}
-  \item{cut}{log likelihood ratio value, model/species with lower
+\item{cut}{log likelihood ratio value, model/species with lower
   values are excluded from summaries and plots,
   the default is \code{2}.}
-  \item{sort}{logical value indicating if species/partitions
+\item{sort}{logical value indicating if species/partitions
   should be meaningfully sorted, the default is \code{TRUE}.
   It can take numeric value when only species (\code{1})
   or partitions (\code{2}) are to be sorted (\code{1:2} is equivalent to
-  \code{TRUE}, wile any other numeric value is equivalent to \code{FALSE}).}
-  \item{theme}{the color theme to be used based on \code{\link{occolors}},
+  \code{TRUE}).}
+\item{theme}{the color theme to be used based on \code{\link{occolors}},
   the default is \code{"br"}.}
-  \item{check_comb}{check the design matrices for complementary partitions
+\item{check_comb}{check the design matrices for complementary partitions
   using \code{\link{checkComb}},
   the default is \code{TRUE}.}
-  \item{try_error}{if \code{\link{opticut}} should \code{\link{try}} to exclude
+\item{try_error}{if \code{\link{opticut}} and \code{\link{multicut}}
+  should \code{\link{try}} to exclude
   species where the models failed (\code{TRUE}), the default
   is to stop when an error is encountered (\code{FALSE}).}
-  \item{scale}{the scaling factor used to calculate indicator value (I)
-  based on the estimated coefficient (b): I = abs(tanh(b*scale)),
+\item{scale}{the scaling factor used to calculate indicator potential (I)
+  based on the estimated contrast (x): I = abs(tanh(x*scale)),
   the default is 0.5.}
-  \item{fix_fitted}{\code{\link{bestpart}} method for multicut object
-  uses \code{\link{lorenz}} which required nonnegative fitted values,
+\item{fix_fitted}{\code{\link{bestpart.multicut}}
+  uses \code{\link{lorenz}} which requires nonnegative fitted values,
   however models with identity link can lead to negative espected values.
   When \code{TRUE} the fitted values (x) are adjusted as x' = x + abs(min(x))
   to ensure nonnegativity. The default is \code{FALSE}.}

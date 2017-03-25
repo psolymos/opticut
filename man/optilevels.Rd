@@ -2,7 +2,7 @@
 \alias{optilevels}
 \alias{bestmodel.optilevels}
 \title{
-Optimal number of factor levels
+Optimal Number of Factor Levels
 }
 \description{
 Finds the optimal number of factor levels given the data and a model
@@ -34,7 +34,7 @@ Variables in \code{z} should be centered (mean 0) (and
 possibly nomalized by SD), because the design matrix
 from \code{x} is not expected to include an intercept.
 }
-  \item{alpha}{
+  \item{alpha}{numeric [0-1],
 weighting factor for calculating information criteria for model selection
 (i.e. IC = (1-alpha)*AIC + alpha*BIC, also referred to as CAIC: consistent AIC).
 }
@@ -48,60 +48,60 @@ see listed on the help page of \code{\link{opticut}}
 fitted object.
 }
   \item{\dots}{
-other arguments passed to the underlying functions, see \code{\link{opticut}}.
+other arguments passed to the underlying functions, see \code{\link{opticut1}}.
 }
 }
 \value{
 An object of class 'optilevels' that is a list with the following elements:
 
 \describe{
-\item{\code{delta}}{delta IC values along the selection path considering best models.}
+\item{\code{"delta"}}{delta IC values along the selection path considering best models.}
 
-\item{\code{ic}}{IC values along the selection path considering best models.}
+\item{\code{"ic"}}{IC values along the selection path considering best models.}
 
-\item{\code{coef}}{matrix of coefficients (linear predictor scale)
+\item{\code{"coef"}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{x}
 along the selection path considering best models.}
 
-\item{\code{zcoef}}{matrix of coefficients (linear predictor scale)
+\item{\code{"zcoef"}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{z} when not \code{NULL}
 along the selection path considering best models, or \code{NULL}.}
 
-\item{\code{rank}}{matrix ranks based on the coefficients
+\item{\code{"rank"}}{matrix ranks based on the coefficients
 along the selection path considering best models.
 Ranking uses the default \code{ties.method = "average"} in \code{\link{rank}}.}
 
-\item{\code{deltalist}}{delta IC values along the selection path
+\item{\code{"deltalist"}}{delta IC values along the selection path
 considering all competing models.}
 
-\item{\code{iclist}}{IC values along the selection path
+\item{\code{"iclist"}}{IC values along the selection path
 considering all competing models.}
 
-\item{\code{coeflist}}{matrix of coefficients (linear predictor scale)
+\item{\code{"coeflist"}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{x}
 along the selection path considering all competing models.}
 
-\item{\code{zcoeflist}}{matrix of coefficients (linear predictor scale)
+\item{\code{"zcoeflist"}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{z} when not \code{NULL}
 along the selection path considering all competing models, or \code{NULL}.}
 
-\item{\code{ranklist}}{matrix ranks based on the coefficients
+\item{\code{"ranklist"}}{matrix ranks based on the coefficients
 along the selection path considering all competing models.}
 
-\item{\code{levels}}{list of (merged) factor levels along the selection path
+\item{\code{"levels"}}{list of (merged) factor levels along the selection path
 considering best models.}
 
-\item{\code{Y}}{vector of observations (argument \code{y}).}
+\item{\code{"Y"}}{vector of observations (argument \code{y}).}
 
-\item{\code{X}}{design matrix component corresponding to argument \code{x}.}
+\item{\code{"X"}}{design matrix component corresponding to argument \code{x}.}
 
-\item{\code{Z}}{design matrix component corresponding to argument \code{z}.}
+\item{\code{"Z"}}{design matrix component corresponding to argument \code{z}.}
 
-\item{\code{alpha}}{weighting argument.}
+\item{\code{"alpha"}}{weighting argument.}
 
-\item{\code{dist}}{distribution argument.}
+\item{\code{"dist"}}{distribution argument.}
 
-\item{\code{factor}}{logical, indicating if argument \code{x} is a factor
+\item{\code{"factor"}}{logical, indicating if argument \code{x} is a factor
 (\code{TRUE}) or a matrix (\code{FALSE}).}
 }
 
@@ -112,10 +112,8 @@ manipulation (e.g. prediction).
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{opticut}} for finding best binary partitions.
-
-\code{\link{sindex}} and \code{\link{wrsi}}
-for weighted relative suitability index.
+\code{\link{opticut}} and \code{\link{multicut}}
+for fitting best binary and multi-level response models.
 }
 \examples{
 ## --- Factor levels with Gaussian distribution
