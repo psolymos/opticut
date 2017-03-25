@@ -5,14 +5,16 @@
 function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
 {
     if (!is.function(dist)) {
-        dist <- match.arg(dist,
-            c("gaussian", "poisson", "binomial", "negbin",
-            "beta", "zip", "zinb"))
+        dist <- .opticut_dist(dist, make_dist=TRUE)
+        Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1L]][1L]
+        if (!(Dist %in% c("gaussian", "poisson", "binomial", "negbin",
+            "beta", "zip", "zinb")))
+            stop("not available for dist=", dist)
     }
+
     if (is.null(colnames(X)))
         colnames(X) <- paste0("X", seq_len(ncol(X)))
     colnames(X) <- gsub("\\s", "", colnames(X))
-#    nx <- ncol(X)
     X0 <- X
     if (!is.null(Z)) {
         Z <- data.matrix(Z)
