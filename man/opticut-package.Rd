@@ -13,12 +13,10 @@ The DESCRIPTION file:
 \packageDESCRIPTION{opticut}
 \packageIndices{opticut}
 
-The main user interface is the \code{\link{opticut}} function
-to find the optimal binary partitioning.
+The main user interface are the \code{\link{opticut}}
+and \code{\link{multicut}} functions
+to find the optimal binary or multi-level response models.
 Make sure to evaluate \code{\link{uncertainty}}.
-
-Go beyond binary partitions:
-\code{\link{multicut}} fits multinomial-response models;
 \code{\link{optilevels}} finds the optimal number of factor levels.
 }
 \author{
