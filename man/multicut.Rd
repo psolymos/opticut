@@ -19,12 +19,11 @@
 \alias{as.data.frame.summary.multicut}
 \alias{getMLE.multicut}
 \title{
-Multinomial-response model for indicator species analysis
+Multi-level Response Model
 }
 \description{
-The functions fits the multinomial-response model for each species,
-possibly controlling for modifying/confounding
-variables.
+The functions fits the multi-level response model for each species,
+possibly controlling for modifying/confounding variables.
 }
 \usage{
 multicut1(Y, X, Z, dist = "gaussian", sset=NULL, ...)
@@ -66,7 +65,7 @@ or possible a vector for single species case) in the left-hand side,
 model terms for modifying effects in the right-hand side
 (its structure depending on the underlying functions).
 For example, in the most basic Gaussian case it can be
-\code{y ~ 1} (mo modifying variables) or \code{y ~ x}
+\code{y ~ 1} (no modifying variables) or \code{y ~ x}
 (with modifying variables).
 Centering the modifying terms (or choosing the origin wisely)
 is generally recommended (especially for Gaussian distribution
@@ -92,11 +91,12 @@ can be specified via the \code{family} argument).
 See Details on \code{\link{opticut}} page and Examples.
 }
   \item{sset}{
-an optional vector specifying a subset of observations to be used in the fitting process. \code{NULL} means no subset taken.
+an optional vector specifying a subset of observations (rows)
+to be used in the fitting process. \code{NULL} means no subset taken.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel computations
-(this does nothing on Windows).
+(integer value for forking is ignored on Windows).
 }
   \item{Y}{
 numeric vector of observations for \code{multicut1},
@@ -121,10 +121,10 @@ logical value indicating if species/partitions
 should be meaningfully sorted, the default is \code{TRUE}.
 It can take numeric value when only species (\code{1})
 or partitions (\code{2}) are to be sorted (\code{1:2} is equivalent to
-\code{TRUE}, wile any other numeric value is equivalent to \code{FALSE}).
+\code{TRUE}).
 }
   \item{show_I}{
-logical, if indicator values should be shown.
+logical, if indicator potential (I) should be shown.
 }
   \item{show_S}{
 logical, if number of indicator species should be shown.
@@ -146,7 +146,7 @@ By default, \code{las} is 1 when \code{horizontal = TRUE} and
 2 when \code{horizontal = FALSE}.
 }
   \item{bty}{
-Character, determines the type of box which is drawn about plots,
+Character, determines the type of box which is drawn around plots,
 see \code{\link{par}}.
 }
   \item{lower, upper}{
@@ -168,7 +168,7 @@ numeric, number of significant digits in output.
   \item{which}{
 numeric or character (can be a vector) defining
 a subset of species from the fitted object,
-or or \code{NULL} (all species, default).
+or \code{NULL} (all species, default).
 }
 \item{row.names}{
 \code{NULL} or a character vector giving the row names for the data frame.
@@ -182,10 +182,10 @@ See \code{\link{as.data.frame}}.
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
 missing values are not accepted. The default \code{NULL} returns
-the original object.
+the original object without subsetting.
 }
   \item{vcov}{
-logical, if variance-covariance matrix is needed to be returned.
+logical, if variance-covariance matrix is to be returned.
 }
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
@@ -195,35 +195,40 @@ to predict for, or \code{NULL}.
 other arguments passed to the underlying functions.
 }
 }
+\details{
+FIXME
+
+add Lc approach and how I is calculated
+}
 \section{Warning}{
 The use of the \code{multicut1} function is generally discouraged:
 some of the internal checks are not guaranteed to
 flag issues when the formula-to-model-matrix translation is side-stepped
 (this is what is happening when the modifier variables are supplied
 as \code{X} argument in \code{multicut1}).
-Use the \code{multicut} with a single species instead.
+Use the \code{multicut} function with a single species instead.
 }
 \value{
-\code{multicut1} returns an object of class multicut1.
+\code{multicut1} returns an object of class 'multicut1'.
 
-\code{multicut} returns an object of class multicut, that is a list
+\code{multicut} returns an object of class 'multicut', that is a list
 with the following components:
 \describe{
 \item{\code{"call"}}{the function call.}
 \item{\code{"species"}}{a list of species specific multicut1 objects.}
 \item{\code{"X"}}{modifying variables as model matrix.}
 \item{\code{"Y"}}{response, single species vector or matrix.}
-\item{\code{"strata"}}{defines the partitions.}
+\item{\code{"strata"}}{defines the stratification.}
 \item{\code{"nobs"}}{sample size.}
 \item{\code{"sset"}}{subset, if specified.}
 \item{\code{"dist"}}{distribution.}
-\item{\code{"failed"}}{IDs for failed species models.}
+\item{\code{"failed"}}{IDs for failed species models dropped from results list.}
 }
 
 The \code{strata} method extracts the \code{strata} argument
 as factor.
 
-The \code{print} and \code{summary} methods are called for their side effects.
+The \code{print} and \code{summary} methods are called for their side effects
 showing expected values, and log likelihood ratio (logLR).
 
 The \code{subset} method subsets the species in the multicut object.
@@ -234,13 +239,11 @@ The \code{plot} method presents the estimates by species and strata.
 partitions for each species (samples and rows, species as columns).
 Binary partitions are based on Lorenz-tangent based optimal threshold
 (see \code{\link{lorenz}}).
-This definition of best partition does not directly matches
-\code{strata}, as opposed to \code{\{link{bestpart.opticut}}.
 \code{\link{lorenz}} requires nonnegative fitted values
 which is not guaranteed under \code{dist = "gaussian"} with identity
-link, see \code{fis_fitted} \code{\link{ocoptions}} setting
-for how to resolve this (choosing a different link function
-or distribution is advised however).
+link, see \code{fix_fitted} \code{\link{ocoptions}} setting
+for how to resolve this (choosing a different link function,
+distribution, or centering modified variables is advised).
 
 \code{\link{bestmodel}} returns the best supported model for further
 manipulation (e.g. prediction). Note: custom distribution
@@ -265,14 +268,20 @@ The coercion methods \code{\link{as.data.frame}} return a data frame.
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{lorenz}} for how multi-level partitions are binarized
+\code{\link{lorenz}} Examples for how multi-level partitions are binarized
 using the Lorenz-tangent approach.
 
-\code{\link{opticut}} for a binary-response model,
+\code{\link{opticut}} for optimal binary response model,
 \code{\link{optilevels}} for finding the optimal number of factor levels.
 
+\code{\link{beta2i}} for indicator potential (I) calculations in summaries.
+
+\code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
+for manipulating fitted objects.
+
 \code{\link{ocoptions}} on how to set some of the global options
-related to the presentation of the results in the package.
+related to the presentation of the results in the package
+and how errors encountered during model fitting are handled.
 }
 \examples{
 ## --- Gaussian

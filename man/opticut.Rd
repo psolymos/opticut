@@ -23,7 +23,7 @@
 \alias{as.data.frame.summary.opticut}
 \alias{getMLE.opticut}
 \title{
-Likelihood based optimal partitioning for indicator species analysis
+Optimal Binary Response Model
 }
 \description{
 The functions find the best binary partition for each species based on
@@ -80,7 +80,7 @@ or possible a vector for single species case) in the left-hand side,
 model terms for modifying effects in the right-hand side
 (its structure depending on the underlying functions).
 For example, in the most basic Gaussian case it can be
-\code{y ~ 1} (mo modifying variables) or \code{y ~ x}
+\code{y ~ 1} (no modifying variables) or \code{y ~ x}
 (with modifying variables).
 Centering the modifying terms (or choosing the origin wisely)
 is generally recommended (especially for Gaussian distribution
@@ -113,11 +113,12 @@ character, how to define the binary partitions.
 \code{"all"} uses \code{\link{allComb}}.
 }
   \item{sset}{
-an optional vector specifying a subset of observations to be used in the fitting process. \code{NULL} means no subset taken.
+an optional vector specifying a subset of observations (rows)
+to be used in the fitting process. \code{NULL} means no subset taken.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel computations
-(this does nothing on Windows).
+(integer value for forking is ignored on Windows).
 }
   \item{Y}{
 numeric vector of observations for \code{opticut1},
@@ -144,10 +145,10 @@ logical value indicating if species/partitions
 should be meaningfully sorted, the default is \code{TRUE}.
 It can take numeric value when only species (\code{1})
 or partitions (\code{2}) are to be sorted (\code{1:2} is equivalent to
-\code{TRUE}, wile any other numeric value is equivalent to \code{FALSE}).
+\code{TRUE}).
 }
   \item{show_I}{
-logical, if indicator values should be shown.
+logical, if indicator potential (I) should be shown.
 }
   \item{show_S}{
 logical, if number of indicator species should be shown.
@@ -169,7 +170,7 @@ By default, \code{las} is 1 when \code{horizontal = TRUE} and
 2 when \code{horizontal = FALSE}.
 }
   \item{bty}{
-Character, determines the type of box which is drawn about plots,
+Character, determines the type of box which is drawn around plots,
 see \code{\link{par}}.
 }
   \item{lower, upper}{
@@ -191,7 +192,7 @@ numeric, number of significant digits in output.
   \item{which}{
 numeric or character (can be a vector) defining
 a subset of species from the fitted object,
-or or \code{NULL} (all species, default).
+or \code{NULL} (all species, default).
 }
   \item{sep}{
 a character string to separate the sub-strings in factor levels.
@@ -215,10 +216,10 @@ This is only important when \code{comb} is not \code{"rank"}.
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
 missing values are not accepted. The default \code{NULL} returns
-the original object.
+the original object without subsetting.
 }
   \item{vcov}{
-logical, if variance-covariance matrix is needed to be returned.
+logical, if variance-covariance matrix is to be returned.
 }
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
@@ -235,7 +236,8 @@ Currently available distributions:
 \describe{
 \item{\code{"gaussian"}}{real valued continuous observations, e.g. biomass,
 uses \code{\link[stats]{lm}} of the stats package.
-Identity link is assumed.}
+Identity link is assumed. Centering modified variables is generally advised
+to avoid negative expected values when the response is nonnegative.}
 
 \item{\code{"poisson"}}{Poisson count data,
 uses \code{\link[stats]{glm}} of the stats package.
@@ -249,7 +251,8 @@ Logistic (logit) link is assumed.}
 uses \code{\link[MASS]{glm.nb}} of the MASS package.
 Exponential (log) link is assumed.}
 
-\item{\code{"beta"}}{continuous response in the unit interval, e.g. percent cover,
+\item{\code{"beta"}}{continuous response in the unit interval (0-1),
+e.g. percent cover,
 uses \code{\link[betareg]{betareg}} of the betareg package.
 Logistic (logit) link for the mean model is assumed.}
 
@@ -292,7 +295,8 @@ in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rsf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model is accepted for \code{"rsf"}.
+Intercept only model (i.e. no modifier variables in right-hand-side
+of the formula) is accepted for \code{"rsf"}.
 Exponential (log) link is assumed.}
 
 \item{\code{"rspf"}}{presence-only data using resource selection
@@ -302,12 +306,14 @@ in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model is not accepted for \code{"rspf"}.
+Intercept only model is not accepted for \code{"rspf"}, need to have
+at least one continuous modifier variable for identifiability
+(see Solymos & Lele 2016).
 Logistic (logit) link is assumed.}
 }
 
 Custom distributions can be defined, see Examples.
-Note: not all downstream algorithms and methods work for custom distributions.
+Note: not all downstream algorithms and methods work with custom distributions.
 
 \code{fix_levels} is a utility function for replacing characters in
 factor levels that are identical to the value of the
@@ -340,7 +346,7 @@ with the following components:
 \item{\code{"nsplit"}}{number of binary splits considered.}
 \item{\code{"dist"}}{distribution.}
 \item{\code{"comb"}}{combination type.}
-\item{\code{"failed"}}{IDs for failed species models.}
+\item{\code{"failed"}}{IDs for failed species models dropped from results list.}
 \item{\code{"collapse"}}{character used for combining partition labels.}
 }
 
@@ -353,8 +359,8 @@ when custom matrix is supplied for \code{strata}.
 The \code{print} and \code{summary} methods are called for their side effects.
 The summary shows the following information:
 best supported split, strength and sign of association,
-indicator value (I), expected values (mu0, mu1), log likelihood ratio (logLR),
-and model weights(w).
+indicator potential (I), expected values (mu0, mu1),
+log likelihood ratio (logLR), and model weights(w).
 
 The \code{subset} method subsets the species in the opticut object.
 
@@ -391,21 +397,27 @@ E. & Solymos, P. (2014): Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
 <doi:10.1556/ComEc.15.2014.2.6>
+
+Solymos, P. & Lele, S. R. (2016): Revisiting resource selection probability
+functions and single-visit methods: clarification and extensions.
+Methods in Ecology and Evolution 7:196--205.
+<doi:10.1111/2041-210X.12432>
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <solymos@ualberta.ca> and Ermias T. Azeria
 }
 \seealso{
 \code{\link{allComb}}, and \code{\link{rankComb}}
 for partitioning algorithms.
 
-\code{\link{beta2i}} for indicator value (I) calculations in summaries.
+\code{\link{beta2i}} for indicator potential (I) calculations in summaries.
 
 \code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
 for manipulating fitted objects.
 
 \code{\link{ocoptions}} on how to set some of the global options
-related to the presentation of the results in the package.
+related to the presentation of the results in the package
+and how errors encountered during model fitting are handled.
 
 \code{\link{multicut}} for multinomial-response model,
 \code{\link{optilevels}} for finding the optimal number of factor levels.
