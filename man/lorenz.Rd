@@ -7,7 +7,7 @@
 \alias{iquantile.lorenz}
 \alias{plot.lorenz}
 \title{
-Lorenz curve based thresholds and partitions
+Lorenz Curve Based Thresholds and Partitions
 }
 \description{
 Lorenz curve based thresholds and partitions.
@@ -34,7 +34,7 @@ an object to plot or summarized.
   \item{n}{a vector of frequencies, must be same length as \code{x}.
 }
 
-  \item{na.last}{for controlling the treatment of \code{NA}s.
+  \item{na.last}{logical, for controlling the treatment of \code{NA}s.
 If \code{TRUE}, missing values in the data are put last;
 if \code{FALSE}, they are put first; if \code{NA}, they are removed
 (see \code{\link{order}}).
@@ -77,13 +77,12 @@ other arguments passed to the underlying functions.
 \details{
 The Lorenz curve is a continuous piecewise linear function
 representing the distribution of income or wealth.
-Cumulative portion of the population: p_i = i / n (i=1,...,n), vs.
-cumulative portion of wealth: L_i = sum_{j=1}^{i} x_j / sum_{j=1}^{n} x_j,
+Cumulative portion of the population: p_i = i / m (i=1,...,m), vs.
+cumulative portion of wealth:
+L_i = sum_{j=1}^{i} x_j * n_j / sum_{j=1}^{n} x_j * n_j.
 where x_i are indexed in non-decreasing order (x_i <= x_{i+1}).
 By convention, p_0 = L_0 = 0.
-
-When \code{n} is provided as unequal frequencies, cumulative wealth
-is defined as L = x * n.
+\code{n} can represent unequal frequencies.
 
 The following charactersitics of the Lorenz curve are calculated:
 \code{"t"}: index where tangent (slope 1) touches the curve;
@@ -91,15 +90,15 @@ The following charactersitics of the Lorenz curve are calculated:
 index t, x(t) is the unmodified input.
 \code{"S"}: Lorenz asymmetry coefficient (S = p(t) + L(t)),
 S = 1 indicates symmetry.
-\code{"G"}: Gini coefficient. 0 is perfect equality,
+\code{"G"}: Gini coefficient, 0 is perfect equality,
   values close to 1 indicate high inequality.
 \code{"J"}: Youden index is the (largest) distance between the anti-diagonal
-and the curve. Distance is largest at the tangent point
-(J = max(p(t) - L(t))).
+and the curve, distance is largest at the tangent point
+(J = max(p - L) = p(t) - L(t)).
 }
 \value{
-\code{lorenz} returns an object of class lorenz. It is a matrix with n+1 rows
-(n = \code{length(x)}) and 3 columns (p, L, x).
+\code{lorenz} returns an object of class lorenz. It is a matrix with m+1 rows
+(m = \code{length(x)}) and 3 columns (p, L, x).
 
 The \code{quantile} method finds values of x_i corresponding to
 quantiles L_i or p_i (depending on the \code{type} argument).

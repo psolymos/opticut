@@ -2,38 +2,38 @@
 \alias{birdrec}
 \docType{data}
 \title{
-Bird species detections
+Bird Species Detections
 }
 \description{
-Data set listing 156 species (birds, amphibians, mammals) detected
+Data set listing 156 species (mostly birds, few amphibians and mammals) detected
 at 127 sites (367 point locations) in Alberta, Canada in 2015,
 using autonomous reconding technology (ARU; Wildlife Acoustic Song Meter)
 for sound recodings.
 }
 \usage{data("birdrec")}
 \format{
-A list with 2 elements:
-\code{y} is a sample x species matrix with number of detections,
-\code{x} is a data frame with sample level attributes.
-Rows in the 2 elements match.
+A list with 3 elements with matching ordering:
+\code{xtab} is a sample x species matrix with number of detections,
+\code{samp} is a data frame with sample level attributes.
+\code{taxa} is a data frame with species level attributes.
 
 Multiple random recordings at each location were selected
 according to a stratified random design
-(based on combination of combination of \code{TOY} and \code{TOD}).
+(based on combination of \code{TOY} and \code{TOD}).
 These recordings were listened to by trained analysts
 and species were identified based on auditory cues.
 
 This data set lists detections from the first 1-minute segment of each
 recording. Dates for the 3967 1-minute segments
 range between 2015-03-31 and 2015-07-29.
-Variables in \code{birdrec$x} are the following:
+Variables in \code{birdrec$samp} are the following:
 
 \code{PKEY}: primary key for location/time combinations.
 
 \code{POINT}: unique spatial location IDs, each point had
 its own ARU unit.
 
-\code{SITE}: site ID (1-4 ARU units per site).
+\code{SITE}: site ID (1-4 ARU units deployed per site).
 
 \code{YEAR}: year, 2015.
 
@@ -71,10 +71,14 @@ missing microphones can occur causing excess static or dead channels.
 
 \code{TOY}: time of year intervals used for stratified random
 selection of dates. 8 intervals divied into 3 major units
-(early, mid, and late breeding season).
+(early, mid, and late breeding season; \code{YDAY} 140 and 180 were used
+as threshold between the major units).
 
 \code{TOD}: time of day, midnight (\code{HOUR} = 0) or
 morning (\code{HOUR} > 0).
+
+Variables in \code{birdrec$taxa} are the following:
+FIXME
 
 Methodology and metadata is described in ABMI (2016), and Lankau et al. (2015).
 }
@@ -99,5 +103,7 @@ aggregate(rowSums(birdrec$y),
     list(TOY=birdrec$x$TOY, TOD=birdrec$x$TOD), mean)
 boxplot(rowSums(birdrec$y) ~ TOD + TOY, birdrec$x,
     col=c("gold", "tomato"), ylab="# detections")
+
+#FIXME -- add more stuff here
 }
 \keyword{datasets}

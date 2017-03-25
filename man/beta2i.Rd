@@ -1,10 +1,10 @@
 \name{beta2i}
 \alias{beta2i}
 \title{
-Indicator values
+Scaling for the Indicator Potential
 }
 \description{
-Transformation of estimated coefficients to indicator values.
+Transformation of estimated contrasts to indicator potential.
 }
 \usage{
 beta2i(x, scale = 1)
@@ -24,7 +24,8 @@ Returns a numeric vector (I = abs(tanh(x * scale))).
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{opticut}} used the scaled I values as indicator values.
+\code{\link{opticut}} and \code{\link{multicut}}
+use the scaled I values as indicator potential.
 
 \code{\link{ocoptions}} for setting value for the default scaling factor.
 }
