@@ -195,11 +195,6 @@ to predict for, or \code{NULL}.
 other arguments passed to the underlying functions.
 }
 }
-\details{
-FIXME
-
-add Lc approach and how I is calculated
-}
 \section{Warning}{
 The use of the \code{multicut1} function is generally discouraged:
 some of the internal checks are not guaranteed to
@@ -230,6 +225,12 @@ as factor.
 
 The \code{print} and \code{summary} methods are called for their side effects
 showing expected values, and log likelihood ratio (logLR).
+Optimal binary partitions are determined as part of the
+summary based on Lorenz-tangent based thresholding,
+which requires nonnegative expected values.
+Indicator potential (I) is based on largest the
+contrast (difference) between the minimum and maximum
+estimates on the linear predictor (link) scale.
 
 The \code{subset} method subsets the species in the multicut object.
 
