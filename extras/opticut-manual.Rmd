@@ -1,5 +1,5 @@
 ---
-title: 'opticut: likelihood-based optimal partitioning for indicator species analysis (supporting information)'
+title: 'opticut: likelihood-based optimal partitioning and indicator species analysis (supporting information)'
 author: "Peter Solymos and Ermias T. Azeria"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -121,7 +121,6 @@ Currently available distributions:
 * `"zip"`, `"zip2"`: zero-inflated Poisson counts (partitioning in count model:
   `"zip"`, or in zero model: `"zip2"`);
 * `"zinb"`, `"zinb2"`: zero-inflated Negative Binomial counts (partitioning in count model: `"zinb"`, or in zero model: `"zinb2"`);
-* `"ordered"`: response measured on ordinal scale, e.g. ordinal vegetation cover (only available for single species because ordinal levels often do not match across different species thus leading to different intercept terms);
 * `"rsf"`, `"rspf"`: presence-only data using resource selection and resource selection probability functions (only available for single species because used distribution is unique for all species thus multiple species cannot be combined in a single input matrix).
 
 Other distributions can be specified by user-defined functions as explained later in the manual.
@@ -553,7 +552,7 @@ with(ucdol$uncertainty[["pvic"]],
     boxplot(I ~ best, col="gold", ylab="Indicator value"))
 ```
 
-## Percent cover data: Binomial, Beta distribution, and ordinal
+## Percent cover data: Binomial and Beta distribution
 
 The data we are using is from the **rioja** package (Juggins 2015)
 is pollen stratigraphic data from Abernethy Forest, Scotland, spanning approximately 5500--12100 BP (from Birks & Mathews 1978).
@@ -639,16 +638,6 @@ sveg[sveg==8] <- 0.8
 table(sveg)
 o2 <- opticut(sveg ~ 1, strata=elev, dist="beta")
 plot(o2, sort=1, mar=c(4,6,2,2), cex.axis=0.6, ylab="")
-```
-
-Finally, here is how an ordered logistic model can be fit to a single species.
-Note that number of ordered categories and baseline levels might change from one species to the other, therefore this distribution is not available for multiple species.
-
-```{r}
-Y <- shoshveg$ASTMIS
-table(Y)
-o4 <- opticut(Y ~ 1, strata=elev, dist="ordered")
-o4$species
 ```
 
 
