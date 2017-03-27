@@ -1,6 +1,9 @@
 ## Y is abundance vector
 ## X is model matrix for nuisance variables
-## Z is design matrix for binary splits or a factor (using rankComb)
+## Z is factor
+##
+## does not store .lc_cut1 output because it might fail
+## leva that for downstream functions but store ingredients
 multicut1 <-
 function(Y, X, Z, dist="gaussian", sset=NULL, ...)
 {
@@ -16,6 +19,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         X <- X[sset,,drop=FALSE]
         Z <- Z[sset]
     }
+    n <- table(Z)
     Z0 <- model.matrix(~Z)
     res0 <- .opticut1(Y, X, Z1=NULL,
         linkinv=TRUE, dist=dist, ...)
@@ -33,6 +37,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         #I=max(mulink)-min(mulink),
         I=beta2i(max(mulink) - min(mulink), scale=scale),
         coefficients=cf,
+        n=n,
         logL=res$logLik,
         logLR=res$logLik-res0$logLik)
     attr(out, "scale") <- scale
