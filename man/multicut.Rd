@@ -8,6 +8,8 @@
 \alias{bestmodel.multicut}
 \alias{fitted.multicut}
 \alias{predict.multicut}
+\alias{lcplot}
+\alias{lcplot.multicut1}
 \alias{plot.multicut}
 \alias{strata.multicut}
 \alias{print.multicut}
@@ -47,6 +49,8 @@ multicut(...)
     show_I = TRUE, show_S = TRUE, hr = TRUE, tick = TRUE,
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
     lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
+lcplot(x, ...)
+\method{lcplot}{multicut}(x, ...)
 
 \method{print}{multicut1}(x, digits, ...)
 \method{print}{multicut}(x, digits, ...)
@@ -236,6 +240,9 @@ The \code{subset} method subsets the species in the multicut object.
 
 The \code{plot} method presents the estimates by species and strata.
 
+The \code{lcplot} method plots the Lorenz curve for a single
+species 'multicut' object.
+
 \code{\link{bestpart}} returns a matrix with the best supported
 partitions for each species (samples and rows, species as columns).
 Binary partitions are based on Lorenz-tangent based optimal threshold
@@ -319,7 +326,8 @@ Y3 <- rbinom(n, 1, p3)
 Y <- cbind(SPP1=Y1, SPP2=Y2, SPP3=Y3)
 X <- model.matrix(~x2)
 
-multicut1(Y1, X, as.factor(x0), dist="binomial")
+(m0 <- multicut1(Y1, X, as.factor(x0), dist="binomial"))
+lcplot(m0)
 
 summary(m1 <- multicut(Y ~ x2, strata=x0, dist="poisson"))
 plot(m1)

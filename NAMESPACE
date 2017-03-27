@@ -4,7 +4,7 @@ export("opticut", "optilevels", "opticut1", "multicut1", "multicut",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "getMLE",
     "uncertainty", "bsmooth",
-    "wplot",
+    "wplot", "lcplot",
     "fix_levels", "strata", "check_strata", "beta2i",
     "iquantile")
 
@@ -43,6 +43,7 @@ S3method("plot", "multicut")
 S3method("plot", "lorenz")
 S3method("wplot", "opticut")
 S3method("wplot", "opticut1")
+S3method("lcplot", "multicut1")
 
 S3method("print", "opticut")
 S3method("print", "multicut")
