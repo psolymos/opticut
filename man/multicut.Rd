@@ -50,7 +50,9 @@ multicut(...)
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
     lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
 lcplot(x, ...)
-\method{lcplot}{multicut1}(x, ...)
+\method{lcplot}{multicut1}(x,
+    ylab="Cumulative abundance", xlab="Strata",
+    bty = "o", theme, ...)
 
 \method{print}{multicut1}(x, digits, ...)
 \method{print}{multicut}(x, digits, ...)

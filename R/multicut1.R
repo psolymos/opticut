@@ -20,6 +20,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
         Z <- Z[sset]
     }
     n <- table(Z)
+    n <- structure(as.numeric(n), names=names(n))
     Z0 <- model.matrix(~Z)
     res0 <- .opticut1(Y, X, Z1=NULL,
         linkinv=TRUE, dist=dist, ...)
