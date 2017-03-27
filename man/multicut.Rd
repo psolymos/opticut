@@ -11,6 +11,7 @@
 \alias{lcplot}
 \alias{lcplot.multicut1}
 \alias{plot.multicut}
+\alias{plot.multicut1}
 \alias{strata.multicut}
 \alias{print.multicut}
 \alias{print.multicut1}
@@ -49,6 +50,8 @@ multicut(...)
     show_I = TRUE, show_S = TRUE, hr = TRUE, tick = TRUE,
     theme, mar = c(5, 4, 4, 4) + 0.1, bty = "o",
     lower = 0, upper = 1, pos = 0, horizontal=TRUE, ...)
+\method{plot}{multicut1}(x,
+    ylab = "Relative abundance", xlab = "Strata", ...)
 lcplot(x, ...)
 \method{lcplot}{multicut1}(x,
     ylab="Cumulative abundance", xlab="Strata",
@@ -241,9 +244,8 @@ estimates on the linear predictor (link) scale.
 The \code{subset} method subsets the species in the multicut object.
 
 The \code{plot} method presents the estimates by species and strata.
-
 The \code{lcplot} method plots the Lorenz curve for a single
-species 'multicut' object.
+species 'multicut1' object.
 
 \code{\link{bestpart}} returns a matrix with the best supported
 partitions for each species (samples and rows, species as columns).
