@@ -105,5 +105,28 @@ aggregate(rowSums(birdrec$xtab),
     list(TOY=birdrec$samp$TOY, TOD=birdrec$samp$TOD), mean)
 boxplot(rowSums(birdrec$xtab) ~ TOD + TOY, birdrec$samp,
     col=c("gold", "tomato"), ylab="# detections")
+
+\dontrun{
+y <- ifelse(birdrec$xtab > 0, 1, 0)
+g <- paste0(gsub("[[:digit:]]", "", as.character(birdrec$samp$TOY)),
+    substr(as.character(birdrec$samp$TOD), 1, 4))
+g <- factor(g, levels=c("EarlyMorn", "MidMorn", "LateMorn",
+    "EarlyMidn", "MidMidn", "LateMidn"))
+## binary response model
+oc <- opticut(y ~ 1, strata=g, dist="binomial")
+## multi-level response model
+mc <- multicut(y ~ 1, strata=g, dist="binomial")
+
+## testing equality of labels
+splito <- as.character(summary(oc)$summary$split)
+splitm <- as.character(summary(mc)$summary$split)
+table(splito == splitm)
+## seeing how much those differ
+bpo <- summary(oc)$bestpart
+bpm <- summary(mc)$bestpart
+rs <- rowSums(abs(bpo-bpm))
+table(rs)
+10 * bpo[rs > 0,] + bpm[rs > 0,]
+}
 }
 \keyword{datasets}
