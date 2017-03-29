@@ -5,5 +5,5 @@
         mu <- mu + abs(min(mu))
     if (any(mu < 0))
         stop("Negative fitted values found.")
-    bp <- apply(mu, 2, .lc_cut1, n=n, fix_fitted=FALSE)
+    bp <- apply(mu, 2, .lc_cut1, n=n, fix_fitted=FALSE, bp_only=TRUE)
 }

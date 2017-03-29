@@ -4,8 +4,9 @@ ylab="Cumulative abundance", xlab="Strata",
 bty="o", theme, ...)
 {
     N <- length(x$mu)
-    l <- lorenz(x$mu, x$n)
-    bp <- .lc_cut1(x$mu, x$n, fix_fitted=getOption("ocoptions")$fix_fitted)
+    l <- .lc_cut1(x$mu, x$n,
+        fix_fitted=getOption("ocoptions")$fix_fitted, bp_only=FALSE)
+    bp <- attr(l, "bp")
     bp <- bp[match(rownames(l), names(bp))]
     bp[1] <- 0
     names(bp)[1] <- ""
