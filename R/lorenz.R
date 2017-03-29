@@ -36,9 +36,9 @@ function(x, n = rep(1, length(x)), na.last=TRUE)
     ## Youden index
     attr(out, "summary") <- c(
         "t" = unname(m1),
-        "x(t)" = unname(xo0[m1 - 1L]),
-        "p(t)" = unname(p[m1]),
-        "L(t)" = unname(L[m1]),
+        "x[t]" = unname(xo0[m1 - 1L]),
+        "p[t]" = unname(p[m1]),
+        "L[t]" = unname(L[m1]),
         "G" = G,
         "S" = unname(L[m1] + p[m1]),
         "J" = max(J))

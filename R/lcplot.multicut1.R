@@ -16,7 +16,7 @@ bty="o", theme, ...)
     plot(l, type="L", axes=FALSE, ann=FALSE, ...)
     #plot(l, type="L", axes=FALSE, ann=FALSE)
     att <- attr(l, "summary")
-    abline(v=att["p(t)"], h=att["L(t)"], col="grey", lwd=0.5, lty=2)
+    abline(v=att["p[t]"], h=att["L[t]"], col="grey", lwd=0.5, lty=2)
     abline(0, 1, col="grey", lwd=0.5)
     for (i in seq_len(N)) {
         polygon(l[c(i, i+1, i+1, i), "p"],

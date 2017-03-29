@@ -86,8 +86,8 @@ By convention, p_0 = L_0 = 0.
 
 The following charactersitics of the Lorenz curve are calculated:
 \code{"t"}: index where tangent (slope 1) touches the curve;
-\code{"x(t)"}, \code{"p(t)"}, and \code{"L(t)"} are values corresponding to
-index t, x(t) is the unmodified input.
+\code{"x[t]"}, \code{"p[t]"}, and \code{"L[t]"} are values corresponding to
+index t, x_t is the unmodified input.
 \code{"S"}: Lorenz asymmetry coefficient (S = p_t + L_t),
 S = 1 indicates symmetry.
 \code{"G"}: Gini coefficient, 0 is perfect equality,
@@ -167,7 +167,7 @@ mu <- aggregate(x, list(g), mean)
 
 plot(l)
 abline(0, 1, lty=2)
-lines(rep(s["p(t)"], 2), c(s["p(t)"], s["L(t)"]), col=2)
+lines(rep(s["p[t]"], 2), c(s["p[t]"], s["L[t]"]), col=2)
 }
 \keyword{ manip }
 \keyword{ misc }
