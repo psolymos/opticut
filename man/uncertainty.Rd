@@ -147,7 +147,7 @@ for further diagnostics.
 The summary method prints the name of the best supported split,
 selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
-reliability) and conficence interval for I (based on \code{level}).
+reliability) and confidence interval for I (based on \code{level}).
 
 The \code{subset} method subsets the species in the uncertainty object.
 

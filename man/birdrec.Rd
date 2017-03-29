@@ -59,7 +59,7 @@ missing microphones can occur causing excess static or dead channels.
 0 = no microphone related issues;
 1 = left microphone cuts out intermittently;
 2 = right microphone cuts out intermittently;
-3 = both microphones cut out intermittently ;
+3 = both microphones cut out intermittently;
 4 = left channel failed;
 5 = right channel failed;
 6 = both channels failed (no cases in the data set);

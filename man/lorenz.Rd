@@ -76,9 +76,9 @@ other arguments passed to the underlying functions.
 }
 \details{
 The Lorenz curve is a continuous piecewise linear function
-representing the distribution of income or wealth.
+representing the distribution of abundance (income, or wealth).
 Cumulative portion of the population: p_i = i / m (i=1,...,m), vs.
-cumulative portion of wealth:
+cumulative portion of abundance:
 L_i = sum_{j=1}^{i} x_j * n_j / sum_{j=1}^{n} x_j * n_j.
 where x_i are indexed in non-decreasing order (x_i <= x_{i+1}).
 By convention, p_0 = L_0 = 0.
@@ -88,13 +88,13 @@ The following charactersitics of the Lorenz curve are calculated:
 \code{"t"}: index where tangent (slope 1) touches the curve;
 \code{"x(t)"}, \code{"p(t)"}, and \code{"L(t)"} are values corresponding to
 index t, x(t) is the unmodified input.
-\code{"S"}: Lorenz asymmetry coefficient (S = p(t) + L(t)),
+\code{"S"}: Lorenz asymmetry coefficient (S = p_t + L_t),
 S = 1 indicates symmetry.
 \code{"G"}: Gini coefficient, 0 is perfect equality,
   values close to 1 indicate high inequality.
 \code{"J"}: Youden index is the (largest) distance between the anti-diagonal
 and the curve, distance is largest at the tangent point
-(J = max(p - L) = p(t) - L(t)).
+(J = max(p - L) = p_t - L_t).
 }
 \value{
 \code{lorenz} returns an object of class lorenz. It is a matrix with m+1 rows

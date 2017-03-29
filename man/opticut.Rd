@@ -26,9 +26,10 @@
 Optimal Binary Response Model
 }
 \description{
-The functions find the best binary partition for each species based on
-model selection. Possibly controlling for modifying/confounding
-variables. The general algorithm is described in Kemencei et al. 2014.
+The functions fits the multi-level response model for each species
+by finding the best binary partition based on model selection.
+Possibly controlling for modifying/confounding variables.
+The general algorithm is described in Kemencei et al. 2014.
 }
 \usage{
 opticut1(Y, X, Z, dist = "gaussian", sset=NULL, ...)

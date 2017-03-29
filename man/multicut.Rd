@@ -87,8 +87,8 @@ in the model. If not found in data, the variables are taken from
 \code{parent.frame()}, typically the environment
 from which \code{multicut} is called.
 }
-  \item{strata}{
-a factor, unique values define partitions
+  \item{strata, Z}{
+a factor, unique values define strata
 (must have at least 2 unique levels, empty levels are dropped).
 }
   \item{dist}{
@@ -112,11 +112,8 @@ numeric vector of observations for \code{multicut1},
 vector or community matrix for \code{multicut.default}.
 }
   \item{X}{
-numeric, design matrix. Can be missing, in which case an intercept-only model
-is assumed.
-}
-  \item{Z}{
-factor (must have at least 2 unique levels).
+numeric, design matrix for possible confounding/modifier variables.
+Can be missing, in which case an intercept-only model is assumed.
 }
   \item{x, object}{
 object to plot, print, summarize.

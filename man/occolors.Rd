@@ -57,6 +57,9 @@ Peter Solymos <solymos@ualberta.ca>
 
 Hexadecimal values for the built-in palettes are taken from
 \url{http://colorbrewer2.org/}.
+
+Converting color to grayscale:
+\url{https://en.wikipedia.org/wiki/Grayscale}
 }
 \seealso{
 \code{\link{colorRampPalette}} for a general description of palettes.
