@@ -15,8 +15,7 @@ function (object, gnew=NULL, xnew=NULL, ...)
             model.matrix(ff, xnew) else data.matrix(xnew)
         Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L]
         Link <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][2L]
-        linkinv <- .opticut1(object$Y[,1L], X=object$X, Z1=NULL,
-            dist=object$dist)$linkinv
+        linkinv <- .get_linkinv(object)
         g <- factor(gnew, levels(object$strata))
         if (any(is.na(X)) || any(is.na(g)))
             stop("new data must not have any NA")

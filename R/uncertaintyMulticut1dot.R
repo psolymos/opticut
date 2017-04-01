@@ -12,11 +12,7 @@ type=c("asymp", "boot"), B=99, pb=FALSE, ...)
         stop("specify which argument")
     if (!length(which))
         stop("which argument must have length 1")
-    linkinv <- .opticut1(
-        Y=object$Y[,1L],
-        X=object$X,
-        Z1=NULL,
-        dist=object$dist, ...)$linkinv
+    linkinv <- .get_linkinv(object, ...)
     scale <- object$scale
     obj <- object$species[[which]]
     n <- nobs(object)
