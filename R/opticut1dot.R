@@ -8,6 +8,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
 {
     if (missing(linkinv))
         linkinv <- is.null(Z1)
+    if (missing(X))
+        X <- matrix(1, NROW(Y), 1L)
     if (is.null(Z1)) {
         XX <- as.data.frame(X)
     } else {
