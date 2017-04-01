@@ -1,5 +1,5 @@
 .lc_cut1 <- function(x, n, fix_fitted=FALSE, bp_only=TRUE) {
-    if (fix_fitted)
+    if (fix_fitted && any(x < 0))
         x <- x + abs(min(x))
     if (any(x < 0))
         stop("Negative fitted values found.")
