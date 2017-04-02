@@ -3,10 +3,12 @@ function(x,
 ylab="Cumulative abundance", xlab="Strata",
 bty="o", theme, ...)
 {
-    N <- length(x$mu)
-    l <- .lc_cut1(x$mu, x$n,
-        fix_fitted=getOption("ocoptions")$fix_fitted, bp_only=FALSE)
-    bp <- attr(l, "bp")
+    K <- length(x$mu)
+    l <- lorenz(x$mu, x$n)
+#    l <- .lc_cut1(x$mu, x$n,
+#        fix_fitted=getOption("ocoptions")$fix_fitted, bp_only=FALSE)
+#    bp <- attr(l, "bp")
+    bp <- x$bestpart
     bp <- bp[match(rownames(l), names(bp))]
     bp[1] <- 0
     names(bp)[1] <- ""
@@ -19,7 +21,7 @@ bty="o", theme, ...)
     att <- attr(l, "summary")
     abline(v=att["p[t]"], h=att["L[t]"], col="grey", lwd=0.5, lty=2)
     abline(0, 1, col="grey", lwd=0.5)
-    for (i in seq_len(N)) {
+    for (i in seq_len(K)) {
         polygon(l[c(i, i+1, i+1, i), "p"],
             c(l[c(i, i+1), "L"], c(-1, -1)),
             col=COL[ColID[i+1]], border="white", lwd=0.5)
