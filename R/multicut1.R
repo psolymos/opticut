@@ -34,7 +34,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     l <- lorenz(mufix, n)
     bp <- structure(numeric(K), names=names(mu))
     bp[rownames(l)[-seq_len(which.max(l[,"p"] - l[,"L"]))]] <- 1
-    bpvec <-
+    bpvec <- bp[as.integer(Z)]
     resbp <- .opticut1(Y, X, Z1=bpvec,
         linkinv=TRUE, dist=dist, ...)
     cfbp <- resbp$coef
