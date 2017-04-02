@@ -28,6 +28,7 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     mu <- res$linkinv(gamma)
     names(mu) <- levels(Z)
     K <- nlevels(Z)
+    fix_fitted <- getOption("ocoptions")$fix_fitted
     mufix <- if (fix_fitted && any(mu < 0))
         mu + abs(min(mu)) else mu
     l <- lorenz(mufix, n)
