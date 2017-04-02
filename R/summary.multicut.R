@@ -1,7 +1,6 @@
 summary.multicut <-
 function(object, ...)
 {
-    #bp <- .lc_cut(object, fix_fitted=getOption("ocoptions")$fix_fitted)
     bp <- sapply(object$species, "[[", "bestpart")
     lab1 <- character(ncol(bp))
     lab0 <- character(ncol(bp))

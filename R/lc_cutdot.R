@@ -1,15 +1,10 @@
-.lc_cut <- function(object, fix_fitted=FALSE) {
-    n <- table(strata(object))
-    mu <- sapply(object$species, "[[", "mu")
-    if (fix_fitted && any(mu < 0))
-        mu <- mu + abs(min(mu))
-    if (any(mu < 0))
+.lc_cut <- function(x, n, fix_fitted=FALSE) {
+    if (fix_fitted && any(x < 0))
+        x <- x + abs(min(x))
+    if (any(x < 0))
         stop("Negative fitted values found.")
-    #linkinv <- .get_linkinv(object)
-    #lc <- lapply(seq_len(ncol(mu)), function(i)
-    #    .lc_cut1(mu[,i], n=n, fix_fitted=FALSE, bp_only=FALSE))
-    #muinv <- linkinv(sapply(lc, attr, "mu"))
-    #bp <- sapply(lc, attr, "bp")
-    #colnames(bp) <- colnames(mu)
-    bp <- apply(mu, 2, .lc_cut1, n=n, fix_fitted=FALSE, bp_only=TRUE)
+    l <- lorenz(x, n)
+    bp <- structure(numeric(length(x)), names=names(x))
+    bp[rownames(l)[-seq_len(which.max(l[,"p"] - l[,"L"]))]] <- 1
+    bp
 }

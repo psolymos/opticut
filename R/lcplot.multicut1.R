@@ -5,9 +5,6 @@ bty="o", theme, ...)
 {
     K <- length(x$mu)
     l <- lorenz(x$mu, x$n)
-#    l <- .lc_cut1(x$mu, x$n,
-#        fix_fitted=getOption("ocoptions")$fix_fitted, bp_only=FALSE)
-#    bp <- attr(l, "bp")
     bp <- x$bestpart
     bp <- bp[match(rownames(l), names(bp))]
     bp[1] <- 0
