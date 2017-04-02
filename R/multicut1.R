@@ -35,22 +35,22 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
     bp <- structure(numeric(K), names=names(mu))
     bp[rownames(l)[-seq_len(which.max(l[,"p"] - l[,"L"]))]] <- 1
     bpvec <- bp[as.integer(Z)]
-    resbp <- .opticut1(Y, X, Z1=bpvec,
-        linkinv=TRUE, dist=dist, ...)
-    cfbp <- resbp$coef
+#    resbp <- .opticut1(Y, X, Z1=bpvec,
+#        linkinv=TRUE, dist=dist, ...)
+#    cfbp <- resbp$coef
     ll <- res$logLik
     scale <- getOption("ocoptions")$scale
     out <- list(
         null=res0$linkinv(res0$coef[1L]),
         mu=mu,
         bestpart=bp,
-        beta0=cfbp[,1L],
-        beta1=cfbp[,2L],
+#        beta0=cfbp[,1L],
+#        beta1=cfbp[,2L],
 #        gamma0=cfbp[,1L],
 #        gamma1=cfbp[,1L] + cfbp[,2L],
-        I=beta2i(cfbp[,2L], scale=scale),
+#        I=beta2i(cfbp[,2L], scale=scale),
         #I=max(mulink)-min(mulink),
-        #I=beta2i(max(mulink) - min(mulink), scale=scale),
+        I=beta2i(max(gamma) - min(gamma), scale=scale),
         coefficients=cf,
         n=n,
         logL=res$logLik,
