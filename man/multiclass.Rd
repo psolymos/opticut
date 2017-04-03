@@ -5,6 +5,7 @@
 \alias{untable}
 \alias{etable}
 \alias{rtable}
+\alias{kappa}
 \title{
 Multiclass Measures and Support Functions
 }
@@ -20,6 +21,7 @@ multiclass(x, y=NULL, beta=1)
 
 etable(table, type="cohen", w=NULL)
 rtable(n, table, type=c("r", "rc"))
+kappa(predicted, reference)
 }
 \arguments{
   \item{x}{
@@ -43,6 +45,8 @@ n
   \item{w}{
 w
 }
+    \item{predicted, reference}{
+predicted, reference
 }
 \details{
 DETAILS
@@ -67,10 +71,17 @@ y <- x
 for (i in 1:length(x))
     if (runif(1) > 0.1) # error rate
         y[i] <- sample(LETTERS[1:K], 1)
+## contingency table (K x K)
 (ct <- ctable(x, y))
+## binary contingency tables (2 x 2) by levels
+## tp/fp: true/false positives, tn/fn: true/false negatives
 (cm <- btable(ct))
+## reconstructing the input vectors
 untable(ct)
 stopifnot(all(ctable(untable(ct)$x, untable(ct)$y) == ctable(x, y)))
+## multiclass measures
 (x <- multiclass(x, y))
+
+## here comes etable rtable and more?
 }
 \keyword{ utilities }
