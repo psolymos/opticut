@@ -1,5 +1,10 @@
 \name{multiclass}
 \alias{multiclass}
+\alias{ctable}
+\alias{btable}
+\alias{untable}
+\alias{etable}
+\alias{rtable}
 \title{
 Multiclass Measures and Support Functions
 }
@@ -60,7 +65,7 @@ K <- 5
 x <- sample(LETTERS[1:K], N, replace=TRUE, prob=sqrt(2^(0:(K-1))))
 y <- x
 for (i in 1:length(x))
-    if (runif(1) > 0.1)
+    if (runif(1) > 0.1) # error rate
         y[i] <- sample(LETTERS[1:K], 1)
 (ct <- ctable(x, y))
 (cm <- btable(ct))
