@@ -1,12 +1,12 @@
 rtable <-
-function(n, table, type=c("r", "rc"))
+function(n, table, method=c("r", "rc"))
 {
-    type <- match.arg(type)
-    if (type == "rc") {
+    method <- match.arg(method)
+    if (method == "rc") {
         out <- array(unlist(r2dtable(n, rowSums(table), colSums(table))),
             c(dim(table), n))
     }
-    if (type == "r") {
+    if (method == "r") {
         r <- rowSums(table)
         K <- length(r)
         f <- function() {

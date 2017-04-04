@@ -6,6 +6,7 @@
 \alias{etable}
 \alias{rtable}
 \alias{kappa}
+\alias{test_table}
 \title{
 Multiclass Measures and Support Functions
 }
@@ -20,8 +21,10 @@ untable(table)
 multiclass(x, y=NULL, beta=1)
 
 etable(table, type="cohen", w=NULL)
-rtable(n, table, type=c("r", "rc"))
+rtable(n, table, method=c("r", "rc"))
 kappa(predicted, reference)
+test_table(table, FUN=kappa, n=0,
+    type="cohen", method="r", w=NULL, ...)
 }
 \arguments{
   \item{x}{
@@ -38,6 +41,9 @@ beta
 }
   \item{type}{
 type
+}
+  \item{method}{
+method
 }
   \item{n}{
 n
