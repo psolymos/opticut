@@ -54,6 +54,7 @@ w
     \item{predicted, reference}{
 predicted, reference
 }
+}
 \details{
 DETAILS
 }
