@@ -5,7 +5,7 @@
 \alias{untable}
 \alias{etable}
 \alias{rtable}
-\alias{kappa}
+\alias{kappacoef}
 \alias{test_table}
 \title{
 Multiclass Measures and Support Functions
@@ -22,8 +22,8 @@ multiclass(x, y=NULL, beta=1)
 
 etable(table, type="cohen", w=NULL)
 rtable(n, table, method=c("r", "rc"))
-kappa(predicted, reference)
-test_table(table, FUN=kappa, n=0,
+kappacoef(predicted, reference)
+test_table(table, FUN=kappacoef, n=0,
     type="cohen", method="r", w=NULL, ...)
 }
 \arguments{
@@ -88,7 +88,14 @@ untable(ct)
 stopifnot(all(ctable(untable(ct)$x, untable(ct)$y) == ctable(x, y)))
 ## multiclass measures
 (x <- multiclass(x, y))
-
-## here comes etable rtable and more?
+## expected table with same row and col margins
+etable(ct, type="cohen")
+## single random table based on expected
+rtable(1, ct, method="rc")
+## compare ct against expected using kappacoef
+test_table(ct, FUN=kappacoef, n=0, type="cohen", method="rc")
+## compare ct against random distribution
+tt <- test_table(ct, FUN=kappacoef, n=99, type="cohen", method="rc")
+summary(t(tt))
 }
 \keyword{ utilities }

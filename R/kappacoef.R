@@ -1,4 +1,4 @@
-kappa <-
+kappacoef <-
 function(predicted, reference)
 {
     a <- sum(diag(predicted)) / sum(predicted)
