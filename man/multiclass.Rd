@@ -54,6 +54,9 @@ w
     \item{predicted, reference}{
 predicted, reference
 }
+  \item{FUN}{
+FUN
+}
 }
 \details{
 DETAILS

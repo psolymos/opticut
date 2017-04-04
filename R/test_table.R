@@ -1,5 +1,5 @@
 test_table <-
-function(table, FUN=kappa, n=0, type="cohen", method="r", w=NULL, ...)
+function(table, FUN=kappacoef, n=0, type="cohen", method="r", w=NULL, ...)
 {
     ref <- etable(table, type=type, w=w)
     D <- c(dim(table), n+1)
