@@ -57,6 +57,9 @@ predicted, reference
   \item{FUN}{
 FUN
 }
+  \item{\dots}{
+other arguments passed to the \code{FUN}.
+}
 }
 \details{
 DETAILS
