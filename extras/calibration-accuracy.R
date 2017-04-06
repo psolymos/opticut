@@ -58,53 +58,70 @@ ip4 <- ipredict(o, ynew, xnew=NULL, method="mcmc", n.iter=1000)
 
 ## LOO
 
-loo <- function (object, ...)
-    UseMethod("loo")
+loso <- function (object, ...)
+    UseMethod("loso")
+loto <- function (object, ...)
+    UseMethod("loto")
+lotso <- function (object, ...)
+    UseMethod("lotso")
 
-loo.opticut <- function(object, refit=TRUE,
-method=c("analytic", "mcmc"), cl=NULL, ...)
+loso.opticut <- function(object, refit=TRUE,
+verbose=1, cl=NULL, ...)
 {
-    g0 <- strata(object)
-    gp <- g0
+    gp <- strata(object)
     gp[] <- NA
     Y0 <- object$Y
     X0 <- object$X
     #if (ncol(X0) < 2L)
     #    X0 <- NULL
-    N0 <- nobs(object)
     N <- nobs(object)
     ivec <- seq_len(N)
-    if (refit) {
-        for (i in ivec) {
-            o <- opticut(Y=Y0, X=X0, strata=g0,
-                dist=object$dist, comb=object$comb, cl=cl,
-                sset=which(ivec != i))
-            Ynew <- Y0[ivec == i,,drop=FALSE]
-            Xnew <- X0[ivec == i,,drop=FALSE]
-            if (ncol(X0) < 2L)
-                Xnew <- NULL
-            ip <- ipredict.opticut(o, ynew=Ynew, xnew=Xnew,
-                method=method, cl=cl, ...)
-            gp[i] <- ip$gnew
+    pbo <- pboptions(type="none")
+    on.exit(pboptions(pbo))
+    for (i in ivec) {
+        if (verbose > 0) {
+            cat("LOO step", i, "of", N, "\n")
+            flush.console()
         }
-    } else {
-        o <- object
-        Ynew <- Y0
-        Xnew <- X0
+        o <- opticut(Y=Y0, X=X0, strata=g0,
+            dist=object$dist, comb=object$comb, cl=cl,
+            sset=which(ivec != i))
+        Ynew <- Y0[ivec == i,,drop=FALSE]
+        Xnew <- X0[ivec == i,,drop=FALSE]
         if (ncol(X0) < 2L)
             Xnew <- NULL
         ip <- ipredict.opticut(o, ynew=Ynew, xnew=Xnew,
-            method=method, cl=cl, ...)
-        gp <- ip$gnew
+            method="analytic", cl=NULL, ...)
+        gp[i] <- ip$gnew
     }
+    ## collect species specific ll values as well
     gp
 }
-## figure out cl, suppress pb, but optionally verbose
+loto.opticut <- function(object, ...)
+{
+    Xnew <- object$X
+    if (ncol(Xnew) < 2L)
+        Xnew <- NULL
+    ip <- ipredict(object, ynew=object$Y, xnew=Xnew,
+        method="analytic", cl=NULL, ...)
+    gp <- ip$gnew
+    ## collect species specific ll values as well
+    ## calculate multiclass stuff in loop by leaving out 1 spp at a time
+    gp
+}
+## lotso needs to replicate loso with subset(object)
+
 z <- loo(object)
-## loso: subset(object) for one less species
-## need to figure out multiclass metrics etc.
-## and object structures
-## !refit means no LOO: is it OK to have the option here?
+## OK - figure out cl, suppress pb, but optionally verbose
+## need to figure out multiclass metrics etc. and object structures
+## OK - should restrict to analytic method
+##      because species contribution is easy to calculate that way
+
+## LOSO: overall accuracy, need to leave a site out and refit
+## LOTO: evaluate taxon contribution to overall accuracy without refit
+## LOTSO: taxon contribution with refit (refit and store spp results
+##        to calculate stuff as in LOTO)
+
 
 
 ## old stuff
