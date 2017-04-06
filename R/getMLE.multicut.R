@@ -34,6 +34,6 @@ function(object, which, vcov=FALSE, ...)
             attr(est, "theta") else m1$theta
     if (Dist == "gaussian")
         attr(est, "sigma") <- if (vcov)
-            attr(est, "sigma") else summary(m1)$sigma
+            summary(m1)$sigma else attr(est, "sigma")
     list(coef=est, vcov=V, dist=dist)
 }
