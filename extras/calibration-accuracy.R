@@ -16,6 +16,7 @@ ynew=spp
 xnew=NULL
 object <- opticut(spp ~ 1, strata=gr, dist="gaussian")
 
+.opticut_dist=opticut:::.opticut_dist
 ip1 <- ipredict(object, ynew, xnew=NULL, method="analytic", cl=NULL)
 ip2 <- ipredict(object, ynew, xnew=NULL, method="mcmc", cl=NULL)
 
@@ -65,37 +66,30 @@ loto <- function (object, ...)
 lotso <- function (object, ...)
     UseMethod("lotso")
 
-loso.opticut <- function(object, refit=TRUE,
-verbose=1, cl=NULL, ...)
+.loso1 <- function(i, object, ...)
 {
-    gp <- strata(object)
-    gp[] <- NA
-    Y0 <- object$Y
-    X0 <- object$X
-    #if (ncol(X0) < 2L)
-    #    X0 <- NULL
-    N <- nobs(object)
-    ivec <- seq_len(N)
     pbo <- pboptions(type="none")
     on.exit(pboptions(pbo))
-    for (i in ivec) {
-        if (verbose > 0) {
-            cat("LOO step", i, "of", N, "\n")
-            flush.console()
-        }
-        o <- opticut(Y=Y0, X=X0, strata=g0,
-            dist=object$dist, comb=object$comb, cl=cl,
-            sset=which(ivec != i))
-        Ynew <- Y0[ivec == i,,drop=FALSE]
-        Xnew <- X0[ivec == i,,drop=FALSE]
-        if (ncol(X0) < 2L)
-            Xnew <- NULL
-        ip <- ipredict.opticut(o, ynew=Ynew, xnew=Xnew,
-            method="analytic", cl=NULL, ...)
-        gp[i] <- ip$gnew
-    }
-    ## collect species specific ll values as well
-    gp
+    ivec <- seq_len(nobs(object))
+    sset <- which(ivec != i)
+    o <- update(object, sset=which(ivec != i))
+    Ynew <- object$Y[ivec == i,,drop=FALSE]
+    Xnew <- object$X[ivec == i,,drop=FALSE]
+    if (ncol(object$X) < 2L)
+        Xnew <- NULL
+    ip <- ipredict(o,
+        ynew=Ynew, xnew=Xnew,
+        method="analytic", cl=NULL, ...)
+}
+
+
+loso.opticut <- function(object, cl=NULL, ...)
+{
+    ivec <- seq_len(nobs(object))
+    iplist <- pblapply(ivec, .loso1, object=object, cl=cl, ...)
+    ## compare gnew to g, accuracy, kappa etc, or just
+    ## same should work for multi/opti
+    NULL
 }
 loto.opticut <- function(object, ...)
 {
@@ -107,6 +101,7 @@ loto.opticut <- function(object, ...)
     gp <- ip$gnew
     ## collect species specific ll values as well
     ## calculate multiclass stuff in loop by leaving out 1 spp at a time
+    ## use kappa to compare -j to full
     gp
 }
 ## lotso needs to replicate loso with subset(object)
