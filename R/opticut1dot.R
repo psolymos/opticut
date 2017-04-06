@@ -37,10 +37,14 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 "gaussian"=gaussian(link),
                 "poisson"=poisson(link),
                 "binomial"=binomial(link))
-            mod <- stats::glm(Y ~ .-1, data=XX, family=Family, ...)
-            cf <- coef(mod)
-            if (dist == "gaussian")
+            if (Family == "gaussian" && link == "identity") {
+                mod <- stats::lm(Y ~ .-1, data=XX, ...)
+                cf <- coef(mod)
                 attr(cf, "sigma") <- summary(mod)$sigma
+            } else {
+                mod <- stats::glm(Y ~ .-1, data=XX, family=Family, ...)
+                cf <- coef(mod)
+            }
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
