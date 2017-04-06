@@ -9,10 +9,16 @@ function (object, gnew=NULL, xnew=NULL, ...)
         if (is.null(xnew)) {
             xnew <- matrix(1, length(gnew), 1L)
         }
-        ff <- formula(object)
-        ff[[2]] <- NULL
-        X <- if (is.data.frame(xnew))
-            model.matrix(ff, xnew) else data.matrix(xnew)
+        ff <- try(formula(object), silent=TRUE)
+        if (!inherits(ff, "try-error")) {
+            ff[[2]] <- NULL
+            X <- if (is.data.frame(xnew))
+                model.matrix(ff, xnew) else data.matrix(xnew)
+        } else {
+            X <- data.matrix(xnew)
+            if (!all(colnames(object$X) == colnames(X)))
+                stop("incorrect xnew")
+        }
         Dist <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][1L]
         Link <- strsplit(object$dist, ":", fixed=TRUE)[[1L]][2L]
         linkinv <- .get_linkinv(object)
