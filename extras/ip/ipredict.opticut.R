@@ -1,8 +1,14 @@
 ipredict.opticut <-
 function(object, ynew, xnew=NULL,
-type=c("analytic", "mcmc"), cl=NULL, ...)
+method=c("analytic", "mcmc"), cl=NULL, ...)
 {
-    type <- match.arg(type)
+    if (is.function(object$dist))
+        stop("inverse prediction not available for custom distribution")
+    dist <- object$dist
+    Dist <- .opticut_dist(dist, make_dist=TRUE)
+    if (!(Dist %in% c("gaussian", "poisson", "binomial")))
+        stop("inverse prediction not available for dist = ", Dist)
+    method <- match.arg(method)
     #ynew <- ynew[,colnames(object$Y),drop=FALSE]
     ## new and missing species treated as 0
     sd1 <- setdiff(colnames(ynew), colnames(object$Y))
@@ -26,8 +32,10 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
     K <- ncol(bp)
     S <- nrow(bp)
     mle <- lapply(seq_len(S), function(i)
-        getMLE(object, i, vcov=type == "mcmc"))
+        getMLE(object, i, vcov=method == "mcmc"))
     cf <- sapply(mle, "[[", "coef")
+    if (Dist == "gaussian")
+        sig <- sapply(mle, function(z) attr(z$coef, "sigma"))
     if (!is.null(xnew)) {
         if (is.data.frame(xnew)) {
             ff <- formula(object)
@@ -37,7 +45,7 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             xnew <- data.matrix(xnew)
         }
     }
-    if (type == "mcmc") {
+    if (method == "mcmc") {
         requireNamespace("rjags")
         requireNamespace("dclone")
         ## avoid clashes when running parallel
@@ -54,6 +62,8 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             S=S,
             cf=cf,
             prec=prec)
+        if (Dist == "gaussian")
+            dat$sigma <- sig
         model <- list(
             head=c("model {",
                 "  for (i in 1:n) {",
@@ -80,13 +90,15 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             model$mu <- "      mu[i,r] <- b0[r] + bp[r,k[i]]*b1[r]"
             model$mvn <- "    theta[r,1:2] ~ dmnorm(cf[1:2,r], prec[1:2,1:2,r])"
         }
-        model$dist <- switch(object$dist,
-            "poisson"="      y[i,r] ~ dpois(exp(mu[i,r]))",
-            "poisson:log"="      y[i,r] ~ dpois(exp(mu[i,r]))",
-            "binomial"="      y[i,r] ~ dbern(ilogit(mu[i,r]))",
-            "binomial:logit"="      y[i,r] ~ dbern(ilogit(mu[i,r]))",
-            "binomial:cloglog"="      y[i,r] ~ dbern(icloglog(mu[i,r]))",
-            "binomial:probit"="      y[i,r] ~ dbern(phi(mu[i,r]))")
+        model$dist <- switch(dist,
+            "gaussian:identity"="      y[i,r] ~ dnorm(mu[i,r], 1/sigma[r]^2)",
+            "gaussian"=         "      y[i,r] ~ dnorm(mu[i,r], 1/sigma[r]^2)",
+            "poisson"=          "      y[i,r] ~ dpois(exp(mu[i,r]))",
+            "poisson:log"=      "      y[i,r] ~ dpois(exp(mu[i,r]))",
+            "binomial"=         "      y[i,r] ~ dbern(ilogit(mu[i,r]))",
+            "binomial:logit"=   "      y[i,r] ~ dbern(ilogit(mu[i,r]))",
+            "binomial:cloglog"= "      y[i,r] ~ dbern(icloglog(mu[i,r]))",
+            "binomial:probit"=  "      y[i,r] ~ dbern(phi(mu[i,r]))")
         model <- dclone::custommodel(unlist(model))
         if (is.null(cl)) {
             jm <- dclone::jags.fit(dat, "k", model, ...)
@@ -101,7 +113,7 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             out
         }
         PI <- apply(mm, 2, f, K=K) / nrow(mm)
-        rownames(PI) <- colnames(bp)
+        rownames(PI) <- LEV
         colnames(PI) <- rownames(ynew)
         gnew <- apply(PI, 2, which.max)
         results <- list(
@@ -110,7 +122,6 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             niter=nrow(mm),
             pi=t(PI))
     } else {
-        Dist <- strsplit(object$dist, ":")[[1L]][1L]
         ll <- array(NA, c(dim(ynew), K))
         lls <- matrix(NA, nrow(ynew), K)
         dimnames(ll) <- list(rownames(ynew), colnames(ynew), LEV)
@@ -118,6 +129,10 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
         for (i in LEV) {
             pr <- predict(object,
                 gnew=factor(rep(i, nrow(ynew)), LEV), xnew=xnew)
+            if (Dist == "gaussian") {
+                for (j in seq_len(S))
+                    ll[,j,i] <- dnorm(ynew[,j], pr[,j], sig[j], log=TRUE)
+            }
             if (Dist == "poisson")
                 ll[,,i] <- dpois(ynew, pr, log=TRUE)
             if (Dist == "binomial")
@@ -133,8 +148,8 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
         ynew=ynew0,
         xnew=xnew,
         gnew=factor(LEV[gnew], LEV),
-        dist=object$dist,
-        type=type,
+        dist=dist,
+        method=method,
         results=results)
     class(out) <- c("ipredict.opticut", "ipredict")
     out
