@@ -1,11 +1,69 @@
+#devtools::install_github("psolymos/opticut", ref="multiclass")
+library(opticut)
+library(dclone)
+library(rjags)
+source("~/repos/opticut/extras/ip/ipredict.R")
+source("~/repos/opticut/extras/ip/ipredict.multicut.R")
+source("~/repos/opticut/extras/ip/ipredict.opticut.R")
+
+
+gr <- as.factor(paste0("X", rep(1:5, each=5)))
+spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
+    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
+    Species3=rep(c(18,2,0,0,0), each=5))
+rownames(spp) <- gr
+ynew=spp
+xnew=NULL
+object <- opticut(spp ~ 1, strata=gr, dist="gaussian")
+
+ip1 <- ipredict(object, ynew, xnew=NULL, method="analytic", cl=NULL)
+ip2 <- ipredict(object, ynew, xnew=NULL, method="mcmc", cl=NULL)
+
+ocoptions(fix_fitted=TRUE)
+object <- multicut(spp ~ 1, strata=gr, dist="gaussian")
+ip3 <- ipredict(object, ynew, xnew=NULL, method="analytic", cl=NULL)
+ip4 <- ipredict(object, ynew, xnew=NULL, method="mcmc", cl=NULL)
+
+getMLE(object, 1)
+
+
+
+Dist <- "binomial"
+set.seed(1)
+K <- 5
+m <- 20
+g <- rep(LETTERS[1:K], each=20)
+n <- length(g)
+cf <- matrix(rnorm(2*m), 2, m)
+bp <- array(NA, c(K, m), list(LETTERS[1:K], paste0("Sp", 1:m)))
+bpcf <- bp
+for (j in 1:m) {
+    bp[,j] <- rbinom(K, 1, rbeta(1,10,15))
+    bpcf[,j] <- cf[bp[,j]+1,j]
+}
+mu <- bpcf[match(g, rownames(bp)),]
+Y <- rbinom(length(mu), 1, plogis(drop(mu)))
+dim(Y) <- dim(mu)
+dimnames(Y) <- dimnames(mu)
+X <- data.frame(g=g)
+ynew <- Y
+o <- opticut(Y ~ 1, strata=X$g, dist=Dist)
+
+ip1 <- ipredict(o, ynew, xnew=NULL, method="analytic")
+ip2 <- ipredict(o, ynew, xnew=NULL, method="mcmc", n.iter=1000)
+
+o <- multicut(Y ~ 1, strata=X$g, dist=Dist)
+ip3 <- ipredict(o, ynew, xnew=NULL, method="analytic")
+ip4 <- ipredict(o, ynew, xnew=NULL, method="mcmc", n.iter=1000)
+
+## old stuff
+
 library(opticut)
 library(dclone)
 library(rjags)
 source("~/repos/opticut/extras/calibrate.R")
-#source("~/repos/opticut/R/ipredict.R")
-#source("~/repos/opticut/R/ipredict.default.R")
-#source("~/repos/opticut/R/ipredict.opticut.R")
 source("~/repos/opticut/extras/multiclass.R")
+
 
 #Inverse prediction might be a good metric of overall accuracy and scaling species contribution (i.e. the real indicator power).
 #Implement binary-multinomial-continuous comparison.
