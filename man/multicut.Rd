@@ -113,7 +113,7 @@ vector or community matrix for \code{multicut.default}.
 }
   \item{X}{
 numeric, design matrix for possible confounding/modifier variables.
-Can be missing, in which case an intercept-only model is assumed.
+Can be missing or \code{NULL}, in which case an intercept-only model is assumed.
 }
   \item{x, object}{
 object to plot, print, summarize.

@@ -126,8 +126,8 @@ numeric vector of observations for \code{opticut1},
 vector or community matrix for \code{opticut.default}.
 }
   \item{X}{
-numeric, design matrix. Can be missing, in which case an intercept-only model
-is assumed.
+numeric, design matrix. Can be missing or \code{NULL},
+in which case an intercept-only model is assumed.
 }
   \item{Z}{
 factor (must have at least 2 unique levels,
