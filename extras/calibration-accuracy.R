@@ -56,6 +56,49 @@ o <- multicut(Y ~ 1, strata=X$g, dist=Dist)
 ip3 <- ipredict(o, ynew, xnew=NULL, method="analytic")
 ip4 <- ipredict(o, ynew, xnew=NULL, method="mcmc", n.iter=1000)
 
+## LOO
+
+loo <- function (object, ...)
+    UseMethod("loo")
+
+loo.opticut <- function(object, refit=TRUE,
+method=c("analytic", "mcmc"), cl=NULL, ...)
+{
+    g0 <- strata(object)
+    gp <- g0
+    gp[] <- NA
+    Y0 <- object$Y
+    X0 <- object$X
+    #if (ncol(X0) < 2L)
+    #    X0 <- NULL
+    N0 <- nobs(object)
+    N <- nobs(object)
+    ivec <- seq_len(N)
+    for (i in ivec) {
+        Ynew <- Y0[ivec == i,,drop=FALSE]
+        Xnew <- X0[ivec == i,,drop=FALSE]
+        if (refit) {
+            o <- opticut(Y=Y0, X=X0, strata=g0,
+                dist=object$dist, comb=object$comb, cl=cl,
+                sset=which(ivec != i))
+        } else {
+            o <- object
+        }
+        if (ncol(X0) < 2L)
+            Xnew <- NULL
+        ip <- ipredict.opticut(o, ynew=Ynew, xnew=Xnew,
+            method=method, cl=cl, ...)
+        gp[i] <- ip$gnew
+    }
+    gp
+}
+## figure out cl, suppress pb, but optionally verbose
+z <- loo(object)
+## loso: subset(object) for one less species
+## need to figure out multiclass metrics etc.
+## and object structures
+
+
 ## old stuff
 
 library(opticut)
