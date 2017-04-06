@@ -74,21 +74,28 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
     N0 <- nobs(object)
     N <- nobs(object)
     ivec <- seq_len(N)
-    for (i in ivec) {
-        Ynew <- Y0[ivec == i,,drop=FALSE]
-        Xnew <- X0[ivec == i,,drop=FALSE]
-        if (refit) {
+    if (refit) {
+        for (i in ivec) {
             o <- opticut(Y=Y0, X=X0, strata=g0,
                 dist=object$dist, comb=object$comb, cl=cl,
                 sset=which(ivec != i))
-        } else {
-            o <- object
+            Ynew <- Y0[ivec == i,,drop=FALSE]
+            Xnew <- X0[ivec == i,,drop=FALSE]
+            if (ncol(X0) < 2L)
+                Xnew <- NULL
+            ip <- ipredict.opticut(o, ynew=Ynew, xnew=Xnew,
+                method=method, cl=cl, ...)
+            gp[i] <- ip$gnew
         }
+    } else {
+        o <- object
+        Ynew <- Y0
+        Xnew <- X0
         if (ncol(X0) < 2L)
             Xnew <- NULL
         ip <- ipredict.opticut(o, ynew=Ynew, xnew=Xnew,
             method=method, cl=cl, ...)
-        gp[i] <- ip$gnew
+        gp <- ip$gnew
     }
     gp
 }
@@ -97,6 +104,7 @@ z <- loo(object)
 ## loso: subset(object) for one less species
 ## need to figure out multiclass metrics etc.
 ## and object structures
+## !refit means no LOO: is it OK to have the option here?
 
 
 ## old stuff
