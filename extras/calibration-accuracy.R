@@ -59,6 +59,7 @@ ip4 <- ipredict(o, ynew, xnew=NULL, method="mcmc", n.iter=1000)
 
 ## LOO
 
+## generic functions
 loso <- function (object, ...)
     UseMethod("loso")
 loto <- function (object, ...)
@@ -66,6 +67,7 @@ loto <- function (object, ...)
 lotso <- function (object, ...)
     UseMethod("lotso")
 
+## refit model with -i data and IP for i
 .loso1 <- function(i, object, ...)
 {
     pbo <- pboptions(type="none")
@@ -82,31 +84,103 @@ lotso <- function (object, ...)
         method="analytic", cl=NULL, ...)
 }
 
-
-loso.opticut <- function(object, cl=NULL, ...)
+## internal function for leave-one-site-out
+## with true LOO or without
+.loso <-
+function(object, cl=NULL, ..., refit=FALSE)
 {
-    ivec <- seq_len(nobs(object))
-    iplist <- pblapply(ivec, .loso1, object=object, cl=cl, ...)
+    g0 <- strata(object)
+    if (refit) {
+        ## LOO used for IP
+        iplist <- pblapply(seq_len(nobs(object)),
+            .loso1, object=object, cl=cl, ...)
+        ip <- iplist[[1L]]
+        ip$ynew <- object$Y
+        ip$xnew <- object$X
+        ip$gnew <- sapply(iplist, "[[", "gnew")
+        ip$results$loglik_species <- array(0,
+            c(dim(object$Y), nlevels(strata(object))))
+        dimnames(ip$results$loglik_species) <- c(dimnames(object$Y),
+            list(levels(g0)))
+        ip$results$loglik <- array(0,
+            c(nrow(object$Y), nlevels(strata(object))))
+        dimnames(ip$results$loglik) <- list(rownames(object$Y),
+            levels(g0))
+        for (i in seq_len(length(iplist))) {
+            ip$results$loglik_species[i,,] <-
+                iplist[[i]]$results$loglik_species[1L,,]
+            ip$results$loglik[i,] <-
+                iplist[[i]]$results$loglik[1L,]
+        }
+    } else {
+        ## no LOO used for IP
+        ip <- ipredict(object, ynew=object$Y,
+            xnew=if (ncol(object$X) < 2L) NULL else object$X,
+            method="analytic", cl=NULL, ...)
+    }
+    ip$strata <- g0
+    ip$S <- ncol(object$Y)
+    ip$multiclass <- multiclass(g0, ip$gnew)
+    ip$kappa <- test_table(ip$multiclass$ctable)
     ## compare gnew to g, accuracy, kappa etc, or just
     ## same should work for multi/opti
-    NULL
+    ip
 }
-loto.opticut <- function(object, ...)
+
+## methods
+loso.opticut <- function(object, cl=NULL, ...)
+    .loso(object, cl=cl, ..., refit=TRUE)
+loso.multicut <- function(object, cl=NULL, ...)
+    .loso(object, cl=cl, ..., refit=TRUE)
+
+## internal function to calculate metrics for -j
+## returns gnew integer vector
+.loto1 <- function(i, ip) {
+    ll <- ip$results$loglik_species[,-i,,drop=FALSE]
+    LEV <- dimnames(ll)[[3L]]
+    lls <- ip$results$loglik
+    for (i in LEV) {
+        lls[,i] <- rowSums(ll[,,i,drop=FALSE])
+    }
+#    gnew <- factor(LEV[apply(lls, 1, which.max)], LEV)
+#    results <- list(
+#        gnew=gnew,
+#        loglik_species=ll,
+#        loglik=lls)
+    apply(lls, 1, which.max)
+}
+
+## internal function for calculating leave-one-taxon-out metrics
+.loto <- function(object, cl=NULL, ..., refit=FALSE)
 {
-    Xnew <- object$X
-    if (ncol(Xnew) < 2L)
-        Xnew <- NULL
-    ip <- ipredict(object, ynew=object$Y, xnew=Xnew,
-        method="analytic", cl=NULL, ...)
-    gp <- ip$gnew
-    ## collect species specific ll values as well
-    ## calculate multiclass stuff in loop by leaving out 1 spp at a time
-    ## use kappa to compare -j to full
-    gp
+    ip <- .loso(object, cl=cl, ..., refit=refit)
+    g0 <- ip$strata
+    LEV <- levels(g0)
+    gnew <- sapply(seq_len(ip$S), .loto1, ip=ip)
+    ct0 <- ip$multiclass$ctable
+    kappa <- apply(gnew, 2, function(z)
+        kappacoef(predicted=ctable(g0, factor(LEV[z], LEV)), reference=ct0))
+    ip$gnew_species <- gnew
+    ip$kappa_species <- kappa
+    ip
 }
+#plot(sort(kappa["k",]),type="b");abline(h=0)
+
+## methods
+loto.opticut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=FALSE)
+loto.multicut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=FALSE)
+
+## methods: leave-one-taxon-and-species-out
+
+lotso.opticut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=FALSE)
+lotso.multicut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=FALSE)
+
 ## lotso needs to replicate loso with subset(object)
 
-z <- loo(object)
 ## OK - figure out cl, suppress pb, but optionally verbose
 ## need to figure out multiclass metrics etc. and object structures
 ## OK - should restrict to analytic method
