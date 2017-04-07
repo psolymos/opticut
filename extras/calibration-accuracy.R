@@ -122,8 +122,7 @@ function(object, cl=NULL, ..., refit=FALSE)
     ip$S <- ncol(object$Y)
     ip$multiclass <- multiclass(g0, ip$gnew)
     ip$kappa <- test_table(ip$multiclass$ctable)
-    ## compare gnew to g, accuracy, kappa etc, or just
-    ## same should work for multi/opti
+    ip$refit <- refit
     ip
 }
 
@@ -142,11 +141,6 @@ loso.multicut <- function(object, cl=NULL, ...)
     for (i in LEV) {
         lls[,i] <- rowSums(ll[,,i,drop=FALSE])
     }
-#    gnew <- factor(LEV[apply(lls, 1, which.max)], LEV)
-#    results <- list(
-#        gnew=gnew,
-#        loglik_species=ll,
-#        loglik=lls)
     apply(lls, 1, which.max)
 }
 
