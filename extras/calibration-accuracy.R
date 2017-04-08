@@ -169,9 +169,38 @@ loto.multicut <- function(object, cl=NULL, ...)
 ## methods: leave-one-taxon-and-species-out
 
 lotso.opticut <- function(object, cl=NULL, ...)
-    .loto(object, cl=cl, ..., refit=FALSE)
+    .loto(object, cl=cl, ..., refit=TRUE)
 lotso.multicut <- function(object, cl=NULL, ...)
-    .loto(object, cl=cl, ..., refit=FALSE)
+    .loto(object, cl=cl, ..., refit=TRUE)
+
+ip <- lotso(o)
+
+a0 <- ip$multiclass$single["Accuracy",]
+a <- apply(ip$gnew_species, 2, function(z)
+        multiclass(ip$strata,
+            factor(levels(ip$strata)[z],
+                levels(ip$strata)))$single["Accuracy",])
+k <- (a - a0)/(1 - a0)
+
+x <- ip$kappa_species["k",]
+names(x) <- colnames(ip$ynew)
+x <- sort(x)
+S <- length(x)
+Col <- rev(occolors()(201))
+j1 <- floor(90*x/max(abs(x)))+101
+j2 <- j2 + sign(x)*10
+plot(x, seq_len(S), axes=FALSE, ann=FALSE, type="n",
+    ylim=c(S+0.5, 0.5))
+for (i in seq_len(length(x)))
+    polygon(c(x[c(i,i)], 0, 0), i+c(-0.5, 0.5, 0.5, -0.5),
+        col=Col[j1[i]], border=Col[j2[i]])
+text(rep(0, S)[x<0], seq_len(S)[x<0], names(x)[x<0], pos=4)
+text(rep(0, S)[x>=0], seq_len(S)[x>=0], names(x)[x>=0], pos=2)
+axis(1)
+title(xlab="kappa")
+
+bp <- summary(o)$bestpart
+pbp <- ifelse(k<0,1,0)
 
 ## lotso needs to replicate loso with subset(object)
 
