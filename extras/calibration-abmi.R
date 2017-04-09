@@ -21,6 +21,11 @@ VALS <- VALS[!(VALS$TAXON %in% c("vascular_plants", "bryophytes", "lichens") &
 VALS <- VALS[!(VALS$TAXON != "birds" & VALS$SCALE=="sites_pc"),]
 VALS <- VALS[order(VALS$TAXON, VALS$METHOD, VALS$DIST, VALS$SCALE),]
 
+if (TEST) {
+    VALS <- droplevels(VALS[VALS$TAXON=="mites",])
+    levels(VALS$TAXON) <- "dolina"
+}
+
 rn <- rownames(ABMI$sites[ABMI$sites$Year >= 2009 &
     ABMI$sites$NRNAME %in% c("Boreal", "Foothills"),])
 for (i in names(ABMI$detections))
@@ -98,14 +103,12 @@ clusterExport(cl, c("opticut.formula", "multicut.formula", ".opticut_dist",
 clusterExport(cl, c("Y", "g0", "DIST"))
 
 ip <- lotso(o, cl=cl)
+ip2 <- loto(o, cl=cl)
+
 ip$settings <- list(NMIN=NMIN, TAXON=TAXON, SCALE=SCALE,
     DIST=DIST, METHOD=METHOD)
 stopCluster(cl)
 
 fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f, ".Rdata")
-if (!TEST)
-    save(o, ip, file=fn)
-if (TEST)
-   break
-
+save(o, ip, ip2, file=fn)
 }
