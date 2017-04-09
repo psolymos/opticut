@@ -32,6 +32,7 @@ NCL <- 2
 ## min number of detections
 NMIN <- 20
 ## test is small snail data
+TEST <- FALSE
 
 #v <- 1
 for (v in 1:nrow(VALSE)) {
