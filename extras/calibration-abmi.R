@@ -25,7 +25,7 @@ rn <- rownames(ABMI$sites[ABMI$sites$Year >= 2009 &
     ABMI$sites$NRNAME %in% c("Boreal", "Foothills"),])
 for (i in names(ABMI$detections))
     rn <- sort(intersect(rn, rownames(ABMI$detections[[i]])))
-str(rn)
+#str(rn)
 
 ## number of workers
 NCL <- 2
@@ -35,7 +35,7 @@ NMIN <- 20
 TEST <- FALSE
 
 #v <- 1
-for (v in 1:nrow(VALSE)) {
+for (v in 1:nrow(VALS)) {
 
 ## "birds" "mites" "vascular_plants" "bryophytes" "lichens"
 TAXON <- as.character(VALS$TAXON[v]) # "birds"
@@ -48,7 +48,7 @@ METHOD <- as.character(VALS$METHOD[v]) # "opticut"
 
 f <- paste("ocip", TAXON, METHOD, DIST,
     ifelse(SCALE=="sites", "ha", "pc"), sep="-")
-cat(rep("-", 50), "\n", f, as.character(Sys.time()),
+cat(rep("-", 50), "\n", f, " ", as.character(Sys.time()),
     "\n", rep("-", 50), "\n", sep="")
 flush.console()
 
@@ -105,5 +105,7 @@ stopCluster(cl)
 fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f, ".Rdata")
 if (!TEST)
     save(o, ip, file=fn)
+if (TEST)
+   break
 
 }
