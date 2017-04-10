@@ -17,6 +17,8 @@ NCL <- 14
 NMIN <- 20
 ## test is small snail data
 TEST <- FALSE
+## subset to common cases or not
+SUBSET <- TRUE
 
 VALS <- expand.grid(
     TAXON=names(ABMI$detections),
@@ -32,11 +34,6 @@ if (TEST) {
     VALS <- droplevels(VALS[VALS$TAXON=="mites",])
 }
 
-rn <- rownames(ABMI$sites[ABMI$sites$Year >= 2009 &
-    ABMI$sites$NRNAME %in% c("Boreal", "Foothills"),])
-for (i in names(ABMI$detections))
-    rn <- sort(intersect(rn, rownames(ABMI$detections[[i]])))
-#str(rn)
 
 #v <- 1
 for (v in 1:nrow(VALS)) {
@@ -49,6 +46,20 @@ SCALE <- as.character(VALS$SCALE[v]) # "sites"
 DIST <- as.character(VALS$DIST[v]) # "binomial"
 ## opticut, multicut
 METHOD <- as.character(VALS$METHOD[v]) # "opticut"
+## if not common subset, do it taxa specific
+if (!SUBSET) {
+    if (TAXON %in% c("mosses", "lichens")) {
+        rn <- rownames(ABMI$sites[ABMI$sites$Year >= 2009 &
+            ABMI$sites$NRNAME %in% c("Boreal", "Foothills"),])
+    } else {
+        rn <- rownames(ABMI$sites[ABMI$sites$NRNAME %in% c("Boreal", "Foothills"),])
+    }
+} else {
+    rn <- rownames(ABMI$sites[ABMI$sites$Year >= 2009 &
+        ABMI$sites$NRNAME %in% c("Boreal", "Foothills"),])
+}
+for (i in names(ABMI$detections))
+    rn <- sort(intersect(rn, rownames(ABMI$detections[[i]])))
 
 X <- ABMI[[SCALE]][rn,]
 
@@ -98,6 +109,7 @@ if (METHOD=="opticut") {
 print(o)
 print(o$dist)
 print(range(Y))
+print(dim(Y))
 
 if (NCL > 1) {
     clusterEvalQ(cl, library(opticut))
@@ -119,7 +131,8 @@ ip$settings <- list(NMIN=NMIN, TAXON=TAXON, SCALE=SCALE,
 if (NCL > 1)
     stopCluster(cl)
 
-fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f, ".Rdata")
+fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f,
+    if (SUBSET) "" else "-full", ".Rdata")
 save(o, ip, ip2, file=fn)
 print(ip$kappa[,1])
 }
