@@ -72,6 +72,7 @@ levels(X$A) <- c("A0","A1","A2")
 X$SA <- interaction(X$S, X$A, drop=TRUE, sep="")
 table(X$SA, useNA="a")
 g0 <- X$SA
+#g0 <- relevel(g0, "TL")
 
 Y <- ABMI$detections[[TAXON]][rn,]
 Y <- Y[,colSums(Y>0) >= 5]
@@ -121,7 +122,7 @@ if (NCL > 1) {
     clusterExport(cl, c("Y", "g0", "DIST"))
 }
 t0 <- proc.time()
-ip <- lotso(o, cl=cl)
+ip <- lotso(o, cl=cl, fold=10)
 t1 <- proc.time()-t0
 ip2 <- loto(o, cl=cl)
 

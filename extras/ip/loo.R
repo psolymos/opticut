@@ -32,6 +32,7 @@ lotso <- function (object, ...)
 ## with true LOO or without
 ## fold=NULL is leave one out (n-fold XV)
 ## when fold is a number (<n) it is used for k-fold XV
+## !!! allow folds to be defined as input vector (is.list() or length>1)
 .loso <-
 function(object, fold=NULL, refit=FALSE, cl=NULL, ...)
 {
