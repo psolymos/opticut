@@ -43,10 +43,15 @@ function(object, fold=NULL, refit=FALSE, cl=NULL, ...)
         if (is.null(fold)) {
             ii <- as.list(seq_len(Nobs))
         } else {
-            if (fold < 2 || fold > Nobs)
-                stop("fold must be within 2 and nobs(object)")
-            REP <- sample(rep(seq_len(fold), ceiling(Nobs/fold))[seq_len(Nobs)])
-            ii <- lapply(seq_len(fold), function(z) which(REP == z))
+            if (is.list(fold) || length(fold) > 1L) {
+                ii <- if (is.list(fold))
+                    fold else lapply(unique(fold), function(z) which(fold == z))
+            } else {
+                if (fold < 2 || fold > Nobs)
+                    stop("fold must be within 2 and nobs(object)")
+                REP <- sample(rep(seq_len(fold), ceiling(Nobs/fold))[seq_len(Nobs)])
+                ii <- lapply(seq_len(fold), function(z) which(REP == z))
+            }
         }
         iplist <- pblapply(ii,
             .loso1, object=object, cl=cl, ...)
