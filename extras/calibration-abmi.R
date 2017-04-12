@@ -193,3 +193,52 @@ V2 <- data.frame(VALS, a=tmp[,1])
 
 ct <- xx[["ocip-vascular_plants-opticut-binomial-ha.Rdata"]]$multiclass$ctable
 addmargins(ct)
+
+library(opticut)
+source("~/repos/opticut/extras/ip/ipredict.R")
+source("~/repos/opticut/extras/ip/ipredict.multicut.R")
+source("~/repos/opticut/extras/ip/ipredict.opticut.R")
+source("~/repos/opticut/extras/ip/loo.R")
+
+f <- "ocip-vascular_plants-opticut-binomial-ha.Rdata"
+fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f)
+load(fn)
+
+plot(sort(ip$kappa_species[3,]), type="l")
+
+f <- function(x) {
+    multiclass(ip$strata, x)$average["Acc"]
+}
+
+ff <- function(sp) {
+    jj <- which(!(1:ncol(o$Y) %in% sp))
+    ii <- .loto1(jj, ip)
+    f(factor(levels(ip$strata)[ii], levels(ip$strata)))
+}
+ff2 <- function(jj) {
+    ii <- .loto1(jj, ip)
+    f(factor(levels(ip$strata)[ii], levels(ip$strata)))
+}
+
+
+I <- summary(o)$summary$I
+A <- sapply(1:ncol(o$Y), ff2)
+A0 <- f(ip$gnew)
+k <- (A-A0)/(1-A0)
+
+ii <- seq.int(1, 397, 100)
+aaa <- pbreplicate(1000, sapply(ii, function(i) ff(sample.int(398, i))))
+aa <- rowMeans(aaa)
+bb <- sapply(rev(ii), function(i) ff(which(order(I)>=i)))
+#bb <- sapply(seq(0,1,len=398), function(i) ff(which(I>i)))
+
+
+plot(aa, type="l")
+lines(bb, col=2)
+
+plot(k, I)
+
+boxplot(I ~ sign(k))
+
+## check how can any random species have .66-.88 Accuracy
+
