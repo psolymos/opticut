@@ -182,8 +182,9 @@ for (f in fl) {
 }
 
 tmp <- t(sapply(xx, function(z) z$kappa))
+colnames(tmp) <- c("Acc", "Acc0", "kappa")
 V2 <- data.frame(VALS, a=tmp[,1])
-## why is a0 not the same? -- cohen consides col props, use random?
+## why is a0 not the same? -- cohen considers col props, use random?
 ## opti is better than multi: binary is more robust for extrapolation?
 ## bin/pois not very different
 ## generally good accuracy
@@ -204,7 +205,11 @@ f <- "ocip-vascular_plants-opticut-binomial-ha.Rdata"
 fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f)
 load(fn)
 
-plot(sort(ip$kappa_species[3,]), type="l")
+plot(sort(ip$kappa_species[3,]), type="l", lwd=2, col="tomato",
+    xlab="Fajok", ylab="kappa")
+abline(h=0, lty=2)
+lines(sort(ip$kappa_species[3,]), lwd=2, col="tomato")
+table(sign(ip$kappa_species[3,]))/length(ip$kappa_species[3,])
 
 f <- function(x) {
     multiclass(ip$strata, x)$average["Acc"]
@@ -225,18 +230,22 @@ I <- summary(o)$summary$I
 A <- sapply(1:ncol(o$Y), ff2)
 A0 <- f(ip$gnew)
 k <- (A-A0)/(1-A0)
+plot(I, k)
 
-ii <- seq.int(1, 397, 100)
-aaa <- pbreplicate(1000, sapply(ii, function(i) ff(sample.int(398, i))))
+ii <- seq.int(1, 397, 10)
+aaa <- pbreplicate(200, sapply(ii, function(i) ff(sample.int(398, i))))
 aa <- rowMeans(aaa)
-bb <- sapply(rev(ii), function(i) ff(which(order(I)>=i)))
+bb <- sapply(398-ii, function(i) ff(which(order(I)>=i)))
+cc <- sapply(398-ii, function(i) ff(which(order(-I)>=i)))
 #bb <- sapply(seq(0,1,len=398), function(i) ff(which(I>i)))
 
 
-plot(aa, type="l")
-lines(bb, col=2)
+plot(ii, aa, col=4, type="l", ylim=c(0.7,1), xlab="", ylab="", lwd=2)
+lines(ii, bb, col=2, lwd=2)
+lines(ii, cc, col=3, lwd=2)
 
 plot(k, I)
+
 
 boxplot(I ~ sign(k))
 
