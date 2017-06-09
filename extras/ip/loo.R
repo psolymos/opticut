@@ -102,8 +102,11 @@ loso.multicut <- function(object, fold=NULL, cl=NULL, ...)
 ## returns gnew integer vector
 .loto1 <- function(j, ip) {
     ll <- ip$results$loglik_species[,-j,,drop=FALSE]
+    if (dim(ll)[2L] < 1L)
+        stop("please do not drop all species")
     LEV <- dimnames(ll)[[3L]]
     lls <- ip$results$loglik
+    lls[] <- 0
     for (i in LEV) {
         lls[,i] <- rowSums(ll[,,i,drop=FALSE])
     }
@@ -116,7 +119,7 @@ loso.multicut <- function(object, fold=NULL, cl=NULL, ...)
     ip <- .loso(object, fold=fold, refit=refit, cl=cl, ...)
     g0 <- ip$strata
     LEV <- levels(g0)
-    gnew <- sapply(seq_len(ip$S), .loto1, ip=ip)
+    gnew <- sapply(seq_len(ip$S), .loto1, ip=ip) # -j is 1 spp
     ct0 <- ip$multiclass$ctable
     kappa <- apply(gnew, 2, function(z)
         kappacoef(predicted=ctable(g0, factor(LEV[z], LEV)), reference=ct0))

@@ -230,6 +230,7 @@ I <- summary(o)$summary$I
 A <- sapply(1:ncol(o$Y), ff2)
 A0 <- f(ip$gnew)
 k <- (A-A0)/(1-A0)
+
 plot(I, k)
 
 ii <- seq.int(1, 397, 10)
@@ -237,17 +238,108 @@ aaa <- pbreplicate(200, sapply(ii, function(i) ff(sample.int(398, i))))
 aa <- rowMeans(aaa)
 bb <- sapply(398-ii, function(i) ff(which(order(I)>=i)))
 cc <- sapply(398-ii, function(i) ff(which(order(-I)>=i)))
+
+ks <- ip$kappa_species[3,]
+as <- ip$kappa_species[1,]
+as <- (as-min(as)) / diff(range(as))
+
+ip1 <- ff(which(ks > 0))
+ip2 <- ff(which(ks == 0))
+ip3 <- ff(which(ks < 0))
+
+
+ii <- seq.int(1, 397, 100)
+aaa <- pbreplicate(200,
+    sapply(ii, function(i) ff(sample.int(398, i))))
+aa <- rowMeans(aaa)
+#bb <- sapply(rev(ii), function(i) ff(which(order(I)>=i)))
+
 #bb <- sapply(seq(0,1,len=398), function(i) ff(which(I>i)))
+
+bbb <- pbreplicate(200,
+    sapply(ii, function(i) ff(sample.int(398, i, prob=I))))
+bb <- rowMeans(bbb)
+ccc <- pbreplicate(200,
+    sapply(ii, function(i) ff(sample.int(398, i, prob=as))))
+cc <- rowMeans(ccc)
 
 
 plot(ii, aa, col=4, type="l", ylim=c(0.7,1), xlab="", ylab="", lwd=2)
 lines(ii, bb, col=2, lwd=2)
 lines(ii, cc, col=3, lwd=2)
 
-plot(k, I)
+plot(aa, type="l")
+lines(bb, col=2)
+lines(bb, col=4)
+
+plot(as, I)
 
 
 boxplot(I ~ sign(k))
 
 ## check how can any random species have .66-.88 Accuracy
+
+f <- "ocip-mites-opticut-binomial-ha-full.Rdata"
+fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f)
+e1 <- new.env()
+load(fn, envir=e1)
+f <- "ocip-mites-opticut-binomial-ha-fullrelevel.Rdata"
+fn <- paste0("~/Dropbox/collaborations/opticut/R/abmi-data/", f)
+e2 <- new.env()
+load(fn, envir=e2)
+
+o1 <- e1$o
+ip1 <- e1$ip
+o2 <- e2$o
+ip2 <- e2$ip
+
+table(strata(o1))
+table(strata(o2))
+
+ip1$multiclass$average
+ip2$multiclass$average
+ip1$multiclass$ctable
+ip2$multiclass$ctable
+
+
+
+## LOO
+## add method argument -- but it is not suitable for loto...
+## allow fold to be feeded from outside
+## return pi matrix
+## fix which.max issue
+
+if (FALSE) {
+library(opticut)
+source("~/repos/opticut/extras/ip/ipredict.R")
+source("~/repos/opticut/extras/ip/ipredict.multicut.R")
+source("~/repos/opticut/extras/ip/ipredict.opticut.R")
+source("~/repos/opticut/extras/ip/loo.R")
+opticut.formula <- opticut:::opticut.formula
+multicut.formula <- opticut:::multicut.formula
+.opticut_dist <- opticut:::.opticut_dist
+data(dolina)
+g0 <- dolina$samp$mhab[dolina$samp$method=="T"]
+Y <- dolina$xtab[dolina$samp$method=="T",]
+Y <- ifelse(Y[,colSums(Y>0) >= 20]>0, 1, 0)
+o <- opticut(Y ~ 1, strata=g0, dist="binomial")
+#o <- multicut(Y ~ 1, strata=g0, dist="binomial")
+ip <- loso(o, fold=10)
+
+S <- ip$S
+j <- 1:(S-1)
+ll <- ip$results$loglik_species[,-j,,drop=FALSE]
+LEV <- dimnames(ll)[[3L]]
+lls <- ip$results$loglik
+lls[] <- 0
+for (i in LEV) {
+    lls[,i] <- rowSums(ll[,,i,drop=FALSE])
+}
+gnew <- apply(lls, 1, which.max)
+table(gnew)
+head(lls)
+
+m <- ip$results$loglik
+mm <- sapply(1:nrow(m), function(i) as.integer(m[i,]==max(m[i,])))
+}
 
