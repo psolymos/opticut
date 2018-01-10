@@ -45,7 +45,7 @@ Tags are the following:
   the default is 0.5.}
 \item{fix_fitted}{\code{\link{bestpart.multicut}}
   uses \code{\link{lorenz}} which requires nonnegative fitted values,
-  however models with identity link can lead to negative espected values.
+  however models with identity link can lead to negative expected values.
   When \code{TRUE} the fitted values (x) are adjusted as x' = x + abs(min(x))
   to ensure nonnegativity. The default is \code{FALSE}.}
 }

@@ -31,7 +31,7 @@ It is the user's responsibility to ensure that values supplied
 for \code{z} are sensible and it also makes sense to bind
 \code{x} and \code{z} together.
 Variables in \code{z} should be centered (mean 0) (and
-possibly nomalized by SD), because the design matrix
+possibly normalized by SD), because the design matrix
 from \code{x} is not expected to include an intercept.
 }
   \item{alpha}{numeric [0-1],

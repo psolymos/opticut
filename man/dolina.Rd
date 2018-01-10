@@ -5,7 +5,7 @@
 Land Snail Data Set
 }
 \description{
-A comprehensive and micro-scale land snail data set from 16 dolines of the
+A comprehensive and micro-scale land snail data set from 16 dolinas of the
 Aggtelek Karst Area, Hungary.
 Data set containing land snail counts as described in Kemecei et al. 2014.
 }

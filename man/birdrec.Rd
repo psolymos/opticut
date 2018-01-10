@@ -7,8 +7,8 @@ Bird Species Detections
 \description{
 Data set listing 156 species (mostly birds, few amphibians and mammals) detected
 at 127 sites (367 point locations) in Alberta, Canada in 2015,
-using autonomous reconding technology (ARU; Wildlife Acoustic Song Meter)
-for sound recodings.
+using autonomous recording technology (ARU; Wildlife Acoustic Song Meter)
+for sound recordings.
 }
 \usage{data("birdrec")}
 \format{
@@ -48,7 +48,7 @@ its own ARU unit.
 \code{YDAY}: ordinal day of the year, 89-209.
 
 \code{RAIN}, \code{WIND}, \code{INDUSTRY}, \code{NOISE}:
-level of rain, wind, indistrial noise, and background noise.
+level of rain, wind, industrial noise, and background noise.
 0 = no; 1 = light; 2 = moderate; 3 = heavy.
 
 \code{MICROPHONE}:
