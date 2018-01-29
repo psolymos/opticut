@@ -37,7 +37,11 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 "gaussian"=gaussian(link),
                 "poisson"=poisson(link),
                 "binomial"=binomial(link))
-            mod <- stats::glm(Y ~ .-1, data=XX, family=Family, ...)
+            mod <- if (dist == "gaussian" && link == "identity") {
+                stats::lm(Y ~ .-1, data=XX, family=Family, ...)
+            } else {
+                stats::glm(Y ~ .-1, data=XX, family=Family, ...)
+            }
             cf <- coef(mod)
             if (dist == "gaussian")
                 attr(cf, "sigma") <- sigma(mod) # summary(mod)$sigma
