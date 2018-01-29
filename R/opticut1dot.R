@@ -40,7 +40,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
             mod <- stats::glm(Y ~ .-1, data=XX, family=Family, ...)
             cf <- coef(mod)
             if (dist == "gaussian")
-                attr(cf, "sigma") <- summary(mod)$sigma
+                attr(cf, "sigma") <- sigma(mod) # summary(mod)$sigma
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
