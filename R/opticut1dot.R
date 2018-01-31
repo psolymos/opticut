@@ -146,7 +146,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
         ## this should set logLik to s very low but numerically safe number
         ## handles issue of perfect fit in examples
         if (is.na(ll) || is.infinite(ll))
-            ll <- .Machine$double.xmin^(1/3)
+            ll <- (-(.Machine$double.xmax^(1/3)))
         out <- list(coef=cf, logLik=ll, linkinv=linv)
     } else {
         if (full_model)
