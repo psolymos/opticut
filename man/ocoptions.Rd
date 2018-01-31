@@ -48,6 +48,13 @@ Tags are the following:
   however models with identity link can lead to negative expected values.
   When \code{TRUE} the fitted values (x) are adjusted as x' = x + abs(min(x))
   to ensure nonnegativity. The default is \code{FALSE}.}
+\item{robust_loglik}{if ill-defined models resulting in perfect fit
+  (infinite log likelihood, or \code{NA}, \code{NaN})
+  should be allowed. The default \code{TRUE} makes such ill-defined
+  log likelihoods a very small real number
+  \code{-(.Machine$double.xmax^(1/3))}.
+  \code{FALSE} is equivalent to allowing every model to
+  safeguard agains such cases or not.}
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
