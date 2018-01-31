@@ -38,7 +38,7 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 "poisson"=poisson(link),
                 "binomial"=binomial(link))
             mod <- if (dist == "gaussian" && link == "identity") {
-                stats::lm(Y ~ .-1, data=XX, family=Family, ...)
+                stats::lm(Y ~ .-1, data=XX, ...)
             } else {
                 stats::glm(Y ~ .-1, data=XX, family=Family, ...)
             }
