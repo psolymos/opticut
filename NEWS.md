@@ -1,11 +1,13 @@
 # User-visible changes in the opticut package
 
-## Version 0.1-1 -- Jan 30, 2018
+## Version 0.1-1 -- Jan 31, 2018
 
 * `multicut` added for multi-level response model.
 * `fitted` and `predict` methods added.
 * New data set: `birdrec` bird detections.
 * `wrsi` and `sindex` functions migrated to ResourceSelection package.
+* the option `robust_loglik` safequards agains ill-defined (i.e. infinite)
+  log likelihoods that can be a result e.g. of perfect fit.
 
 ## Version 0.1-0 -- Dec 16, 2016
 
