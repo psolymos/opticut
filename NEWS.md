@@ -1,6 +1,6 @@
 # User-visible changes in the opticut package
 
-## Version 0.1-1 -- Mar 1, 2017
+## Version 0.1-1 -- Jan 30, 2018
 
 * `multicut` added for multi-level response model.
 * `fitted` and `predict` methods added.
