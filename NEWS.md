@@ -1,6 +1,6 @@
 # User-visible changes in the opticut package
 
-## Version 0.1-2 -- Jan 31, 2018
+## Version 0.1-2 -- Feb 1, 2018
 
 * the option `robust_loglik` safequards agains ill-defined (i.e. infinite)
   log likelihoods that can be a result e.g. of perfect fit.
