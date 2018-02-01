@@ -54,7 +54,7 @@ Tags are the following:
   log likelihoods a very small real number
   \code{-(.Machine$double.xmax^(1/3))}.
   \code{FALSE} is equivalent to allowing every model to
-  safeguard agains such cases or not.}
+  safeguard against such cases or not.}
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>

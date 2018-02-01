@@ -70,7 +70,7 @@ missing microphones can occur causing excess static or dead channels.
 11 = unbalanced channels.
 
 \code{TOY}: time of year intervals used for stratified random
-selection of dates. 8 intervals divied into 3 major units
+selection of dates. 8 intervals divided into 3 major units
 (early, mid, and late breeding season; \code{YDAY} 140 and 180 were used
 as threshold between the major units).
 
