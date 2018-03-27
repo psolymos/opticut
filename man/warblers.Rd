@@ -35,8 +35,8 @@ Ecology 39:599--619.
 data(warblers)
 str(warblers)
 
-warbh <- groupSums(warblers$xtab$num_cnt, 1, warblers$samp$height)
-warbd <- groupSums(warblers$xtab$num_cnt, 1, warblers$samp$depth)
+warbh <- mefa4::groupSums(warblers$xtab$num_cnt, 1, warblers$samp$height)
+warbd <- mefa4::groupSums(warblers$xtab$num_cnt, 1, warblers$samp$depth)
 op <- par(mfrow=c(1,2))
 matplot(rownames(warbh), warbh, type="b", xlab="height")
 matplot(warbd, type="b", axes=FALSE, xlab="depth")
