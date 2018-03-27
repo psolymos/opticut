@@ -1,5 +1,9 @@
 # User-visible changes in the opticut package
 
+## Version 0.1-3 -- Mar 27, 2018
+
+* `warblers` data set added based on MacArthur 1958.
+
 ## Version 0.1-2 -- Feb 1, 2018
 
 * the option `robust_loglik` safequards agains ill-defined (i.e. infinite)
