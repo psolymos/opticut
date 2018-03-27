@@ -6,8 +6,8 @@
 
 ## Version 0.1-2 -- Feb 1, 2018
 
-* the option `robust_loglik` safequards agains ill-defined (i.e. infinite)
-  log likelihoods that can be a result e.g. of perfect fit.
+* the option `robust_loglik` safequards against ill-defined (i.e. infinite)
+  log likelihoods that can be a result of e.g. perfect fit.
 
 ## Version 0.1-1 -- Jan 30, 2018
 
