@@ -5,7 +5,7 @@
 Warblers Data Set
 }
 \description{
-Five species of warblers were studies to determine the factors
+Five species of warblers were studied to determine the factors
 controlling the species abundances and competition (MacArthur 1958).
 }
 \usage{data("warblers")}
