@@ -25,8 +25,7 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
     LEV <- colnames(bp)
     K <- ncol(bp)
     S <- nrow(bp)
-    mle <- lapply(seq_len(S), function(i)
-        getMLE(object, i, vcov=type == "mcmc"))
+    mle <- lapply(seq_len(S), function(i) getMLE(object, i))
     cf <- sapply(mle, "[[", "coef")
     if (!is.null(xnew)) {
         if (is.data.frame(xnew)) {

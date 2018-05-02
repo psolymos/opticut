@@ -1,8 +1,6 @@
 subset.opticut <-
-function(x, subset=NULL, ...)
+function(x, subset, ...)
 {
-    if (is.null(subset))
-        return(x)
     if (any(is.na(subset)))
         stop("subset should not contain NA")
     out <- x

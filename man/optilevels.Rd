@@ -2,7 +2,7 @@
 \alias{optilevels}
 \alias{bestmodel.optilevels}
 \title{
-Optimal Number of Factor Levels
+Optimal number of factor levels
 }
 \description{
 Finds the optimal number of factor levels given the data and a model
@@ -31,77 +31,78 @@ It is the user's responsibility to ensure that values supplied
 for \code{z} are sensible and it also makes sense to bind
 \code{x} and \code{z} together.
 Variables in \code{z} should be centered (mean 0) (and
-possibly normalized by SD), because the design matrix
+possibly nomalized by SD), because the design matrix
 from \code{x} is not expected to include an intercept.
 }
-  \item{alpha}{numeric [0-1],
+  \item{alpha}{
 weighting factor for calculating information criteria for model selection
 (i.e. IC = (1-alpha)*AIC + alpha*BIC, also referred to as CAIC: consistent AIC).
 }
   \item{dist}{
 character, distribution argument passed to underlying functions,
 see listed on the help page of \code{\link{opticut}}
-(except for \code{dist = "zip2"}, \code{dist = "zinb2"}
-\code{dist = "rsf"}, and \code{dist = "rspf"}).
+(except for \code{dist = "rsf"} and \code{dist = "rspf"}
+which does not have a sound theoretical
+basis due to non-identifiability of piece-wise constant RSPF models).
 }
   \item{object}{
 fitted object.
 }
   \item{\dots}{
-other arguments passed to the underlying functions, see \code{\link{opticut1}}.
+other arguments passed to the underlying functions, see \code{\link{opticut}}.
 }
 }
 \value{
 An object of class 'optilevels' that is a list with the following elements:
 
 \describe{
-\item{\code{"delta"}}{delta IC values along the selection path considering best models.}
+\item{\code{delta}}{delta IC values along the selection path considering best models.}
 
-\item{\code{"ic"}}{IC values along the selection path considering best models.}
+\item{\code{ic}}{IC values along the selection path considering best models.}
 
-\item{\code{"coef"}}{matrix of coefficients (linear predictor scale)
+\item{\code{coef}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{x}
 along the selection path considering best models.}
 
-\item{\code{"zcoef"}}{matrix of coefficients (linear predictor scale)
+\item{\code{zcoef}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{z} when not \code{NULL}
 along the selection path considering best models, or \code{NULL}.}
 
-\item{\code{"rank"}}{matrix ranks based on the coefficients
+\item{\code{rank}}{matrix ranks based on the coefficients
 along the selection path considering best models.
 Ranking uses the default \code{ties.method = "average"} in \code{\link{rank}}.}
 
-\item{\code{"deltalist"}}{delta IC values along the selection path
+\item{\code{deltalist}}{delta IC values along the selection path
 considering all competing models.}
 
-\item{\code{"iclist"}}{IC values along the selection path
+\item{\code{iclist}}{IC values along the selection path
 considering all competing models.}
 
-\item{\code{"coeflist"}}{matrix of coefficients (linear predictor scale)
+\item{\code{coeflist}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{x}
 along the selection path considering all competing models.}
 
-\item{\code{"zcoeflist"}}{matrix of coefficients (linear predictor scale)
+\item{\code{zcoeflist}}{matrix of coefficients (linear predictor scale)
 corresponding to argument \code{z} when not \code{NULL}
 along the selection path considering all competing models, or \code{NULL}.}
 
-\item{\code{"ranklist"}}{matrix ranks based on the coefficients
+\item{\code{ranklist}}{matrix ranks based on the coefficients
 along the selection path considering all competing models.}
 
-\item{\code{"levels"}}{list of (merged) factor levels along the selection path
+\item{\code{levels}}{list of (merged) factor levels along the selection path
 considering best models.}
 
-\item{\code{"Y"}}{vector of observations (argument \code{y}).}
+\item{\code{Y}}{vector of observations (argument \code{y}).}
 
-\item{\code{"X"}}{design matrix component corresponding to argument \code{x}.}
+\item{\code{X}}{design matrix component corresponding to argument \code{x}.}
 
-\item{\code{"Z"}}{design matrix component corresponding to argument \code{z}.}
+\item{\code{Z}}{design matrix component corresponding to argument \code{z}.}
 
-\item{\code{"alpha"}}{weighting argument.}
+\item{\code{alpha}}{weighting argument.}
 
-\item{\code{"dist"}}{distribution argument.}
+\item{\code{dist}}{distribution argument.}
 
-\item{\code{"factor"}}{logical, indicating if argument \code{x} is a factor
+\item{\code{factor}}{logical, indicating if argument \code{x} is a factor
 (\code{TRUE}) or a matrix (\code{FALSE}).}
 }
 
@@ -112,8 +113,10 @@ manipulation (e.g. prediction).
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{opticut}} and \code{\link{multicut}}
-for fitting best binary and multi-level response models.
+\code{\link{opticut}} for finding best binary partitions.
+
+\code{\link{sindex}} and \code{\link{wrsi}}
+for weighted relative suitability index.
 }
 \examples{
 ## --- Factor levels with Gaussian distribution
@@ -126,9 +129,6 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
     Species3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
-## must add some noise to avoid perfect fit
-spp[6, "Species1"] <- 7
-spp[1, "Species3"] <- 17
 spp
 
 ol <- optilevels(spp[,"Species3"], gr)
@@ -155,7 +155,7 @@ names(b) <- LETTERS[1:k]
 x <- replicate(k, exp(rnorm(n)))
 x <- x / rowSums(x) # proportions
 X <- model.matrix(~.-1, data=data.frame(x))
-lam <- exp(drop(crossprod(t(X), b)))
+lam <- exp(drop(X \%*\% b))
 y <- rpois(n, lam)
 
 z <- optilevels(y, x, dist="poisson")

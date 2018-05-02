@@ -2,11 +2,11 @@
 \alias{rankComb}
 \alias{oComb}
 \title{
-Ranking Based Binary Partitions
+Ranking based binary partitions
 }
 \description{
 Blindly fitting a model to all possible partitions is wasteful
-use of resources. Instead, one can rank the K levels (strata)
+use of resources. Instead, one can rank the K partitions
 based on expected response values
 to explore only K-1 binary partitions along the gradient
 defined by the ranks of the expected values.

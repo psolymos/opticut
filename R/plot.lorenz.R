@@ -6,7 +6,7 @@ function(x, type=c("L", "x"), tangent=NA, h=NA, v=NA, ...)
         x[,c("p", "L")] else x[,c("p", "x")]
     ss <- summary(x)
     zz <- if (type == "L")
-        list(x=ss["p[t]"], y=ss["L[t]"]) else list(x=ss["p[t]"], y=ss["x[t]"])
+        list(x=ss["p(t)"], y=ss["L(t)"]) else list(x=ss["p(t)"], y=ss["x(t)"])
     if (type == "x" && !is.na(tangent)) {
         tangent <- NA
         warning("tangent cannot be plotted when type = 'x'")

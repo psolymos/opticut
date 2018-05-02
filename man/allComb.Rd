@@ -3,12 +3,12 @@
 \alias{kComb}
 \alias{checkComb}
 \title{
-Finding All Possible Binary Partitions
+Finding all possible binary partitions
 }
 \description{
 These functions are used to find all possible binary partitions.
 Finding all combinations require
-a classification vector with K > 1 strata.
+a classification vector with K > 1 partitions.
 }
 \usage{
 allComb(x, collapse)
@@ -24,17 +24,17 @@ character, what to paste between levels.
 Defaults to \code{getOption("ocoptions")$collapse}.
 }
   \item{k}{
-numeric, number of levels (strata) in a given classification (K > 1).
+numeric, number of partitions in a given classification (K > 1).
 }
 }
 \value{
 \code{kComb} returns a contrast matrix corresponding to
-all possible binary partitions of the factor with K levels.
+all possible binary partitions of the factor with k levels.
 Complements are not counted twice, i.e.
 (0,0,1,1) is equivalent to (1,1,0,0).
-The number of such possible combinations is M = 2^(K - 1) - 1.
+The number of such possible combinations is M = 2^(K-1) - 1.
 
-\code{allComb} takes a classification vector with at least 2 levels
+\code{allComb} this takes a classification vector with at least 2 levels
 and returns a model matrix with binary partitions.
 
 \code{checkComb} checks if combinations are unique and non-complementary
@@ -44,10 +44,9 @@ and returns a model matrix with binary partitions.
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{opticut}} for the user interface.
+\code{\link{rankComb}} for alternative partitioning algorithm.
 
-\code{\link{rankComb}} and \code{\link{lorenz}}
-for alternative partitioning algorithms.
+\code{\link{opticut}} for the user interface.
 }
 \examples{
 kComb(k = 2)

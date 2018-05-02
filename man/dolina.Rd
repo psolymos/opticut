@@ -2,10 +2,10 @@
 \alias{dolina}
 \docType{data}
 \title{
-Land Snail Data Set
+Land snail data set
 }
 \description{
-A comprehensive and micro-scale land snail data set from 16 dolinas of the
+A comprehensive and micro-scale land snail data set from 16 dolines of the
 Aggtelek Karst Area, Hungary.
 Data set containing land snail counts as described in Kemecei et al. 2014.
 }
@@ -38,7 +38,7 @@ litter microhabitat were not collected near wood or rocks
 (minimum distance of 2 meters). During 5 minutes per site of
 time-restricted direct search we investigated microhabitats in
 a 1 meter radius circle around the litter sample location, but
-also including tree or rock surfaces for those microhabitats.
+also including tree or rock surfaces.
 
 The vertical zone (\code{dolina$samp$stratum},
 bottom, middle or edge of the dolinas),
@@ -54,7 +54,7 @@ method of sorting dry material and the delay in litter sample
 processing, so these were combined and constituted the
 'fresh' group. Whitened, disintegrating and broken shells
 constituted the 'broken' group. This 'broken' group was
-excluded from the data set presented here.
+excluded from the data set.
 }
 \source{
 Solymos et al. 2016 and Kemencei et al. 2014.

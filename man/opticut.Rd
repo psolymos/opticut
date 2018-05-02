@@ -23,13 +23,12 @@
 \alias{as.data.frame.summary.opticut}
 \alias{getMLE.opticut}
 \title{
-Optimal Binary Response Model
+Likelihood based optimal partitioning for indicator species analysis
 }
 \description{
-The functions fits the multi-level response model for each species
-by finding the best binary partition based on model selection.
-Possibly controlling for modifying/confounding variables.
-The general algorithm is described in Kemencei et al. 2014.
+The functions find the best binary partition for each species based on
+model selection. Possibly controlling for modifying/confounding
+variables. The general algorithm is described in Kemencei et al. 2014.
 }
 \usage{
 opticut1(Y, X, Z, dist = "gaussian", sset=NULL, ...)
@@ -46,8 +45,8 @@ strata(object, ...)
 
 \method{bestmodel}{opticut}(object, which = NULL, ...)
 \method{bestpart}{opticut}(object, pos_only = FALSE, ...)
-\method{getMLE}{opticut}(object, which, vcov=FALSE, ...)
-\method{subset}{opticut}(x, subset=NULL, ...)
+\method{getMLE}{opticut}(object, which, ...)
+\method{subset}{opticut}(x, subset, ...)
 \method{fitted}{opticut}(object, ...)
 \method{predict}{opticut}(object, gnew=NULL, xnew=NULL, ...)
 
@@ -81,7 +80,7 @@ or possible a vector for single species case) in the left-hand side,
 model terms for modifying effects in the right-hand side
 (its structure depending on the underlying functions).
 For example, in the most basic Gaussian case it can be
-\code{y ~ 1} (no modifying variables) or \code{y ~ x}
+\code{y ~ 1} (mo modifying variables) or \code{y ~ x}
 (with modifying variables).
 Centering the modifying terms (or choosing the origin wisely)
 is generally recommended (especially for Gaussian distribution
@@ -114,12 +113,11 @@ character, how to define the binary partitions.
 \code{"all"} uses \code{\link{allComb}}.
 }
   \item{sset}{
-an optional vector specifying a subset of observations (rows)
-to be used in the fitting process. \code{NULL} means no subset taken.
+an optional vector specifying a subset of observations to be used in the fitting process. \code{NULL} means no subset taken.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel computations
-(integer value for forking is ignored on Windows).
+(this does nothing on Windows).
 }
   \item{Y}{
 numeric vector of observations for \code{opticut1},
@@ -146,10 +144,10 @@ logical value indicating if species/partitions
 should be meaningfully sorted, the default is \code{TRUE}.
 It can take numeric value when only species (\code{1})
 or partitions (\code{2}) are to be sorted (\code{1:2} is equivalent to
-\code{TRUE}).
+\code{TRUE}, wile any other numeric value is equivalent to \code{FALSE}).
 }
   \item{show_I}{
-logical, if indicator potential (I) should be shown.
+logical, if indicator values should be shown.
 }
   \item{show_S}{
 logical, if number of indicator species should be shown.
@@ -171,7 +169,7 @@ By default, \code{las} is 1 when \code{horizontal = TRUE} and
 2 when \code{horizontal = FALSE}.
 }
   \item{bty}{
-Character, determines the type of box which is drawn around plots,
+Character, determines the type of box which is drawn about plots,
 see \code{\link{par}}.
 }
   \item{lower, upper}{
@@ -193,7 +191,7 @@ numeric, number of significant digits in output.
   \item{which}{
 numeric or character (can be a vector) defining
 a subset of species from the fitted object,
-or \code{NULL} (all species, default).
+or or \code{NULL} (all species, default).
 }
   \item{sep}{
 a character string to separate the sub-strings in factor levels.
@@ -216,11 +214,7 @@ This is only important when \code{comb} is not \code{"rank"}.
 }
   \item{subset}{
 logical, numeric, or character index indicating species to keep,
-missing values are not accepted. The default \code{NULL} returns
-the original object without subsetting.
-}
-  \item{vcov}{
-logical, if variance-covariance matrix is to be returned.
+missing values are not accepted.
 }
   \item{gnew, xnew}{
 new values for \code{strata} and modifiers (right-hand-side of formula)
@@ -236,59 +230,45 @@ Currently available distributions:
 
 \describe{
 \item{\code{"gaussian"}}{real valued continuous observations, e.g. biomass,
-uses \code{\link[stats]{lm}} of the stats package.
-Identity link is assumed. Centering modified variables is generally advised
-to avoid negative expected values when the response is nonnegative.}
+uses \code{\link[stats]{lm}} of the stats package.}
 
 \item{\code{"poisson"}}{Poisson count data,
-uses \code{\link[stats]{glm}} of the stats package.
-Exponential (log) link is assumed.}
+uses \code{\link[stats]{glm}} of the stats package.}
 
 \item{\code{"binomial"}}{presence-absence (detection-nondetection) type data,
-uses \code{\link[stats]{glm}} of the stats package.
-Logistic (logit) link is assumed.}
+uses \code{\link[stats]{glm}} of the stats package.}
 
 \item{\code{"negbin"}}{overdispersed Negative Binomial count data,
-uses \code{\link[MASS]{glm.nb}} of the MASS package.
-Exponential (log) link is assumed.}
+uses \code{\link[MASS]{glm.nb}} of the MASS package.}
 
-\item{\code{"beta"}}{continuous response in the unit interval (0-1),
-e.g. percent cover,
-uses \code{\link[betareg]{betareg}} of the betareg package.
-Logistic (logit) link for the mean model is assumed.}
+\item{\code{"beta"}}{continuous response in the unit interval, e.g. percent cover,
+uses \code{\link[betareg]{betareg}}  of the betareg package.}
 
 \item{\code{"zip"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the abundance model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
-Exponential (log) link is used for count based analysis,
-the second part of the \code{dist} argument following the colon
-is used as link function for the zero component (logistic link assumed).}
+The zero-inflation component refers to the probability of 0.}
 
 \item{\code{"zinb"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the abundance model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
-The zero-inflation component refers to the probability of 0.
-Exponential (log) link is used for count based analysis,
-the second part of the \code{dist} argument following the colon
-is used as link function for the zero component (logistic link assumed).}
+The zero-inflation component refers to the probability of 0.}
 
 \item{\code{"zip2"}}{zero-inflated Poisson counts,
 indicative properties are tested as part of the zero-model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 1
-to be consistent with other methods regarding positive and negative effects.
-Logistic (logit) link is assumed for zero-nonzero based analysis,
-only symmetric link functions (logit, probit) allowed.
-Exponential (log) link is used for the count data part which cannot be changed.}
+to be consistent with other methods regarding positive and negative effects.}
 
 \item{\code{"zinb2"}}{zero-inflated Negative Binomial counts,
 indicative properties are tested as part of the zero-model,
 uses \code{\link[pscl]{zeroinfl}} of the pscl package.
 The zero-inflation component refers to the probability of 1
-to be consistent with other methods regarding positive and negative effects.
-Logistic (logit) link is assumed for zero-nonzero based analysis,
-only symmetric link functions (logit, probit) allowed.
-Exponential (log) link is used for the count data part which cannot be changed.}
+to be consistent with other methods regarding positive and negative effects.}
+
+\item{\code{"ordered"}}{response measured on ordinal scale,
+e.g. ordinal vegetation cover,
+uses \code{\link[MASS]{polr}} of the MASS package.}
 
 \item{\code{"rsf"}}{presence-only data using resource selection
 functions (RSF) as explained in  \code{\link[ResourceSelection]{rsf}}
@@ -296,9 +276,7 @@ in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rsf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model (i.e. no modifier variables in right-hand-side
-of the formula) is accepted for \code{"rsf"}.
-Exponential (log) link is assumed.}
+Intercept only model is accepted for \code{"rsf"}.}
 
 \item{\code{"rspf"}}{presence-only data using resource selection
 probability functions (RSPF)
@@ -307,14 +285,10 @@ in the ResourceSelection package, assuming global availability (\code{m = 0}).
 The \code{"rspf"} works only for single species using \code{opticut1}
 because 'presence-only' type data cannot be kept in a single
 matrix-like object for multiple species.
-Intercept only model is not accepted for \code{"rspf"}, need to have
-at least one continuous modifier variable for identifiability
-(see Solymos & Lele 2016).
-Logistic (logit) link is assumed.}
+Intercept only model is not accepted for \code{"rspf"}.}
 }
 
 Custom distributions can be defined, see Examples.
-Note: not all downstream algorithms and methods work with custom distributions.
 
 \code{fix_levels} is a utility function for replacing characters in
 factor levels that are identical to the value of the
@@ -347,7 +321,7 @@ with the following components:
 \item{\code{"nsplit"}}{number of binary splits considered.}
 \item{\code{"dist"}}{distribution.}
 \item{\code{"comb"}}{combination type.}
-\item{\code{"failed"}}{IDs for failed species models dropped from results list.}
+\item{\code{"failed"}}{IDs for failed species models.}
 \item{\code{"collapse"}}{character used for combining partition labels.}
 }
 
@@ -360,8 +334,8 @@ when custom matrix is supplied for \code{strata}.
 The \code{print} and \code{summary} methods are called for their side effects.
 The summary shows the following information:
 best supported split, strength and sign of association,
-indicator potential (I), expected values (mu0, mu1),
-log likelihood ratio (logLR), and model weights(w).
+indicator value (I), expected values (mu0, mu1), log likelihood ratio (logLR),
+and model weights(w).
 
 The \code{subset} method subsets the species in the opticut object.
 
@@ -370,7 +344,7 @@ The \code{plot} method presents the contrasts by species and strata.
 The \code{wplot} (weight plot) shows model weights for partitions.
 
 \code{\link{bestpart}} returns a matrix with the best supported
-partitions for each species (samples and rows, species as columns).
+partitions for each species (species as columns).
 
 \code{\link{bestmodel}} returns the best supported model for further
 manipulation (e.g. prediction). Note: custom distribution
@@ -380,7 +354,7 @@ use the best partition returned by \code{bestpart} to refit the model.
 \code{getMLE} returns a named list corresponding to the best supported
 model. The list has the following elements:
 \code{coef} is the Maximum Likelihood Estimate (MLE),
-\code{vcov} is the variance-covariance matrix for the MLE or \code{NULL},
+\code{vcov} is the variance-covariance matrix for the MLE,
 \code{dist} is the distribution inherited from input \code{object}.
 
 \code{\link{fitted}} returns expected values on the predictor scale
@@ -398,29 +372,22 @@ E. & Solymos, P. (2014): Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 Community Ecology 15:180--186.
 <doi:10.1556/ComEc.15.2014.2.6>
-
-Solymos, P. & Lele, S. R. (2016): Revisiting resource selection probability
-functions and single-visit methods: clarification and extensions.
-Methods in Ecology and Evolution 7:196--205.
-<doi:10.1111/2041-210X.12432>
 }
 \author{
-Peter Solymos <solymos@ualberta.ca> and Ermias T. Azeria
+Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
 \code{\link{allComb}}, and \code{\link{rankComb}}
 for partitioning algorithms.
 
-\code{\link{beta2i}} for indicator potential (I) calculations in summaries.
+\code{\link{beta2i}} for indicator value (I) calculations in summaries.
 
 \code{\link{bestmodel}}, \code{\link{bestpart}}, and \code{\link{uncertainty}}
 for manipulating fitted objects.
 
 \code{\link{ocoptions}} on how to set some of the global options
-related to the presentation of the results in the package
-and how errors encountered during model fitting are handled.
+related to the presentation of the results in the package.
 
-\code{\link{multicut}} for multinomial-response model,
 \code{\link{optilevels}} for finding the optimal number of factor levels.
 }
 \examples{
@@ -434,9 +401,6 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
     Species3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
-## must add some noise to avoid perfect fit
-spp[6, "Species1"] <- 7
-spp[1, "Species3"] <- 17
 spp
 
 ## all partitions
@@ -452,7 +416,7 @@ summary(opticut(spp, strata=gr, dist="gaussian", comb="rank")) # alternative
 set.seed(1234)
 n <- 200
 x0 <- sample(1:4, n, TRUE)
-x1 <- ifelse(x0 <= 2, 1, 0)
+x1 <- ifelse(x0 \%in\% 1:2, 1, 0)
 x2 <- rnorm(n, 0.5, 1)
 p1 <- plogis(-0.5 + 2*x1 + -0.8*x2)
 Y1 <- rbinom(n, 1, p1)
@@ -498,7 +462,7 @@ mods
 confint(mods[[1]])
 
 ## MLE and variance-covariance matrix (species 1)
-getMLE(m2, which=1, vcov=TRUE)
+getMLE(m2, which = 1)
 
 ## fitted values
 head(fitted(m2))

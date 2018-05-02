@@ -3,11 +3,11 @@
 \alias{bestpart}
 \alias{getMLE}
 \title{
-Best model, Partition, and MLE
+Best model, partition, and MLE
 }
 \description{
-Generic functions for accessing best model, best partition,
-and Maximum Likelihood Estimate from fitted objects.
+Accessing best model, best partition, and Maximum Likelihood Estimate
+from fitted objects.
 }
 \usage{
 bestmodel(object, ...)
@@ -39,6 +39,6 @@ model. The list has the following elements:
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{opticut}}, \code{\link{multicut}}, \code{\link{uncertainty}}.
+\code{\link{opticut}}, \code{\link{uncertainty}}.
 }
 \keyword{ methods }
