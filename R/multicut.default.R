@@ -38,13 +38,10 @@ function(Y, X, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
     Z <- strata
 
     if (!is.function(dist)) {
+        dist <- .opticut_dist(dist, make_dist=TRUE)
         Dist <- strsplit(as.character(dist), ":", fixed=TRUE)[[1L]][1L]
-        Dist <- match.arg(Dist,
-            c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rsf", "rspf",
-            "zip2", "zinb2"))
-        ## sanity check for ordered/rsf/rspf
-        if (Dist %in% c("ordered", "rsf", "rspf") && ncol(Y) > 1L)
+        ## sanity check for rsf/rspf
+        if (Dist %in% c("rsf", "rspf") && ncol(Y) > 1L)
             stop("'", Dist, "' is only available for single species in RHS")
     }
 
@@ -94,6 +91,7 @@ function(Y, X, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
         nobs=NOBS,
         sset=sset,
         dist=dist,
+        scale=getOption("ocoptions")$scale,
         failed=failed)
     if (is.function(dist)) {
         attr(out$dist, "dist") <- deparse(substitute(dist))
@@ -101,5 +99,9 @@ function(Y, X, strata, dist="gaussian", sset=NULL, cl=NULL, ...)
             attr(out$species[[i]], "dist") <- deparse(substitute(dist))
     }
     class(out) <- "multicut"
+    mu <- sapply(out$species, "[[", "mu")
+    if (any(mu < 0))
+        warning("Negative fitted values found for ",
+            sum(colSums(mu < 0) > 0), " species.")
     out
 }

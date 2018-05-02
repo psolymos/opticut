@@ -6,7 +6,7 @@ print.summary.opticut <- function(x, cut, sort, digits, ...) {
     if (missing(sort))
         sort <- getOption("ocoptions")$sort
 
-    xx <- .summary_opticut(x, cut=cut, sort=sort)
+    xx <- .summary_opticut(x, cut=cut, sort=sort, multi=FALSE)
 
     Missing <- nrow(x$summary) - nrow(xx)
     tmp <- if (nrow(xx) > 1L)

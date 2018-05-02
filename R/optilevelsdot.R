@@ -4,19 +4,9 @@
 .optilevels <-
 function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
 {
-    if (!is.function(dist)) {
-        dist <- match.arg(dist,
-            c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rspf"))
-        if (dist == "rspf")
-            stop("dist='rspf' not supported for optilevels")
-        if (dist == "rsf")
-            stop("dist='rsf' not supported for optilevels")
-    }
     if (is.null(colnames(X)))
         colnames(X) <- paste0("X", seq_len(ncol(X)))
     colnames(X) <- gsub("\\s", "", colnames(X))
-#    nx <- ncol(X)
     X0 <- X
     if (!is.null(Z)) {
         Z <- data.matrix(Z)
@@ -31,6 +21,7 @@ function(Y, X, Z = NULL, alpha=0, dist="gaussian", ...)
 
     m_full <- .opticut1(Y, X, Z1=NULL, dist=dist, ...)
     cf_full <- m_full$coef
+    ## drop phi and variance components
     if (dist %in% c("zip","zinb","beta"))
         cf_full <- cf_full[-length(cf_full)]
 

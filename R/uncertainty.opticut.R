@@ -29,20 +29,15 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
         niter <- ncol(B)
     }
     ## subset
-    if (is.null(which))
-        which <- names(object$species)
+    object <- subset(object, subset=which)
     spp <- names(object$species)
-    names(spp) <- spp
-    spp <- spp[which]
-    ## subset object according to which
-    object$species <- object$species[spp]
+#    names(spp) <- spp
 
     ## template for return value
     out <- summary(object)
     out$B <- niter
     out$type <- type
-    out$Y <- out$Y[,spp,drop=FALSE]
-    class(out) <- "uncertainty"
+    class(out) <- c("uncertainty_opti", "uncertainty")
 
     if (inherits(cl, "cluster")) {
         parallel::clusterEvalQ(cl, library(opticut))
@@ -58,6 +53,7 @@ type=c("asymp", "boot", "multi"), B=99, cl=NULL, ...)
         .uncertaintyOpticut1(object=object, i, type=type, B=B,
             pb = FALSE, ...), cl=cl, ...)
 
+    names(res) <- spp
     out$uncertainty <- res
     out
 }

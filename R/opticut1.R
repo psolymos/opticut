@@ -85,19 +85,22 @@ function(Y, X, Z, dist="gaussian", sset=NULL, ...)
 
     scale <- getOption("ocoptions")$scale
     out <- data.frame(assoc=h,
-        I=abs(tanh(cf[,2L] * scale)),
-        #I=tanh(abs(cf[,2L])),
-#        I=2*(plogis(abs(cf[,2L]))-0.5),
+        I=beta2i(cf[,2L], scale=scale),
         null=cfnull,
-        mu0=cf0, mu1=cf1,
-        beta0=cf[,1L], beta1=cf[,2L],
-        logL=ll, logLR=ll-res0$logLik, w=w)
+        mu0=cf0,
+        mu1=cf1,
+        beta0=cf[,1L],
+        beta1=cf[,2L],
+#        gamma0=cf[,1L],
+#        gamma1=cf[,1L] + cf[,2L],
+        logL=ll,
+        logLR=ll-res0$logLik,
+        w=w)
     rownames(out) <- colnames(Z)
     attr(out, "logL_null") <- res0$logLik
-#    attr(out, "penalty") <- getOption("ocoptions")$penalty
     attr(out, "H") <- sum(w^2)
     attr(out, "dist") <- if (is.function(dist))
-        deparse(substitute(dist)) else dist
+        deparse(substitute(dist)) else .opticut_dist(dist, make_dist=TRUE)
     attr(out, "comb") <- Comb
     attr(out, "est") <- Est
     attr(out, "scale") <- scale

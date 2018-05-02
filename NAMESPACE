@@ -1,65 +1,81 @@
 export("opticut", "optilevels", "opticut1", "multicut1", "multicut",
-    "wrsi", "sindex",
     "lorenz",
     "ocoptions", "occolors", "col2gray",
     "allComb", "kComb", "checkComb", "rankComb", "oComb",
     "bestmodel", "bestpart", "getMLE",
     "uncertainty", "bsmooth",
-    "ipredict",
-    "wplot",
+    "wplot", "lcplot",
     "fix_levels", "strata", "check_strata", "beta2i",
     "iquantile")
+
 S3method("opticut", "default")
 S3method("opticut", "formula")
 S3method("multicut", "default")
 S3method("multicut", "formula")
 S3method("bestmodel", "opticut")
+S3method("bestmodel", "multicut")
 S3method("bestmodel", "optilevels")
 S3method("bestpart", "opticut")
+S3method("bestpart", "multicut")
 S3method("bestpart", "uncertainty")
 S3method("bestpart", "uncertainty1")
 S3method("bsmooth", "uncertainty1")
 S3method("bsmooth", "uncertainty")
 S3method("getMLE", "opticut")
-S3method("ipredict", "multicut")
-S3method("ipredict", "opticut")
+S3method("getMLE", "multicut")
 S3method("predict", "opticut")
+S3method("predict", "multicut")
 S3method("fitted", "opticut")
+S3method("fitted", "multicut")
+S3method("quantile", "lorenz")
+S3method("iquantile", "lorenz")
+S3method("strata", "opticut")
+S3method("strata", "multicut")
+S3method("strata", "uncertainty")
+S3method("subset", "opticut")
+S3method("subset", "multicut")
+S3method("subset", "uncertainty")
+S3method("uncertainty", "opticut")
+S3method("uncertainty", "multicut")
+
 S3method("plot", "opticut")
+S3method("plot", "multicut")
+S3method("plot", "multicut1")
 S3method("plot", "lorenz")
 S3method("wplot", "opticut")
 S3method("wplot", "opticut1")
+S3method("lcplot", "multicut1")
+
 S3method("print", "opticut")
+S3method("print", "multicut")
 S3method("print", "opticut1")
+S3method("print", "multicut1")
 S3method("print", "uncertainty1")
 S3method("print", "uncertainty")
 S3method("print", "summary.uncertainty")
 S3method("print", "summary.opticut")
+S3method("print", "summary.multicut")
 S3method("print", "summary.lorenz")
-S3method("quantile", "lorenz")
-S3method("iquantile", "lorenz")
-S3method("strata", "opticut")
-S3method("strata", "uncertainty")
-S3method("subset", "opticut")
-S3method("subset", "uncertainty")
 S3method("summary", "opticut")
+S3method("summary", "multicut")
 S3method("summary", "uncertainty")
 S3method("summary", "lorenz")
-S3method("uncertainty", "opticut")
 
 S3method("as.data.frame", "opticut")
 S3method("as.data.frame", "summary.opticut")
+S3method("as.data.frame", "multicut")
+S3method("as.data.frame", "summary.multicut")
 S3method("as.data.frame", "uncertainty")
 S3method("as.data.frame", "summary.uncertainty")
 
 importFrom("mefa4", "groupSums", "nonDuplicated")
 importFrom("grDevices", "colorRampPalette", "col2rgb", "gray")
 importFrom("graphics", "abline", "axis", "barplot", "box", "lines",
-           "par", "plot", "polygon", "title")
+           "par", "plot", "polygon", "title", "legend")
 importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
            "vcov", "density", "quantile", ".MFclass", "nobs",
            "as.dist", "hclust", "predict", "fitted", "formula",
-           "dbinom", "dpois")
+           "dbinom", "dpois", "sigma", "lm", "glm")
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")

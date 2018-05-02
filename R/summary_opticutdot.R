@@ -1,7 +1,14 @@
-.summary_opticut <- function(x, cut=2, sort=TRUE) {
+.summary_opticut <-
+function(x, cut=2, sort=TRUE, multi=FALSE)
+{
     sort <- if (is.logical(sort))
         sort[1L] else 1 %in% sort
-    xx <- x$summary[, c("split", "assoc", "I", "mu0", "mu1", "logLR", "w")]
+    if (multi) {
+        cn <- c("split", "assoc", "I", "logLR")
+    } else {
+        cn <- c("split", "assoc", "I", "mu0", "mu1", "logLR", "w")
+    }
+    xx <- x$summary[, cn]
     if (sort) {
         xx <- xx[attr(x$bestpart, "row.order"),]
     }

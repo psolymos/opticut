@@ -2,7 +2,7 @@
 \alias{occolors}
 \alias{col2gray}
 \title{
-Color palettes for the opticut package
+Color Palettes for the opticut Package
 }
 \description{
 A convenient way of setting color palettes for the opticut package.
@@ -14,7 +14,8 @@ col2gray(col, method="BT.709")
 \arguments{
   \item{theme}{
 character value, character vector, or a function used to interpolate the colors.
-The built-in values are \code{"br"} (blue-red divergent palette, colorblind safe),
+The built-in values are \code{"br"} (default, blue-red divergent palette,
+colorblind safe),
 \code{"gr"} (green-red divergent palette), \code{"bw"} (black and white: grayscale converted \code{"br"} settings).
 See \code{\link{colorRampPalette}}, \code{\link{gray}} and the Examples.
 }
@@ -23,7 +24,7 @@ vector of color specification as described on the help page
 for the \code{\link{col2rgb}} function. This is converted to grayscale.
 }
   \item{method}{
-character, the method used for grayscale conversion.
+character, the method used for grayscale conversion. See Details.
 }
 }
 \details{
@@ -48,7 +49,7 @@ red (R), green (G), and blue (B) color channels as follows:
 \value{
 \code{occolors} returns a function, see \code{\link{colorRampPalette}}.
 
-\code{col2gray} returns a vector of grey colors based on
+\code{col2gray} returns a vector of gray colors based on
 the conversion \code{method} and \code{\link{gray}}.
 }
 \author{
@@ -56,11 +57,14 @@ Peter Solymos <solymos@ualberta.ca>
 
 Hexadecimal values for the built-in palettes are taken from
 \url{http://colorbrewer2.org/}.
+
+Converting color to grayscale:
+\url{https://en.wikipedia.org/wiki/Grayscale}
 }
 \seealso{
 \code{\link{colorRampPalette}} for a general description of palettes.
 
-\code{\link{ocoptions}} for setting the color theme options in the
+\code{\link{ocoptions}} for setting the color theme option in the
 opticut package.
 }
 \examples{

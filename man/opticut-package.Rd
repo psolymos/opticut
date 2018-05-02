@@ -13,12 +13,11 @@ The DESCRIPTION file:
 \packageDESCRIPTION{opticut}
 \packageIndices{opticut}
 
-The main user interface is the \code{\link{opticut}} function
-to find the optimal binary partitioning.
+The main user interface are the \code{\link{opticut}}
+and \code{\link{multicut}} functions
+to find the optimal binary or multi-level response models.
 Make sure to evaluate \code{\link{uncertainty}}.
-
-\code{\link{optilevels}} goes beyond
-binary partitions and finds the optimal number of factor levels.
+\code{\link{optilevels}} finds the optimal number of factor levels.
 }
 \author{
 \packageAuthor{opticut}
@@ -54,6 +53,10 @@ uc <- uncertainty(oc, type = "asymp", B = 999)
 summary(uc)
 
 ## go beyond binary partitions
+
+mc <- multicut(formula = y ~ 1, strata = g, dist = "poisson")
+summary(mc)
+
 ol <- optilevels(y[,"Sp2"], as.factor(g))
 ol[c("delta", "coef", "rank", "levels")]
 }

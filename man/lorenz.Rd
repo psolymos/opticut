@@ -7,13 +7,13 @@
 \alias{iquantile.lorenz}
 \alias{plot.lorenz}
 \title{
-Lorenz curve based thresholds and partitions
+Lorenz Curve Based Thresholds and Partitions
 }
 \description{
 Lorenz curve based thresholds and partitions.
 }
 \usage{
-lorenz(x, na.last = TRUE)
+lorenz(x, n = rep(1, length(x)), na.last = TRUE)
 
 \method{quantile}{lorenz}(x, probs = seq(0, 1, 0.25),
     type = c("L", "p"), ...)
@@ -31,7 +31,10 @@ iquantile(x, ...)
   \item{x}{a vector of nonnegative numbers for \code{lorenz}, or
 an object to plot or summarized.
 }
-  \item{na.last}{for controlling the treatment of \code{NA}s.
+  \item{n}{a vector of frequencies, must be same length as \code{x}.
+}
+
+  \item{na.last}{logical, for controlling the treatment of \code{NA}s.
 If \code{TRUE}, missing values in the data are put last;
 if \code{FALSE}, they are put first; if \code{NA}, they are removed
 (see \code{\link{order}}).
@@ -73,27 +76,29 @@ other arguments passed to the underlying functions.
 }
 \details{
 The Lorenz curve is a continuous piecewise linear function
-representing the distribution of income or wealth.
-Cumulative portion of the population: p_i = i / n (i=1,...,n), vs.
-cumulative portion of wealth: L_i = sum_{j=1}^{i} x_j / sum_{j=1}^{n} x_j,
+representing the distribution of abundance (income, or wealth).
+Cumulative portion of the population: p_i = i / m (i=1,...,m), vs.
+cumulative portion of abundance:
+L_i = sum_{j=1}^{i} x_j * n_j / sum_{j=1}^{n} x_j * n_j.
 where x_i are indexed in non-decreasing order (x_i <= x_{i+1}).
 By convention, p_0 = L_0 = 0.
+\code{n} can represent unequal frequencies.
 
 The following charactersitics of the Lorenz curve are calculated:
 \code{"t"}: index where tangent (slope 1) touches the curve;
-\code{"x(t)"}, \code{"p(t)"}, and \code{"L(t)"} are values corresponding to
-index t.
-\code{"S"}: Lorenz asymmetry coefficient (S = p(t) + L(t)),
+\code{"x[t]"}, \code{"p[t]"}, and \code{"L[t]"} are values corresponding to
+index t, x_t is the unmodified input.
+\code{"S"}: Lorenz asymmetry coefficient (S = p_t + L_t),
 S = 1 indicates symmetry.
-\code{"G"}: Gini coefficient. 0 is perfect equality,
+\code{"G"}: Gini coefficient, 0 is perfect equality,
   values close to 1 indicate high inequality.
 \code{"J"}: Youden index is the (largest) distance between the anti-diagonal
-and the curve. Distance is largest at the tangent point
-(J = max(p(t) - L(t))).
+and the curve, distance is largest at the tangent point
+(J = max(p - L) = p_t - L_t).
 }
 \value{
-\code{lorenz} returns an object of class lorenz. It is a matrix with n+1 rows
-(n = \code{length(x)}) and 3 columns (p, L, x).
+\code{lorenz} returns an object of class lorenz. It is a matrix with m+1 rows
+(m = \code{length(x)}) and 3 columns (p, L, x).
 
 The \code{quantile} method finds values of x_i corresponding to
 quantiles L_i or p_i (depending on the \code{type} argument).
@@ -101,6 +106,9 @@ The \code{iquantile} (inverse quantile) method
 finds quantiles of L_i or p_i corresponding to values of x_i.
 
 The \code{plot} method draws a Lorenz curve.
+Because the object is a matrix, \code{\link{lines}}
+and \code{\link{points}} will work for adding multiple lines.
+
 The \code{summary} method returns characteristics of the Lorenz curve.
 }
 \references{
@@ -148,6 +156,18 @@ abline(0, 1, lty=2, col="grey")
 abline(1, -1, lty=2, col="grey")
 plot(l, type="x", lwd=2, h=3, v=4)
 par(op)
+
+## Lorenz-tangent approach to binarize a multi-level problem
+n <- 100
+g <- as.factor(sort(sample(LETTERS[1:4], n, replace=TRUE, prob=4:1)))
+x <- rpois(n, exp(as.integer(g)))
+mu <- aggregate(x, list(g), mean)
+(l <- lorenz(mu$x, table(g)))
+(s <- summary(l))
+
+plot(l)
+abline(0, 1, lty=2)
+lines(rep(s["p[t]"], 2), c(s["p[t]"], s["L[t]"]), col=2)
 }
 \keyword{ manip }
 \keyword{ misc }

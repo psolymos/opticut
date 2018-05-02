@@ -1,6 +1,7 @@
 \name{uncertainty}
 \alias{uncertainty}
 \alias{uncertainty.opticut}
+\alias{uncertainty.multicut}
 \alias{print.uncertainty1}
 \alias{print.uncertainty}
 \alias{print.summary.uncertainty}
@@ -16,7 +17,7 @@
 \alias{bsmooth.uncertainty}
 \alias{subset.uncertainty}
 \title{
-Quantifying uncertainty for fitted objects
+Quantifying Uncertainty for Fitted Objects
 }
 \description{
 Quantifying uncertainty for fitted objects.
@@ -26,10 +27,13 @@ uncertainty(object, ...)
 \method{uncertainty}{opticut}(object,
     which = NULL, type = c("asymp", "boot", "multi"),
     B = 99, cl = NULL, ...)
+\method{uncertainty}{multicut}(object,
+    which = NULL, type = c("asymp", "boot"),
+    B = 99, cl = NULL, ...)
 
 check_strata(x, mat)
 \method{strata}{uncertainty}(object, ...)
-\method{subset}{uncertainty}(x, subset, ...)
+\method{subset}{uncertainty}(x, subset=NULL, ...)
 
 \method{bestpart}{uncertainty}(object, ...)
 \method{bestpart}{uncertainty1}(object, ...)
@@ -49,9 +53,9 @@ check_strata(x, mat)
 }
 \arguments{
   \item{object}{
-fitted model object from \code{\link{opticut}}
-which does not contain extra arguments as part of \code{...}
-(or an output from \code{uncertainty} for the \code{summary} method).
+fitted model object
+(which should not contain extra arguments as part of \code{...}),
+or an output from \code{uncertainty} for the \code{summary} method.
 }
   \item{which}{
 numeric or character (can be a vector) defining
@@ -59,18 +63,8 @@ a subset of species from the fitted object,
 or or \code{NULL} (all species, default).
 }
   \item{type}{
-character, describing the type of uncertainty calculation for
-indicator value \code{I}, and expected values \code{mu0}, and \code{mu1}.
-\code{"asymp"}: asymptotic distribution is based on best partition
-found for the input object (this option
-is unavailable for custom distribution functions).
-\code{"boot"}: non-parametric bootstrap distribution
-based on best partition found for the input object.
-\code{"multi"}: non-parametric bootstrap distribution
-based on best partition found for the bootstrap data (i.e.
-the model ranking is re-evaluated each time).
-\code{"multi"} works only if \code{comb = "rank"} in the
-\code{\link{opticut}} call.
+character, describing the type of uncertainty calculation.
+See Details.
 }
   \item{B}{
 numeric, number of iterations. For \code{type = "boot"} and
@@ -79,7 +73,7 @@ resampling with dimensions length of observations times B.
 }
   \item{cl}{
 a cluster object, or an integer for multiple cores in parallel computations
-(this does nothing on Windows).
+(integer value for forking is ignored on Windows).
 }
   \item{x}{
 an object to be printed.
@@ -115,13 +109,35 @@ missing values are not accepted.
 other arguments passed to the underlying functions.
 }
 }
+\details{
+Uncertainty is calculated for
+indicator potential \code{I}, and expected values
+(\code{mu0}, and \code{mu1} for opticut, and \code{mu_*} for multicut objects).
+
+\code{"asymp"}: asymptotic distribution is based on best supported model
+(this option is unavailable for custom distribution functions because
+it requires the Hessian matrix).
+This type is available for both opticut and multicut objects.
+
+\code{"boot"}: non-parametric bootstrap distribution
+based on best partition found for the input object.
+This type is available for both opticut and multicut objects.
+
+\code{"multi"}: non-parametric bootstrap distribution
+based on best partition found for the bootstrap data (i.e.
+the model ranking is re-evaluated each time).
+\code{"multi"} works only if \code{comb = "rank"} in the
+\code{\link{opticut}} call.
+This type is not available for multicut objects.
+}
 \value{
 \code{uncertainty} returns an object of class 'uncertainty'.
 The \code{uncertainty} element of the object is a list with species specific
 output as elements (object class 'uncertainty1').
-Each 'uncertainty1' output is a data frame with 4 columns:
-\code{best} partition, indicator value \code{I},
-and expected values \code{mu0}, and \code{mu1}.
+Each 'uncertainty1' output is a data frame with columns:
+\code{best} partition, indicator potential \code{I},
+and expected values
+(\code{mu0}, and \code{mu1} for opticut, and \code{mu_*} for multicut objects).
 
 \code{check_strata} returns a logical vector checking if
 all original strata from the input object are represented
@@ -131,31 +147,34 @@ for further diagnostics.
 The summary method prints the name of the best supported split,
 selection frequency (R, reliability), indicator values (I, based on
 the distribution of values within the best supported split with highest
-reliability) and conficence interval for I (based on \code{level}).
+reliability) and confidence interval for I (based on \code{level}).
 
 The \code{subset} method subsets the species in the uncertainty object.
 
 \code{\link{bestpart}} finds the selection frequencies for
-strata as best partitions (number of strata times number of species).
+strata as best partitions (number of strata x number of species).
 
 The coercion method \code{\link{as.data.frame}} returns a data frame.
 
 The \code{bsmooth} method returns bootstrap smoothed results
-for each strata.
+for each strata (not available for multicut based uncertainty objects,
+check uncertainty results instead).
 }
 \section{Warning}{
 Resampling methods can lead to complete exclusion of certain strata
 when sample size is small. Try revising the stratification of the
 input object, or provide custom resampling indices via the \code{B}
 argument using stratified (block) bootstrap, jackknife (leave-one-out),
-or similar techniques. Sometimes finding a suitable random seed
-via \code{\link{set.seed}} can resolve the issue.
+or similar techniques. Finding a suitable random seed
+via \code{\link{set.seed}} or dropping unsuitable iterations
+can also resolve the issue.
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
 }
 \seealso{
-\code{\link{opticut}} for the user interface.
+\code{\link{opticut}} and \code{\link{multicut}} for the
+user interface of the input objects.
 }
 \examples{
 set.seed(2345)
@@ -201,6 +220,7 @@ uc3$uncertainty
 bestpart(uc3$uncertainty[[1]])
 bsmooth(uc3$uncertainty[[1]])
 
+\dontrun{
 ## block bootstrap
 block_fun <- function()
     unlist(lapply(unique(x0), function(z) if (sum(x0==z) < 2)
@@ -214,7 +234,19 @@ B <- sapply(1:n, function(i) which((1:n) != i))
 check_strata(oc, B) # check representation
 summary(uncertainty(oc, type="multi", B=B))
 
-\dontrun{
+## multicut based uncertainty
+mc <- multicut(Y ~ x2, strata=x0, dist="poisson")
+
+## asymptotic confidence intervals
+(muc1 <- uncertainty(mc, type="asymp", B=999))
+summary(muc1)
+bestpart(muc1)
+
+## bootstrap-based confidence intervals
+(muc2 <- uncertainty(mc, type="boot", B=19))
+summary(muc2)
+bestpart(muc2)
+
 ## dolina example
 data(dolina)
 ## stratum as ordinal
@@ -246,6 +278,7 @@ boxplot(t(bs), ylab="Expected value")
 cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
 
 ## A more interesting simulated example for bootstrap smoothing
+## and comparing opticut vs. multicut
 set.seed(1)
 n <- 2000
 x <- sort(runif(n, -8, 8))
@@ -256,13 +289,23 @@ br <- seq(min(x), max(x), by=d)
 g <- cut(x, br, include.lowest=TRUE)
 levels(g) <- LETTERS[1:nlevels(g)]
 o <- opticut(y ~ 1, strata=g, dist="binomial")
+m <- multicut(y ~ 1, strata=g, dist="binomial")
 library(parallel)
 cl <- makeCluster(2)
-u <- uncertainty(o, type="multi", B=99, cl=cl)
+uo <- uncertainty(o, type="multi", B=99, cl=cl)
+um <- uncertainty(m, type="boot", B=99, cl=cl)
 stopCluster(cl)
-bs <- bsmooth(u$uncertainty[[1]])
-stat <- cbind(Mean=rowMeans(bs), t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
-plot(p ~ x, type="l", ylim=c(0,1))
+## bootstrap average for opticut
+bs <- bsmooth(uo$uncertainty[[1]])
+stat <- cbind(Mean=rowMeans(bs),
+    t(apply(bs, 1, quantile, probs=c(0.025, 0.975))))
+## bootstrap average for multicut
+bsm <- as.matrix(um$uncertainty[[1]][,-(1:2)])
+statm <- cbind(Mean=colMeans(bsm),
+    t(apply(bsm, 2, quantile, probs=c(0.025, 0.975))))
+
+op <- par(mfrow=c(2,1))
+plot(p ~ x, type="l", ylim=c(0,1), main="Binary partitions (opticut)")
 abline(v=br, col="grey", lty=3)
 lines(br[-1]-0.5*d, stat[,1], col=4)
 lines(br[-1]-0.5*d, stat[,2], col=4, lty=2)
@@ -270,6 +313,15 @@ lines(br[-1]-0.5*d, stat[,3], col=4, lty=2)
 lines(br[-1]-0.5*d, bs[,1], col=2)
 legend("topright", bty="n", lty=c(1,1,2,1), col=c(1,4,4,2),
     legend=c("True response","bsmooth","0.95 CI","Best partition"))
+
+plot(p ~ x, type="l", ylim=c(0,1), main="Multi-level model (multicut)")
+abline(v=br, col="grey", lty=3)
+lines(br[-1]-0.5*d, statm[,1], col=4)
+lines(br[-1]-0.5*d, statm[,2], col=4, lty=2)
+lines(br[-1]-0.5*d, statm[,3], col=4, lty=2)
+legend("topright", bty="n", lty=c(1,1,2), col=c(1,4,4),
+    legend=c("True response","bsmooth","0.95 CI"))
+par(op)
 }
 }
 \keyword{ manip }

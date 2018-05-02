@@ -13,14 +13,7 @@ theme, mar=c(5, 4, 4, 4) + 0.1, bty="o", ...)
     } else {
         w <- w[x$logLR >= cut]
     }
-    if (!missing(theme) && is.character(theme))
-        if (length(theme) == 1L)
-            if (theme == "bw")
-                #warning("'bw' theme not best suited for wplot")
-                theme <- occolors(c("black", "lightgrey", "black"))
     COL <- occolors(theme)(20)
-#    COL <- c(colorRampPalette(c("red","yellow"))(10),
-#         colorRampPalette(c("yellow","green"))(10))
     br <- seq(-1, 1, 0.1)
     op <- par(las=las, mar=mar)
     on.exit(par(op))

@@ -8,6 +8,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
 {
     if (missing(linkinv))
         linkinv <- is.null(Z1)
+    if (missing(X))
+        X <- matrix(1, NROW(Y), 1L)
     if (is.null(Z1)) {
         XX <- as.data.frame(X)
     } else {
@@ -17,17 +19,14 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
     }
     if (!is.function(dist)) {
         dist <- as.character(dist)
-        dist <- strsplit(dist, ":", fixed=TRUE)[[1]]
+        dist <- strsplit(dist, ":", fixed=TRUE)[[1L]]
         if (length(dist) > 1L) {
             link <- dist[2L]
             dist <- dist[1L]
         } else {
             link <- NULL
         }
-        dist <- match.arg(dist,
-            c("gaussian","poisson","binomial","negbin",
-            "beta","zip","zinb","ordered", "rsf", "rspf",
-            "zip2", "zinb2"))
+        dist <- match.arg(dist, .opticut_dist())
         if (dist %in% c("gaussian", "poisson", "binomial")) {
             if (is.null(link))
                 link <- switch(dist,
@@ -38,14 +37,21 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 "gaussian"=gaussian(link),
                 "poisson"=poisson(link),
                 "binomial"=binomial(link))
-            mod <- stats::glm(Y ~ .-1, data=XX, family=Family, ...)
+            mod <- if (dist == "gaussian" && link == "identity") {
+                stats::lm(Y ~ .-1, data=XX, ...)
+            } else {
+                stats::glm(Y ~ .-1, data=XX, family=Family, ...)
+            }
             cf <- coef(mod)
+            if (dist == "gaussian")
+                attr(cf, "sigma") <- sigma(mod) # summary(mod)$sigma
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
         if (dist == "negbin") {
             mod <- MASS::glm.nb(Y ~ .-1, data=XX, ...)
             cf <- coef(mod)
+            attr(cf, "theta") <- mod$theta
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
@@ -65,7 +71,8 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 link=link, ...)
             cf <- coef(mod)
             ll <- as.numeric(logLik(mod))
-            linv <- mod$linkinv
+            ## log link used for count based contrasts
+            linv <- poisson("log")$linkinv
         }
 ## zip2 & zinb2 implementation:
 ## - MLE returns unmodified coefs (P of 0 in ZI)
@@ -89,38 +96,10 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 stop("only logit and probit link allowed for zip2 and zinb2")
             mod <- pscl::zeroinfl(Y ~ X-1 | ZZ-1, dist=Dist,
                 link=link, ...)
-            linv <- function(eta) binomial(link)$linkinv(eta)
+            ## logit/probit/etc used for (1-phi) based contrasts
+            linv <- binomial(link)$linkinv
             cf <- c(-coef(mod, "zero"), coef(mod, "count"))
             ll <- as.numeric(logLik(mod))
-        }
-        if (dist == "ordered") {
-            if (!is.null(list(...)$method))
-                if (list(...)$method != "logistic")
-                    stop("Sorry but only logisic model allowed for ordered.")
-            if (!is.null(link))
-                if (link != "logistic")
-                    stop("Sorry but only logisic model allowed for ordered.")
-            Y <- as.ordered(Y)
-            if (nlevels(Y) > 2) { # ordinal
-                ## need to keep the intercept
-                if (ncol(XX)==1) {
-                    if (!is.null(list(...)$data))
-                        stop("Note: data argument should not be provided as part of ...")
-                    ## Hess needed for uncertainty(type=asymp):
-                    ## that is when full_model is needed
-                    mod <- MASS::polr(Y ~ 1, method="logistic",
-                        Hess=full_model, ...)
-                } else {
-                    mod <- MASS::polr(Y ~ ., data=data.frame(XX[,-1L,drop=FALSE]),
-                        Hess=full_model, method="logistic", ...)
-                }
-                cf <- c(mod$zeta[1L], coef(mod), mod$zeta[-1L])
-            } else {
-                mod <- stats::glm(Y ~ .-1, data=XX, family=binomial("logit"), ...)
-                cf <- coef(mod)
-            }
-            ll <- as.numeric(logLik(mod))
-            linv <- binomial("logit")$linkinv
         }
         if (dist %in% c("rsf", "rspf")) {
             ## formula interface used (rsf, rspf, and not rsf.fit)
@@ -132,20 +111,24 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 if (!is.null(link) && link != "log")
                     warning("link argument ignored for dist='rsf' (log link used by default)")
                 link <- "log" # this is needed for linkinv below
+                ## --- rsf implementation uses PL of Lele 2009 ---
                 ## note: the call uses link='log', no need to provide link=link here!
-#                mod <- ResourceSelection::rsf(Y ~ .,
-#                    data=XX[,-1,drop=FALSE], m=0, B=0, ...)
                 ## intercept is not reported by rsf
                 ## and this can cause problems in X %*% theta
-#                cf <- c(0, mod$coefficients)
-#                ll <- as.numeric(mod$loglik)
-#                linv <- binomial(link)$linkinv
+                mod <- if (ncol(XX) < 2L) {
+                    ResourceSelection::rsf.null(Y, m=0, ...)
+                } else {
+                    ResourceSelection::rsf(Y ~ .,
+                        data=XX[,-1,drop=FALSE], m=0, B=0, ...)
+                }
+                cf <- mod$results$par
+                cf[1L] <- 0
+                ## --- glm implementation uses ML ---
                 ## can be used for null model as well
-                mod <- stats::glm(Y ~ .-1, data=XX,
-                    family=binomial("logit"), ...)
-                #cf <- c(0, coef(mod)[-1L])
-                cf <- coef(mod)
-                ll <- as.numeric(logLik(mod))
+#                mod <- stats::glm(Y ~ .-1, data=XX,
+#                    family=binomial("logit"), ...)
+#                cf <- coef(mod)
+#                ll <- as.numeric(logLik(mod))
                 ## link is still log !!!
             } else {
                 if (is.null(link))
@@ -153,12 +136,17 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 mod <- ResourceSelection::rspf(Y ~ ., data=XX[,-1,drop=FALSE],
                     link=link, m=0, B=0, ...)
                 cf <- mod$coefficients
-                ll <- as.numeric(mod$loglik)
+#                ll <- as.numeric(mod$loglik)
             }
+            ll <- as.numeric(mod$loglik)
             linv <- binomial(link)$linkinv
         }
         if (!linkinv)
             linv <- NULL
+        ## this should set logLik to a very low but numerically safe number
+        ## handles issue of perfect fit in examples
+        if (getOption("ocoptions")$robust_loglik && (is.na(ll) || is.infinite(ll)))
+            ll <- (-(.Machine$double.xmax^(1/3)))
         out <- list(coef=cf, logLik=ll, linkinv=linv)
     } else {
         if (full_model)
