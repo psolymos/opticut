@@ -1,6 +1,6 @@
 ipredict.opticut <-
 function(object, ynew, xnew=NULL,
-type=c("analytic", "mcmc"), cl=NULL, ...)
+type=c("analytic", "mcmc"), prior=NULL, cl=NULL, ...)
 {
     type <- match.arg(type)
     #ynew <- ynew[,colnames(object$Y),drop=FALSE]
@@ -37,6 +37,12 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             xnew <- data.matrix(xnew)
         }
     }
+    if (is.null(prior)) {
+        prior <- rep(1/K, K)
+        names(prior) <- LEV
+    } else {
+        prior <- prior[LEV]
+    }
     if (type == "mcmc") {
         requireNamespace("rjags")
         requireNamespace("dclone")
@@ -49,7 +55,7 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
         dat <- list(
             y=ynew,
             bp=bp,
-            pi=rep(1/K, K),
+            pi=prior,
             n=NROW(ynew),
             S=S,
             cf=cf,
@@ -119,9 +125,9 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
             pr <- predict(object,
                 gnew=factor(rep(i, nrow(ynew)), LEV), xnew=xnew)
             if (Dist == "poisson")
-                ll[,,i] <- dpois(ynew, pr, log=TRUE)
+                ll[,,i] <- dpois(ynew, pr, log=TRUE) * prior[i]
             if (Dist == "binomial")
-                ll[,,i] <- dbinom(ynew, 1, pr, log=TRUE)
+                ll[,,i] <- dbinom(ynew, 1, pr, log=TRUE) * prior[i]
             lls[,i] <- rowSums(ll[,,i,drop=FALSE])
         }
         gnew <- apply(lls, 1, which.max)
@@ -135,6 +141,7 @@ type=c("analytic", "mcmc"), cl=NULL, ...)
         gnew=factor(LEV[gnew], LEV),
         dist=object$dist,
         type=type,
+        prior=prior,
         results=results)
     class(out) <- c("ipredict.opticut", "ipredict")
     out
