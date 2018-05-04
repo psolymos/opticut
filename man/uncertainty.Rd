@@ -220,7 +220,6 @@ uc3$uncertainty
 bestpart(uc3$uncertainty[[1]])
 bsmooth(uc3$uncertainty[[1]])
 
-\dontrun{
 ## block bootstrap
 block_fun <- function()
     unlist(lapply(unique(x0), function(z) if (sum(x0==z) < 2)
@@ -247,6 +246,7 @@ bestpart(muc1)
 summary(muc2)
 bestpart(muc2)
 
+\dontrun{
 ## dolina example
 data(dolina)
 ## stratum as ordinal
@@ -304,23 +304,31 @@ bsm <- as.matrix(um$uncertainty[[1]][,-(1:2)])
 statm <- cbind(Mean=colMeans(bsm),
     t(apply(bsm, 2, quantile, probs=c(0.025, 0.975))))
 
-op <- par(mfrow=c(2,1))
+xrep <- rep(br, each=2)
+xrep <- xrep[-c(1,length(xrep))]
+statrep <- stat[rep(1:nrow(stat), each=2),]
+statmrep <- statm[rep(1:nrow(statm), each=2),]
+op <- par(mfrow=c(2,1), las=1)
 plot(p ~ x, type="l", ylim=c(0,1), main="Binary partitions (opticut)")
+polygon(c(xrep, rev(xrep)), c(statrep[,2], rev(statrep[,3])),
+    border=NA, col="lightblue")
 abline(v=br, col="grey", lty=3)
-lines(br[-1]-0.5*d, stat[,1], col=4)
-lines(br[-1]-0.5*d, stat[,2], col=4, lty=2)
-lines(br[-1]-0.5*d, stat[,3], col=4, lty=2)
-lines(br[-1]-0.5*d, bs[,1], col=2)
-legend("topright", bty="n", lty=c(1,1,2,1), col=c(1,4,4,2),
-    legend=c("True response","bsmooth","0.95 CI","Best partition"))
+lines(xrep, statrep[,1], col="blue", lwd=2)
+lines(x, p, lwd=2)
+lines(xrep, bs[rep(1:nrow(bs), each=2),1], col="red", lwd=2)
+legend("topright", bty="n", lty=c(1,1,1), col=c(1,2,4),
+    fill=c(NA,NA,"lightblue"), border=NA, lwd=2,
+    legend=c("True response","Best partition","bsmooth with 0.95 CI"))
 
 plot(p ~ x, type="l", ylim=c(0,1), main="Multi-level model (multicut)")
+polygon(c(xrep, rev(xrep)), c(statmrep[,2], rev(statmrep[,3])),
+    border=NA, col="lightblue")
 abline(v=br, col="grey", lty=3)
-lines(br[-1]-0.5*d, statm[,1], col=4)
-lines(br[-1]-0.5*d, statm[,2], col=4, lty=2)
-lines(br[-1]-0.5*d, statm[,3], col=4, lty=2)
-legend("topright", bty="n", lty=c(1,1,2), col=c(1,4,4),
-    legend=c("True response","bsmooth","0.95 CI"))
+lines(xrep, statmrep[,1], col="blue", lwd=2)
+lines(x, p, lwd=2)
+legend("topright", bty="n", lty=c(1,1), col=c(1,4),
+    fill=c(NA,"lightblue"), border=NA, lwd=2,
+    legend=c("True response","bsmooth with 0.95 CI"))
 par(op)
 }
 }

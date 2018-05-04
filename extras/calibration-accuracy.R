@@ -1,11 +1,229 @@
+#devtools::install_github("psolymos/opticut", ref="multiclass")
+library(opticut)
+library(dclone)
+library(rjags)
+source("~/repos/opticut/extras/ip/ipredict.R")
+source("~/repos/opticut/extras/ip/ipredict.multicut.R")
+source("~/repos/opticut/extras/ip/ipredict.opticut.R")
+
+
+gr <- as.factor(paste0("X", rep(1:5, each=5)))
+spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
+    Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
+    Species3=rep(c(18,2,0,0,0), each=5))
+rownames(spp) <- gr
+ynew=spp
+xnew=NULL
+object <- opticut(spp ~ 1, strata=gr, dist="gaussian")
+
+.opticut_dist=opticut:::.opticut_dist
+ip1 <- ipredict(object, ynew, xnew=NULL, method="analytic", cl=NULL)
+ip2 <- ipredict(object, ynew, xnew=NULL, method="mcmc", cl=NULL)
+
+ocoptions(fix_fitted=TRUE)
+object <- multicut(spp ~ 1, strata=gr, dist="gaussian")
+ip3 <- ipredict(object, ynew, xnew=NULL, method="analytic", cl=NULL)
+ip4 <- ipredict(object, ynew, xnew=NULL, method="mcmc", cl=NULL)
+
+getMLE(object, 1)
+
+
+
+Dist <- "binomial"
+set.seed(1)
+K <- 5
+m <- 20
+g <- rep(LETTERS[1:K], each=20)
+n <- length(g)
+cf <- matrix(rnorm(2*m), 2, m)
+bp <- array(NA, c(K, m), list(LETTERS[1:K], paste0("Sp", 1:m)))
+bpcf <- bp
+for (j in 1:m) {
+    bp[,j] <- rbinom(K, 1, rbeta(1,10,15))
+    bpcf[,j] <- cf[bp[,j]+1,j]
+}
+mu <- bpcf[match(g, rownames(bp)),]
+Y <- rbinom(length(mu), 1, plogis(drop(mu)))
+dim(Y) <- dim(mu)
+dimnames(Y) <- dimnames(mu)
+X <- data.frame(g=g)
+ynew <- Y
+o <- opticut(Y ~ 1, strata=X$g, dist=Dist)
+
+ip1 <- ipredict(o, ynew, xnew=NULL, method="analytic")
+ip2 <- ipredict(o, ynew, xnew=NULL, method="mcmc", n.iter=1000)
+
+o <- multicut(Y ~ 1, strata=X$g, dist=Dist)
+ip3 <- ipredict(o, ynew, xnew=NULL, method="analytic")
+ip4 <- ipredict(o, ynew, xnew=NULL, method="mcmc", n.iter=1000)
+
+## LOO
+
+## generic functions
+loso <- function (object, ...)
+    UseMethod("loso")
+loto <- function (object, ...)
+    UseMethod("loto")
+lotso <- function (object, ...)
+    UseMethod("lotso")
+
+## refit model with -i data and IP for i
+.loso1 <- function(i, object, ...)
+{
+    pbo <- pboptions(type="none")
+    on.exit(pboptions(pbo))
+    ivec <- seq_len(nobs(object))
+    sset <- which(ivec != i)
+    o <- update(object, sset=which(ivec != i))
+    Ynew <- object$Y[ivec == i,,drop=FALSE]
+    Xnew <- object$X[ivec == i,,drop=FALSE]
+    if (ncol(object$X) < 2L)
+        Xnew <- NULL
+    ip <- ipredict(o,
+        ynew=Ynew, xnew=Xnew,
+        method="analytic", cl=NULL, ...)
+}
+
+## internal function for leave-one-site-out
+## with true LOO or without
+.loso <-
+function(object, cl=NULL, ..., refit=FALSE)
+{
+    g0 <- strata(object)
+    if (refit) {
+        ## LOO used for IP
+        iplist <- pblapply(seq_len(nobs(object)),
+            .loso1, object=object, cl=cl, ...)
+        ip <- iplist[[1L]]
+        ip$ynew <- object$Y
+        ip$xnew <- object$X
+        ip$gnew <- sapply(iplist, "[[", "gnew")
+        ip$results$loglik_species <- array(0,
+            c(dim(object$Y), nlevels(strata(object))))
+        dimnames(ip$results$loglik_species) <- c(dimnames(object$Y),
+            list(levels(g0)))
+        ip$results$loglik <- array(0,
+            c(nrow(object$Y), nlevels(strata(object))))
+        dimnames(ip$results$loglik) <- list(rownames(object$Y),
+            levels(g0))
+        for (i in seq_len(length(iplist))) {
+            ip$results$loglik_species[i,,] <-
+                iplist[[i]]$results$loglik_species[1L,,]
+            ip$results$loglik[i,] <-
+                iplist[[i]]$results$loglik[1L,]
+        }
+    } else {
+        ## no LOO used for IP
+        ip <- ipredict(object, ynew=object$Y,
+            xnew=if (ncol(object$X) < 2L) NULL else object$X,
+            method="analytic", cl=NULL, ...)
+    }
+    ip$strata <- g0
+    ip$S <- ncol(object$Y)
+    ip$multiclass <- multiclass(g0, ip$gnew)
+    ip$kappa <- test_table(ip$multiclass$ctable)
+    ip$refit <- refit
+    ip
+}
+
+## methods
+loso.opticut <- function(object, cl=NULL, ...)
+    .loso(object, cl=cl, ..., refit=TRUE)
+loso.multicut <- function(object, cl=NULL, ...)
+    .loso(object, cl=cl, ..., refit=TRUE)
+
+## internal function to calculate metrics for -j
+## returns gnew integer vector
+.loto1 <- function(i, ip) {
+    ll <- ip$results$loglik_species[,-i,,drop=FALSE]
+    LEV <- dimnames(ll)[[3L]]
+    lls <- ip$results$loglik
+    for (i in LEV) {
+        lls[,i] <- rowSums(ll[,,i,drop=FALSE])
+    }
+    apply(lls, 1, which.max)
+}
+
+## internal function for calculating leave-one-taxon-out metrics
+.loto <- function(object, cl=NULL, ..., refit=FALSE)
+{
+    ip <- .loso(object, cl=cl, ..., refit=refit)
+    g0 <- ip$strata
+    LEV <- levels(g0)
+    gnew <- sapply(seq_len(ip$S), .loto1, ip=ip)
+    ct0 <- ip$multiclass$ctable
+    kappa <- apply(gnew, 2, function(z)
+        kappacoef(predicted=ctable(g0, factor(LEV[z], LEV)), reference=ct0))
+    ip$gnew_species <- gnew
+    ip$kappa_species <- kappa
+    ip
+}
+#plot(sort(kappa["k",]),type="b");abline(h=0)
+
+## methods
+loto.opticut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=FALSE)
+loto.multicut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=FALSE)
+
+## methods: leave-one-taxon-and-species-out
+
+lotso.opticut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=TRUE)
+lotso.multicut <- function(object, cl=NULL, ...)
+    .loto(object, cl=cl, ..., refit=TRUE)
+
+ip <- lotso(o)
+
+a0 <- ip$multiclass$single["Accuracy",]
+a <- apply(ip$gnew_species, 2, function(z)
+        multiclass(ip$strata,
+            factor(levels(ip$strata)[z],
+                levels(ip$strata)))$single["Accuracy",])
+k <- (a - a0)/(1 - a0)
+
+x <- ip$kappa_species["k",]
+names(x) <- colnames(ip$ynew)
+x <- sort(x)
+S <- length(x)
+Col <- rev(occolors()(201))
+j1 <- floor(90*x/max(abs(x)))+101
+j2 <- j2 + sign(x)*10
+plot(x, seq_len(S), axes=FALSE, ann=FALSE, type="n",
+    ylim=c(S+0.5, 0.5))
+for (i in seq_len(length(x)))
+    polygon(c(x[c(i,i)], 0, 0), i+c(-0.5, 0.5, 0.5, -0.5),
+        col=Col[j1[i]], border=Col[j2[i]])
+text(rep(0, S)[x<0], seq_len(S)[x<0], names(x)[x<0], pos=4)
+text(rep(0, S)[x>=0], seq_len(S)[x>=0], names(x)[x>=0], pos=2)
+axis(1)
+title(xlab="kappa")
+
+bp <- summary(o)$bestpart
+pbp <- ifelse(k<0,1,0)
+
+## lotso needs to replicate loso with subset(object)
+
+## OK - figure out cl, suppress pb, but optionally verbose
+## need to figure out multiclass metrics etc. and object structures
+## OK - should restrict to analytic method
+##      because species contribution is easy to calculate that way
+
+## LOSO: overall accuracy, need to leave a site out and refit
+## LOTO: evaluate taxon contribution to overall accuracy without refit
+## LOTSO: taxon contribution with refit (refit and store spp results
+##        to calculate stuff as in LOTO)
+
+
+
+## old stuff
+
 library(opticut)
 library(dclone)
 library(rjags)
 source("~/repos/opticut/extras/calibrate.R")
-#source("~/repos/opticut/R/ipredict.R")
-#source("~/repos/opticut/R/ipredict.default.R")
-#source("~/repos/opticut/R/ipredict.opticut.R")
 source("~/repos/opticut/extras/multiclass.R")
+
 
 #Inverse prediction might be a good metric of overall accuracy and scaling species contribution (i.e. the real indicator power).
 #Implement binary-multinomial-continuous comparison.

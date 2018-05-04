@@ -113,7 +113,7 @@ vector or community matrix for \code{multicut.default}.
 }
   \item{X}{
 numeric, design matrix for possible confounding/modifier variables.
-Can be missing, in which case an intercept-only model is assumed.
+Can be missing or \code{NULL}, in which case an intercept-only model is assumed.
 }
   \item{x, object}{
 object to plot, print, summarize.
@@ -303,9 +303,6 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
     Species3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
-## must add some noise to avoid perfect fit
-spp[6, "Species1"] <- 7
-spp[1, "Species3"] <- 17
 spp
 
 ## negative expected values are not good

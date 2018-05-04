@@ -16,7 +16,7 @@ comb=c("rank", "all"), sset=NULL, cl=NULL, ...)
         warning("Empty columns in Y were dropped")
         Y <- Y[,colSums(abs(Y)) > 0,drop=FALSE]
     }
-    if (missing(X)) {
+    if (missing(X) || is.null(X)) {
         X <- matrix(1, nrow(Y), 1L)
         rownames(X) <- rownames(Y)
         colnames(X) <- "(Intercept)"

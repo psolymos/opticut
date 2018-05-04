@@ -11,8 +11,7 @@
             check_comb=TRUE,
             try_error=FALSE,
             scale=0.5,
-            fix_fitted=FALSE,
-            robust_loglik=TRUE))
+            fix_fitted=FALSE))
     options("pboptions" = list(
         type = if (interactive()) "timer" else "none",
         char = "[=-]",

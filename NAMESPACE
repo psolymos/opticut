@@ -6,7 +6,9 @@ export("opticut", "optilevels", "opticut1", "multicut1", "multicut",
     "uncertainty", "bsmooth",
     "wplot", "lcplot",
     "fix_levels", "strata", "check_strata", "beta2i",
-    "iquantile")
+    "iquantile",
+    "multiclass", "ctable", "btable", "untable", "etable", "rtable",
+    "kappacoef", "test_table")
 
 S3method("opticut", "default")
 S3method("opticut", "formula")
@@ -76,6 +78,6 @@ importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
            "vcov", "density", "quantile", ".MFclass", "nobs",
            "as.dist", "hclust", "predict", "fitted", "formula",
-           "dbinom", "dpois", "sigma", "lm", "glm")
+           "dbinom", "dpois", "r2dtable", "rmultinom")
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")
