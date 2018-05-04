@@ -1,6 +1,6 @@
 ipredict.opticut <-
 function(object, ynew, xnew=NULL,
-method=c("analytic", "mcmc"), cl=NULL, ...)
+type=c("analytic", "mcmc"), prior=NULL, cl=NULL, ...)
 {
     if (is.function(object$dist))
         stop("inverse prediction not available for custom distribution")
@@ -45,7 +45,13 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
             xnew <- data.matrix(xnew)
         }
     }
-    if (method == "mcmc") {
+    if (is.null(prior)) {
+        prior <- rep(1/K, K)
+        names(prior) <- LEV
+    } else {
+        prior <- prior[LEV]
+    }
+    if (type == "mcmc") {
         requireNamespace("rjags")
         requireNamespace("dclone")
         ## avoid clashes when running parallel
@@ -57,7 +63,7 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
         dat <- list(
             y=ynew,
             bp=bp,
-            pi=rep(1/K, K),
+            pi=prior,
             n=NROW(ynew),
             S=S,
             cf=cf,
@@ -134,9 +140,9 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
                     ll[,j,i] <- dnorm(ynew[,j], pr[,j], sig[j], log=TRUE)
             }
             if (Dist == "poisson")
-                ll[,,i] <- dpois(ynew, pr, log=TRUE)
+                ll[,,i] <- dpois(ynew, pr, log=TRUE) * prior[i]
             if (Dist == "binomial")
-                ll[,,i] <- dbinom(ynew, 1, pr, log=TRUE)
+                ll[,,i] <- dbinom(ynew, 1, pr, log=TRUE) * prior[i]
             lls[,i] <- rowSums(ll[,,i,drop=FALSE])
         }
         gnew <- apply(lls, 1, which.max)
@@ -150,6 +156,7 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
         gnew=factor(LEV[gnew], LEV),
         dist=dist,
         method=method,
+        prior=prior,
         results=results)
     class(out) <- c("ipredict.opticut", "ipredict")
     out
