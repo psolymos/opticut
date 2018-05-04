@@ -37,14 +37,14 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
                 "gaussian"=gaussian(link),
                 "poisson"=poisson(link),
                 "binomial"=binomial(link))
-            if (Family == "gaussian" && link == "identity") {
-                mod <- stats::lm(Y ~ .-1, data=XX, ...)
-                cf <- coef(mod)
-                attr(cf, "sigma") <- summary(mod)$sigma
+            mod <- if (dist == "gaussian" && link == "identity") {
+                stats::lm(Y ~ .-1, data=XX, ...)
             } else {
-                mod <- stats::glm(Y ~ .-1, data=XX, family=Family, ...)
-                cf <- coef(mod)
+                stats::glm(Y ~ .-1, data=XX, family=Family, ...)
             }
+            cf <- coef(mod)
+            if (dist == "gaussian")
+                attr(cf, "sigma") <- sigma(mod) # summary(mod)$sigma
             ll <- as.numeric(logLik(mod))
             linv <- family(mod)$linkinv
         }
@@ -143,6 +143,10 @@ dist="gaussian", linkinv, full_model=FALSE, ...)
         }
         if (!linkinv)
             linv <- NULL
+        ## this should set logLik to a very low but numerically safe number
+        ## handles issue of perfect fit in examples
+        if (getOption("ocoptions")$robust_loglik && (is.na(ll) || is.infinite(ll)))
+            ll <- (-(.Machine$double.xmax^(1/3)))
         out <- list(coef=cf, logLik=ll, linkinv=linv)
     } else {
         if (full_model)

@@ -49,7 +49,7 @@ red (R), green (G), and blue (B) color channels as follows:
 \value{
 \code{occolors} returns a function, see \code{\link{colorRampPalette}}.
 
-\code{col2gray} returns a vector of grey colors based on
+\code{col2gray} returns a vector of gray colors based on
 the conversion \code{method} and \code{\link{gray}}.
 }
 \author{

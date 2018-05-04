@@ -78,6 +78,6 @@ importFrom("stats", "binomial", "coef", "family", "gaussian", "logLik",
            "model.matrix", "model.response", "poisson", "terms",
            "vcov", "density", "quantile", ".MFclass", "nobs",
            "as.dist", "hclust", "predict", "fitted", "formula",
-           "dbinom", "dpois", "r2dtable", "rmultinom")
+           "dbinom", "dpois", "sigma", "lm", "glm”, "r2dtable", "rmultinom")
 importFrom("utils", "combn")
 importFrom("pbapply", "pboptions", "pbapply")
