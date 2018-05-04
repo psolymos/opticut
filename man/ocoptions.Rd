@@ -45,16 +45,9 @@ Tags are the following:
   the default is 0.5.}
 \item{fix_fitted}{\code{\link{bestpart.multicut}}
   uses \code{\link{lorenz}} which requires nonnegative fitted values,
-  however models with identity link can lead to negative expected values.
+  however models with identity link can lead to negative espected values.
   When \code{TRUE} the fitted values (x) are adjusted as x' = x + abs(min(x))
   to ensure nonnegativity. The default is \code{FALSE}.}
-\item{robust_loglik}{if ill-defined models resulting in perfect fit
-  (infinite log likelihood, or \code{NA}, \code{NaN})
-  should be allowed. The default \code{TRUE} makes such ill-defined
-  log likelihoods a very small real number
-  \code{-(.Machine$double.xmax^(1/3))}.
-  \code{FALSE} is equivalent to allowing every model to
-  safeguard against such cases or not.}
 }
 \author{
 Peter Solymos <solymos@ualberta.ca>
@@ -69,10 +62,6 @@ spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
     Species3=rep(c(18,2,0,0,0), each=5))
 rownames(spp) <- gr
-## must add some noise to avoid perfect fit
-spp[6, "Species1"] <- 7
-spp[1, "Species3"] <- 17
-spp
 
 ## current settings
 print(unlist(ocoptions())) # these give identical answers

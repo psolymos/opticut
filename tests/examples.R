@@ -1,5 +1,4 @@
 #devtools::install_github("psolymos/opticut")
-#spelling::spell_check_package("~/repos/opticut")
 library(opticut)
 
 ## --- run examples with \dontrun sections ---

@@ -220,7 +220,6 @@ uc3$uncertainty
 bestpart(uc3$uncertainty[[1]])
 bsmooth(uc3$uncertainty[[1]])
 
-\dontrun{
 ## block bootstrap
 block_fun <- function()
     unlist(lapply(unique(x0), function(z) if (sum(x0==z) < 2)
@@ -247,6 +246,7 @@ bestpart(muc1)
 summary(muc2)
 bestpart(muc2)
 
+\dontrun{
 ## dolina example
 data(dolina)
 ## stratum as ordinal

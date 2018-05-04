@@ -1,15 +1,6 @@
 # User-visible changes in the opticut package
 
-## Version 0.1-3 -- Mar 27, 2018
-
-* `warblers` data set added based on MacArthur 1958.
-
-## Version 0.1-2 -- Feb 1, 2018
-
-* the option `robust_loglik` safequards against ill-defined (i.e. infinite)
-  log likelihoods that can be a result of e.g. perfect fit.
-
-## Version 0.1-1 -- Jan 30, 2018
+## Version 0.1-1 -- Mar 1, 2017
 
 * `multicut` added for multi-level response model.
 * `fitted` and `predict` methods added.

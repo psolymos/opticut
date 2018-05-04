@@ -5,7 +5,6 @@
 [![Linux build status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/g6k5txb3v3i4wres?svg=true)](https://ci.appveyor.com/project/psolymos/opticut)
 [![Code coverage status](https://codecov.io/gh/psolymos/opticut/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/opticut)
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
 Likelihood based optimal partitioning for indicator species analysis and more.
 Finding the best binary partition for each species based on
@@ -34,6 +33,10 @@ User visible changes in the package are listed in the [NEWS](https://github.com/
 
 Use the [issue tracker](https://github.com/psolymos/opticut/issues)
 to report a problem.
+
+## License
+
+[GPL-2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
 ## Typical workflow
 
