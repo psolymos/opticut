@@ -103,5 +103,18 @@ test_table(ct, FUN=kappacoef, n=0, type="cohen", method="rc")
 ## compare ct against random distribution
 tt <- test_table(ct, FUN=kappacoef, n=99, type="cohen", method="rc")
 summary(t(tt))
+
+#set.seed(1)
+#lab <- rbinom(20, 1, seq(0, 1, len=20))
+lab <- c(0L, 0L, 0L, 1L, 0L, 0L, 1L, 0L, 0L, 0L, 1L, 1L, 1L, 1L, 0L,
+    1L, 0L, 1L, 1L, 1L)
+scr <- seq(0, 1, len=20)
+scr2 <- rep(0, 20)
+ROC <- roc(lab, scr)
+head(ROC)
+auc(ROC)
+plot(ROC)
+lines(roc(lab, rep(0, 20)), col=2)
+
 }
 \keyword{ utilities }
