@@ -1,6 +1,6 @@
 ipredict.opticut <-
 function(object, ynew, xnew=NULL,
-type=c("analytic", "mcmc"), prior=NULL, cl=NULL, ...)
+method=c("analytic", "mcmc"), prior=NULL, cl=NULL, ...)
 {
     if (is.function(object$dist))
         stop("inverse prediction not available for custom distribution")
@@ -51,6 +51,7 @@ type=c("analytic", "mcmc"), prior=NULL, cl=NULL, ...)
     } else {
         prior <- prior[LEV]
     }
+    prior <- prior / sum(prior)
     if (type == "mcmc") {
         requireNamespace("rjags")
         requireNamespace("dclone")

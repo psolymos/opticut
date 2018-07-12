@@ -1,6 +1,6 @@
 ipredict.multicut <-
 function(object, ynew, xnew=NULL,
-method=c("analytic", "mcmc"), cl=NULL, ...)
+method=c("analytic", "mcmc"), prior=NULL, cl=NULL, ...)
 {
     if (is.function(object$dist))
         stop("inverse prediction not available for custom distribution")
@@ -45,6 +45,13 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
             xnew <- data.matrix(xnew)
         }
     }
+    if (is.null(prior)) {
+        prior <- rep(1/K, K)
+        names(prior) <- LEV
+    } else {
+        prior <- prior[LEV]
+    }
+    prior <- prior / sum(prior)
     if (method == "mcmc") {
         requireNamespace("rjags")
         requireNamespace("dclone")
@@ -56,7 +63,7 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
             dim = c(nrow(cf), nrow(cf), S))
         dat <- list(
             y=ynew,
-            pi=rep(1/K, K),
+            pi=prior,
             n=NROW(ynew),
             K=K,
             S=S,
@@ -136,9 +143,9 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
                     ll[,j,i] <- dnorm(ynew[,j], pr[,j], sig[j], log=TRUE)
             }
             if (Dist == "poisson")
-                ll[,,i] <- dpois(ynew, pr, log=TRUE)
+                ll[,,i] <- dpois(ynew, pr, log=TRUE) * prior[i]
             if (Dist == "binomial")
-                ll[,,i] <- dbinom(ynew, 1, pr, log=TRUE)
+                ll[,,i] <- dbinom(ynew, 1, pr, log=TRUE) * prior[i]
             lls[,i] <- rowSums(ll[,,i,drop=FALSE])
         }
         gnew <- apply(lls, 1, which.max)
@@ -151,6 +158,7 @@ method=c("analytic", "mcmc"), cl=NULL, ...)
         xnew=xnew,
         gnew=factor(LEV[gnew], LEV),
         dist=dist,
+        prior=prior,
         method=method,
         results=results)
     class(out) <- c("ipredict.multicut", "ipredict")
