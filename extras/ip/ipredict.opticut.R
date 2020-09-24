@@ -52,7 +52,7 @@ method=c("analytic", "mcmc"), prior=NULL, cl=NULL, ...)
         prior <- prior[LEV]
     }
     prior <- prior / sum(prior)
-    if (type == "mcmc") {
+    if (method == "mcmc") {
         requireNamespace("rjags")
         requireNamespace("dclone")
         ## avoid clashes when running parallel
