@@ -3,7 +3,7 @@ Type: Package
 Title: Likelihood Based Optimal Partitioning and Indicator Species Analysis
 Version: 0.1-3
 Date: 2024-05-21
-Author: Peter Solymos [cre, aut], Ermias T. Azeria [ctb]
+Author: Peter Solymos [cre, aut] (<https://orcid.org/0000-0001-7337-1740>), Ermias T. Azeria [ctb]
 Maintainer: Peter Solymos <psolymos@gmail.com>
 Description: Likelihood based optimal partitioning and indicator
   species analysis. Finding the best binary partition for each species
