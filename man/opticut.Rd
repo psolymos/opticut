@@ -405,7 +405,7 @@ Methods in Ecology and Evolution 7:196--205.
 <doi:10.1111/2041-210X.12432>
 }
 \author{
-Peter Solymos <solymos@ualberta.ca> and Ermias T. Azeria
+Peter Solymos <psolymos@gmail.com> and Ermias T. Azeria
 }
 \seealso{
 \code{\link{allComb}}, and \code{\link{rankComb}}
@@ -428,7 +428,7 @@ and how errors encountered during model fitting are handled.
 ## simple example from Legendre 2013
 ## Indicator Species: Computation, in
 ## Encyclopedia of Biodiversity, Volume 4
-## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
+## https://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
 gr <- as.factor(paste0("X", rep(1:5, each=5)))
 spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),

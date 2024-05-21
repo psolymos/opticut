@@ -9,3 +9,4 @@ extras
 ^\.Rproj\.user$
 ^docs$
 ^_pkgdown\.yml$
+^RELEASE\.R$

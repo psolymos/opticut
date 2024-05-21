@@ -1,10 +1,7 @@
 # opticut: Likelihood Based Optimal Partitioning and Indicator Species Analysis
 
-[![CRAN version](http://www.r-pkg.org/badges/version/opticut)](https://CRAN.R-project.org/package=opticut)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/grand-total/opticut)](http://www.rdocumentation.org/packages/opticut)
-[![Linux build status](https://travis-ci.org/psolymos/opticut.svg?branch=master)](https://travis-ci.org/psolymos/opticut)
-[![Windows build status](https://ci.appveyor.com/api/projects/status/g6k5txb3v3i4wres?svg=true)](https://ci.appveyor.com/project/psolymos/opticut)
-[![Code coverage status](https://codecov.io/gh/psolymos/opticut/branch/master/graph/badge.svg)](https://codecov.io/gh/psolymos/opticut)
+[![CRAN version](https://www.r-pkg.org/badges/version/opticut)](https://CRAN.R-project.org/package=opticut)
+[![CRAN mirror downloads](https://cranlogs.r-pkg.org/badges/grand-total/opticut)](https://CRAN.R-project.org/package=opticut)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
 Likelihood based optimal partitioning for indicator species analysis and more.
@@ -81,7 +78,7 @@ summary(uc)
 
 ## Dynamic documents with opticut
 
-Here is a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
+Here is a minimal [Rmarkdown](https://rmarkdown.rstudio.com/) example: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
 
 ## References
 
@@ -89,4 +86,4 @@ Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung,
 E. & Solymos, P. (2014): Microhabitat associations of land snails in
 forested dolinas: implications for coarse filter conservation.
 _Community Ecology_ **15**:180--186.
-[[link](http://dx.doi.org/10.1556/ComEc.15.2014.2.6), [PDF](https://drive.google.com/file/d/0B-q59n6LIwYPWnBjLUxvcXJVUXc/view?usp=sharing)]
+[[link](https://dx.doi.org/10.1556/ComEc.15.2014.2.6), [PDF](https://drive.google.com/file/d/0B-q59n6LIwYPWnBjLUxvcXJVUXc/view?usp=sharing)]

@@ -170,7 +170,7 @@ via \code{\link{set.seed}} or dropping unsuitable iterations
 can also resolve the issue.
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <psolymos@gmail.com>
 }
 \seealso{
 \code{\link{opticut}} and \code{\link{multicut}} for the

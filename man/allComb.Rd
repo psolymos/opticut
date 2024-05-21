@@ -41,7 +41,7 @@ and returns a model matrix with binary partitions.
 (misfits are returned as attributes). Returns a logical value.
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <psolymos@gmail.com>
 }
 \seealso{
 \code{\link{opticut}} for the user interface.

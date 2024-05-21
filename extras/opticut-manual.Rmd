@@ -878,7 +878,7 @@ Tags are the following:
 ## simple example from Legendre 2013
 ## Indicator Species: Computation, in
 ## Encyclopedia of Biodiversity, Volume 4
-## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
+## https://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
 gr <- as.factor(paste0("X", rep(1:5, each=5)))
 spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),
@@ -910,7 +910,7 @@ in `colorRampPalette`.
 
 The `theme` argument can be a character value, character vector, or a function used to interpolate the colors. The built-in values are `"br"` (blue-red divergent palette, colorblind safe),
 `"gr"` (green-red divergent palette), `"bw"` (black and white).
-Hexadecimal values for the built-in palettes are taken from [http://colorbrewer2.org](http://colorbrewer2.org/).
+Hexadecimal values for the built-in palettes are taken from [https://colorbrewer2.org](https://colorbrewer2.org/).
 
 ```{r}
 plot(1:100, rep(2, 100), pch = 15,
@@ -957,7 +957,7 @@ to turn the summary into a data frame, which is what for example the
 output is much facilitated, and the user does not have to dig into the
 structure of the summary object.
 
-The GitHub repository has a minimal [Rmarkdown](http://rmarkdown.rstudio.com/) example do demonstrate how to format **opticut** objects for best effects: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
+The GitHub repository has a minimal [Rmarkdown](https://rmarkdown.rstudio.com/) example do demonstrate how to format **opticut** objects for best effects: [Rmd](https://raw.githubusercontent.com/psolymos/opticut/master/extras/opticut-knitr-example.Rmd) source, knitted [PDF](https://github.com/psolymos/opticut/raw/master/extras/opticut-knitr-example.pdf).
 
 ```{r}
 library(knitr)
@@ -1007,7 +1007,7 @@ Birks, H. H. & Mathews, R. W. (1978). Studies in the vegetational history of Sco
 
 Chytry, M., Tichy, L., Holt, J. & Botta-Dukat, Z. (2002). Determination of diagnostic species with statistical fidelity measures. *Journal of Vegetation Science* 13: 79--90.
 
-Cribari-Neto, F. & Zeileis, A. (2010). Beta Regression in R. *Journal of Statistical Software* 34(2): 1--24. http://www.jstatsoft.org/v34/i02/.
+Cribari-Neto, F. & Zeileis, A. (2010). Beta Regression in R. *Journal of Statistical Software* 34(2): 1--24. https://www.jstatsoft.org/v34/i02/.
 
 De Caceres, M. & Legendre, P. (2009). Associations between species and groups of sites: Indices and statistical inference. *Ecology* 90: 3566--3574.
 
@@ -1015,7 +1015,7 @@ Dufrene, M. & Legendre, P. (1997) Species assemblages and indicator species: The
 
 Halme, P., Monkkonen, M., Kotiaho, J. S, Ylisirnio, A-L. (2009). Quantifying the indicator power of an indicator species. *Conservation Biology* 23: 1008--1016.
 
-Juggins, S. (2015). rioja: Analysis of Quaternary Science Data, R package version 0.9-9. http://cran.r-project.org/package=rioja
+Juggins, S. (2015). rioja: Analysis of Quaternary Science Data, R package version 0.9-9. https://cran.r-project.org/package=rioja
 
 Kemencei, Z., Farkas, R., Pall-Gergely, B., Vilisics, F., Nagy, A., Hornung, E. & Solymos, P. (2014). Microhabitat associations of land snails in forested dolinas: implications for coarse filter conservation. *Community Ecology* 15: 180--186.
 
@@ -1055,6 +1055,6 @@ Wildi, O. & Feldmeyer-Christe, E. (2013). Indicator values (IndVal) mimic rankin
 
 Wood, S. N. (2006). *Generalized Additive Models: An Introduction with R*. Chapman and Hall/CRC.
 
-Zeileis, A., Kleiber, C. & Jackman, S. (2008). Regression Models for Count Data in R. *Journal of Statistical Software*, 27(8), 1-25. http://www.jstatsoft.org/v27/i08/
+Zeileis, A., Kleiber, C. & Jackman, S. (2008). Regression Models for Count Data in R. *Journal of Statistical Software*, 27(8), 1-25. https://www.jstatsoft.org/v27/i08/
 
 Zettler, M. L., Proffitt, C. E., Darr, A., Degraer, S., Devriese, L., Greathead, C., Kotta, J., Magni, P., Martin, G., Reiss, H., Speybroeck, J., Tagliapietra, D., Van Hoey, G. & Ysebaert, T. (2013). On the Myths of Indicator Species: Issues and Further Consideration in the Use of Static Concepts for Ecological Applications. *PLoS ONE*, 8(10):e78219.

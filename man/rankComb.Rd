@@ -49,7 +49,7 @@ to find out the ranking, and returns a binary classification matrix
 as returned by \code{oComb} corresponding to the ranking.
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <psolymos@gmail.com>
 }
 \seealso{
 \code{\link{allComb}} for alternative partitioning algorithm.

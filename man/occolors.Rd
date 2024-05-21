@@ -53,10 +53,10 @@ red (R), green (G), and blue (B) color channels as follows:
 the conversion \code{method} and \code{\link{gray}}.
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <psolymos@gmail.com>
 
 Hexadecimal values for the built-in palettes are taken from
-\url{http://colorbrewer2.org/}.
+\url{https://colorbrewer2.org/}.
 
 Converting color to grayscale:
 \url{https://en.wikipedia.org/wiki/Grayscale}

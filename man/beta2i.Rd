@@ -21,7 +21,7 @@ numeric, scaling constant.
 Returns a numeric vector (I = abs(tanh(x * scale))).
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <psolymos@gmail.com>
 }
 \seealso{
 \code{\link{opticut}} and \code{\link{multicut}}

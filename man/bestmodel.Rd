@@ -36,7 +36,7 @@ model. The list has the following elements:
 \code{dist} is the distribution inherited from input \code{object}.
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <psolymos@gmail.com>
 }
 \seealso{
 \code{\link{opticut}}, \code{\link{multicut}}, \code{\link{uncertainty}}.

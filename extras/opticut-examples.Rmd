@@ -373,9 +373,9 @@ library (vegan)
 data (BCI)
 library (BiodiversityR)  # available from R version 2.15.1, not older!
 data (BCI.env)
-BCI.soil <- read.delim ('http://www.davidzeleny.net/anadat-r/lib/exe/fetch.php?media=data:bci.soil.txt')
+BCI.soil <- read.delim ('https://www.davidzeleny.net/anadat-r/lib/exe/fetch.php?media=data:bci.soil.txt')
 ###
-BCI.hab <- read.table("http://www.kharms.biology.lsu.edu/TORUS_Habitats.txt",
+BCI.hab <- read.table("https://www.kharms.biology.lsu.edu/TORUS_Habitats.txt",
     sep="\t", header=TRUE)
 ```
 
@@ -435,7 +435,7 @@ system.time(opticut(as.matrix(mite) ~ 1, strata=mite.env$hab, dist="poisson", cl
 
 ### Dune data, cover type data as ordinal
 
-See http://www.davidzeleny.net/anadat-r/doku.php/en:data:dune
+See https://www.davidzeleny.net/anadat-r/doku.php/en:data:dune
 
 ```{r}
 library(vegan)

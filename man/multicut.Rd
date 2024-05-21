@@ -274,7 +274,7 @@ and \code{xnew} are \code{NULL}, or corresponding point predictions
 The coercion methods \code{\link{as.data.frame}} return a data frame.
 }
 \author{
-Peter Solymos <solymos@ualberta.ca>
+Peter Solymos <psolymos@gmail.com>
 }
 \seealso{
 \code{\link{lorenz}} Examples for how multi-level partitions are binarized
@@ -297,7 +297,7 @@ and how errors encountered during model fitting are handled.
 ## simple example from Legendre 2013
 ## Indicator Species: Computation, in
 ## Encyclopedia of Biodiversity, Volume 4
-## http://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
+## https://dx.doi.org/10.1016/B978-0-12-384719-5.00430-5
 gr <- as.factor(paste0("X", rep(1:5, each=5)))
 spp <- cbind(Species1=rep(c(4,6,5,3,2), each=5),
     Species2=c(rep(c(8,4,6), each=5), 4,4,2, rep(0,7)),

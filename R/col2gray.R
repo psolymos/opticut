@@ -1,4 +1,4 @@
-## http://www.tannerhelland.com/3643/grayscale-image-algorithm-vb6/
+## https://www.tannerhelland.com/3643/grayscale-image-algorithm-vb6/
 col2gray <-
 function(col, method="BT.709")
 {
