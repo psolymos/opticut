@@ -1,5 +1,9 @@
 # User-visible changes in the opticut package
 
+## Version 0.1-4 -- May 21, 2024
+
+* Maintainer email change.
+
 ## Version 0.1-3 -- Mar 27, 2018
 
 * `warblers` data set added based on MacArthur 1958.
