@@ -1,6 +1,7 @@
 # Version 0.1-4 -- May 21, 2024
 
 * Maintainer email change.
+* Add `Authors@R` field in `DESCRIPTION`.
 
 # Version 0.1-3 -- Mar 27, 2018
 
